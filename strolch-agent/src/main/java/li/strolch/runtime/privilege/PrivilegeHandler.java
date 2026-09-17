@@ -63,6 +63,18 @@ public interface PrivilegeHandler {
 	Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive);
 
 	/**
+	 * Authenticates a user using a Personal Access Token (PAT)
+	 *
+	 * @param token  the raw personal access token in the format {@code tokenId:tokenValue}
+	 * @param source the source of the request
+	 *
+	 * @return the {@link Certificate} for the authenticated user
+	 *
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticatePersonalAccessToken(String, String)
+	 */
+	Certificate authenticatePersonalAccessToken(String token, String source);
+
+	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
 	 * @param data the data to perform the SSO

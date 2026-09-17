@@ -73,6 +73,16 @@ public interface StrolchSessionHandler {
 	Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive);
 
 	/**
+	 * Authenticates a user using a Personal Access Token (PAT)
+	 *
+	 * @param token  the raw personal access token in the format {@code tokenId:tokenValue}
+	 * @param source the source of the request
+	 *
+	 * @return the {@link Certificate} for the logged in user
+	 */
+	Certificate authenticatePersonalAccessToken(String token, String source);
+
+	/**
 	 * Performs a single-sign-on with the given data, if SSO is enabled
 	 *
 	 * @param data the data to pass to the SSO handler

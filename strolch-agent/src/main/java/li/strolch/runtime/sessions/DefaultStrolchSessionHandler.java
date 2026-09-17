@@ -165,6 +165,17 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public Certificate authenticatePersonalAccessToken(String token, String source) {
+		DBC.PRE.assertNotEmpty("token must be set!", token);
+		DBC.PRE.assertNotEmpty("source must be set!", source);
+
+		Certificate certificate = this.privilegeHandler.authenticatePersonalAccessToken(token, source);
+
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		return certificate;
+	}
+
+	@Override
 	public Certificate authenticateSingleSignOn(Object data) {
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
 

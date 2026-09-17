@@ -152,6 +152,14 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
+	public Certificate authenticatePersonalAccessToken(String token, String source) {
+		assertContainerStarted();
+		Certificate certificate = this.privilegeHandler.authenticatePersonalAccessToken(token, source);
+		writeAudit(certificate, LOGIN, AccessType.CREATE, certificate.getUsername());
+		return certificate;
+	}
+
+	@Override
 	public Certificate authenticateSingleSignOn(Object data) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, false);
