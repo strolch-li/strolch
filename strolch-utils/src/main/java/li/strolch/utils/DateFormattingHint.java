@@ -23,6 +23,7 @@ public enum DateFormattingHint {
 	None,
 	Date,
 	DateTime,
+	DateTimeDashIfEmpty,
 	DateTimeSeconds,
 	Time,
 	TimeSeconds;

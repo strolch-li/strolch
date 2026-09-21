@@ -40,28 +40,40 @@ public class LocaleAwareDateTimeFormatting {
 		return switch (hint) {
 			case None -> ISO_LOCAL_DATE_TIME;
 			case Date -> ISO_LOCAL_DATE;
-			case DateTime -> new DateTimeFormatterBuilder()
-					.parseCaseInsensitive()
-					.append(ISO_LOCAL_DATE)
-					.appendLiteral(' ')
-					.append(new DateTimeFormatterBuilder()
-							.appendValue(HOUR_OF_DAY, 2)
-							.appendLiteral(':')
-							.appendValue(MINUTE_OF_HOUR, 2)
-							.toFormatter(locale))
-					.toFormatter(locale);
-			case DateTimeSeconds -> new DateTimeFormatterBuilder()
-					.parseCaseInsensitive()
-					.append(ISO_LOCAL_DATE)
-					.appendLiteral(' ')
-					.append(ISO_LOCAL_TIME)
-					.toFormatter(locale);
-			case Time -> new DateTimeFormatterBuilder()
-					.appendValue(HOUR_OF_DAY, 2)
-					.appendLiteral(':')
-					.appendValue(MINUTE_OF_HOUR, 2)
-					.toFormatter(locale);
+			case DateTime, DateTimeDashIfEmpty -> getDateTimeFormatter(locale);
+			case DateTimeSeconds -> getDateTimeSecondsFormatter(locale);
+			case Time -> getTimeFormatter(locale);
 			case TimeSeconds -> ISO_LOCAL_TIME;
 		};
+	}
+
+	private static DateTimeFormatter getDateTimeFormatter(Locale locale) {
+		return new DateTimeFormatterBuilder()
+				.parseCaseInsensitive()
+				.append(ISO_LOCAL_DATE)
+				.appendLiteral(' ')
+				.append(new DateTimeFormatterBuilder()
+						.appendValue(HOUR_OF_DAY, 2)
+						.appendLiteral(':')
+						.appendValue(MINUTE_OF_HOUR, 2)
+						.toFormatter(locale))
+				.toFormatter(locale);
+	}
+
+	private static DateTimeFormatter getTimeFormatter(Locale locale) {
+		return new DateTimeFormatterBuilder()
+				.appendValue(HOUR_OF_DAY, 2)
+				.appendLiteral(':')
+				.appendValue(MINUTE_OF_HOUR, 2)
+				.toFormatter(locale);
+	}
+
+	private static DateTimeFormatter getDateTimeSecondsFormatter(Locale locale) {
+		return new DateTimeFormatterBuilder()
+				.parseCaseInsensitive()
+				.append(ISO_LOCAL_DATE)
+				.appendLiteral(' ')
+				.append(ISO_LOCAL_TIME)
+				.toFormatter(locale);
 	}
 }

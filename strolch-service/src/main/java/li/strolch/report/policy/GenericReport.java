@@ -16,6 +16,7 @@
 
 package li.strolch.report.policy;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.model.*;
 import li.strolch.model.parameter.*;
@@ -48,8 +49,7 @@ import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.ObjectHelper.compare;
 import static li.strolch.utils.ObjectHelper.contains;
-import static li.strolch.utils.helper.StringHelper.EMPTY;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.*;
 
 /**
  * A Generic Report defines a report as is described at <a href="https://strolch.li/documentation-reports.html">Strolch
@@ -520,28 +520,47 @@ public class GenericReport extends ReportPolicy {
 			case ZonedDateTime dateTime -> formatDateTime(columnId, dateTime);
 			case Date date -> formatDateTime(columnId, ofInstant(date.toInstant(), systemDefault()));
 			case Parameter<?> parameter -> formatColumn(columnDefP.getId(), parameter);
-			default -> value.toString();
+			default -> translateValue(columnDefP.getId(), value.toString());
 		};
 	}
 
 	protected String formatColumn(String columnId, Parameter<?> param) {
 		if (param instanceof BooleanParameter b) {
-			String value = b.getValueAsString();
-			if (this.i18nData != null && this.i18nData.has(value))
-				return this.i18nData.get(value).getAsString();
-			return value;
+			return translateValue(columnId, b.getValueAsString());
 		} else if (param instanceof DateParameter d) {
 			return formatDateTime(columnId, d.getValueZdt());
 		} else {
-			return param.getValueAsString();
+			return translateValue(columnId, param.getValueAsString());
 		}
+	}
+
+	protected String translateValue(String columnId, String value) {
+		return translateValue(value);
+	}
+
+	protected String translateValue(String value) {
+		if (this.i18nData == null)
+			return value;
+
+		value = trimOrEmpty(value);
+		if (isEmpty(value))
+			return value;
+
+		JsonElement i18nValue = this.i18nData.get(value);
+		if (i18nValue == null)
+			return value;
+
+		return i18nValue.getAsString();
 	}
 
 	protected String formatDateTime(String columnId, ZonedDateTime dt) {
 		String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
 		if (isEmpty(hint))
 			return DateFormattingHint.None.format(tx().getLocale(), dt);
-		return DateFormattingHint.valueOf(hint).format(tx().getLocale(), dt);
+		DateFormattingHint formattingHint = DateFormattingHint.valueOf(hint);
+		if (formattingHint.equals(DateFormattingHint.DateTimeDashIfEmpty) && dt.getYear() == 1970)
+			return "-";
+		return formattingHint.format(tx().getLocale(), dt);
 	}
 
 	@Override
