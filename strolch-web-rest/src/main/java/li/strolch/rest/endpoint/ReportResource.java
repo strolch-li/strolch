@@ -17,7 +17,6 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,49 +29,38 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
-import li.strolch.model.Resource;
-import li.strolch.model.Tags;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
-import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.report.Report;
-import li.strolch.report.ReportElement;
 import li.strolch.report.ReportSearch;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
-import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
-import li.strolch.utils.iso8601.ISO8601;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.Comparator.comparing;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.report.ReportConstants.*;
+import static li.strolch.report.Report.*;
+import static li.strolch.report.ReportConstants.BAG_ADDITIONAL_TYPE;
+import static li.strolch.report.ReportConstants.BAG_COLUMNS;
+import static li.strolch.report.ReportConstants.BAG_JOINS;
+import static li.strolch.report.ReportConstants.BAG_ORDERING;
+import static li.strolch.report.ReportConstants.LOCALES_JSON;
+import static li.strolch.report.ReportConstants.PARAM_DURATION;
+import static li.strolch.report.ReportConstants.PARAM_PARALLEL;
+import static li.strolch.report.ReportConstants.TYPE_FILTER;
 import static li.strolch.rest.RestfulStrolchComponent.getInstance;
 import static li.strolch.rest.StrolchRestfulConstants.*;
-import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.StringHelper.*;
-import static li.strolch.utils.iso8601.ISO8601.MAX_LOCAL_TIME;
 
 @Path("strolch/reports")
 @Tag(name = "Report API", description = "API for managing reports")
@@ -87,7 +75,7 @@ public class ReportResource {
 
 	@Operation(summary = "Get all report IDs", description = "Retrieves a list of all report IDs.", responses = {
 			@ApiResponse(responseCode = "200", description = "Successful retrieval",
-					content = @Content(mediaType = "application/json")),
+					content = @Content(mediaType = MediaType.APPLICATION_JSON)),
 			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -122,7 +110,7 @@ public class ReportResource {
 
 	@Operation(summary = "Get report facets", description = "Retrieves facets of a specific report.", responses = {
 			@ApiResponse(responseCode = "200", description = "Successful retrieval",
-					content = @Content(mediaType = "application/json")),
+					content = @Content(mediaType = MediaType.APPLICATION_JSON)),
 			@ApiResponse(responseCode = "404", description = "Report not found"),
 			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
@@ -142,27 +130,11 @@ public class ReportResource {
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 		     Report report = new Report(tx, id)) {
-			assertHasReportPrivilege(id, tx);
+			report.assertHasPrivilege(tx);
 			if (localeJ != null)
-				report.getReportPolicy().setI18nData(localeJ);
+				report.i18nData(localeJ);
 
-			JsonArray facetsJ = new JsonArray();
-
-			MapOfSets<String, JsonObject> criteria = report.generateFilterCriteria(limit);
-
-			criteria.keySet().stream().sorted(comparing(type -> {
-				JsonElement translatedJ = localeJ == null ? null : localeJ.get(type);
-				return translatedJ == null ? type : translatedJ.getAsString();
-			})).forEach(type -> {
-				Set<JsonObject> elements = criteria.getSet(type);
-				JsonObject filter = new JsonObject();
-				filter.addProperty(Tags.Json.TYPE, type);
-				filter.add(Tags.Json.VALUES, elements
-						.stream()
-						.sorted(comparing(e -> e.get(Tags.Json.NAME).getAsString()))
-						.collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
-				facetsJ.add(filter);
-			});
+			JsonArray facetsJ = report.generateFacetsAsJson(limit, localeJ);
 
 			String duration = formatNanoDuration(System.nanoTime() - start);
 
@@ -177,7 +149,7 @@ public class ReportResource {
 
 	@Operation(summary = "Get report facet values", description = "Retrieves specific facet values for a report.",
 			responses = {@ApiResponse(responseCode = "200", description = "Successful retrieval",
-					content = @Content(mediaType = "application/json")),
+					content = @Content(mediaType = MediaType.APPLICATION_JSON)),
 					@ApiResponse(responseCode = "404", description = "Facet not found"),
 					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
@@ -199,15 +171,11 @@ public class ReportResource {
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 		     Report report = new Report(tx, id)) {
-			assertHasReportPrivilege(id, tx);
+			report.assertHasPrivilege(tx);
 			if (localeJ != null)
-				report.getReportPolicy().setI18nData(localeJ);
+				report.i18nData(localeJ);
 
-			// get filter criteria
-			JsonArray array = report
-					.generateFilterCriteria(type, limit, query)
-					.sorted(comparing(e -> e.get(Tags.Json.NAME).getAsString()))
-					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+			JsonArray array = report.generateFacetValuesAsJson(type, limit, query);
 
 			String duration = formatNanoDuration(System.nanoTime() - start);
 			logger.info("Facet Generation for {}.{} took: {}", report.getReportResource().getId(), type, duration);
@@ -215,13 +183,9 @@ public class ReportResource {
 		}
 	}
 
-	private static void assertHasReportPrivilege(String id, StrolchTransaction tx) {
-		tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
-	}
-
 	@Operation(summary = "Get report by ID", description = "Retrieves a report based on its ID.", responses = {
 			@ApiResponse(responseCode = "200", description = "Successful retrieval",
-					content = @Content(mediaType = "application/json")),
+					content = @Content(mediaType = MediaType.APPLICATION_JSON)),
 			@ApiResponse(responseCode = "404", description = "Report not found"),
 			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@POST
@@ -244,69 +208,29 @@ public class ReportResource {
 		int limit = jsonObject.get(LIMIT) != null ? jsonObject.get(LIMIT).getAsInt() : 50;
 
 		MapOfSets<String, String> filters = jsonObject.get(PARAM_FILTER) != null ?
-				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) : new MapOfSets<>();
+				parseFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) : new MapOfSets<>();
 
 		// get date range if defined
 		JsonObject rangeJ = jsonObject.get(PARAM_DATE_RANGE) != null ? jsonObject.getAsJsonObject(PARAM_DATE_RANGE) :
 				null;
 
-		ZonedDateTime from = getFrom(rangeJ);
-		ZonedDateTime to = getTo(rangeJ);
+		ZonedDateTime from = parseDateFrom(rangeJ);
+		ZonedDateTime to = parseDateTo(rangeJ);
 		JsonObject localeJ = getI18nData(request, cert);
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 		     Report report = new Report(tx, id)) {
-			prepareReport(id, tx, localeJ, report, from, to);
+			report.assertHasPrivilege(tx);
+			if (localeJ != null)
+				report.i18nData(localeJ);
 
-			if (!filters.isEmpty())
-				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
+			report.dateRange(from, to);
+			report.filter(filters);
 
-			// get rows
-			Stream<JsonObject> json = report.doReportWithPageAsJson(offset, limit);
-
-			// add rows to response
-			JsonObject finalResult = new JsonObject();
-			JsonArray rows = new JsonArray();
-			if (report.isParallel())
-				json.forEachOrdered(rows::add);
-			else
-				json.forEach(rows::add);
-
-			finalResult.add(PARAM_ROWS, rows);
-
-			// add column information to JSON
-			JsonArray col = new JsonArray();
-
-			Resource reportR = tx.getResourceBy(TYPE_REPORT, id, true);
-			reportR.getParameterBag(BAG_COLUMNS).getParameterKeySet().forEach(s -> {
-				StringParameter param = reportR.getParameter(BAG_COLUMNS, s, true);
-				String name = param.getName();
-				String columnName = localeJ != null && localeJ.has(name) ? localeJ.get(name).getAsString() : name;
-
-				JsonObject o = new JsonObject();
-				o.addProperty(Tags.Json.ID, s);
-				o.addProperty(Tags.Json.NAME, columnName);
-				o.addProperty(Tags.Json.INDEX, param.getIndex());
-				col.add(o);
-			});
-
-			finalResult.add(PARAM_COLUMNS, col);
-
-			long size = report.getCounter();
-			long lastOffset = size % limit == 0 ? size - limit : (size / limit) * limit;
-			long nextOffset = Math.min(lastOffset, limit + offset);
-			long previousOffset = Math.max(0, offset - limit);
-
-			finalResult.addProperty(LIMIT, limit);
-			finalResult.addProperty(OFFSET, offset);
-			finalResult.addProperty(SIZE, size);
-			finalResult.addProperty(LAST_OFFSET, lastOffset);
-			finalResult.addProperty(NEXT_OFFSET, nextOffset);
-			finalResult.addProperty(PREVIOUS_OFFSET, previousOffset);
+			JsonObject finalResult = report.generateReportWithPage(offset, limit, localeJ);
 
 			String duration = formatNanoDuration(System.nanoTime() - start);
 			finalResult.addProperty(PARAM_DURATION, duration);
-			finalResult.addProperty(PARAM_PARALLEL, report.isParallel());
 
 			logger.info("{} Report took: {}", report.getReportResource().getId(), duration);
 			return ResponseUtil.toResponse(DATA, finalResult);
@@ -335,16 +259,14 @@ public class ReportResource {
 		JsonObject jsonObject = StringHelper.isEmpty(data) ? null : JsonParser.parseString(data).getAsJsonObject();
 
 		MapOfSets<String, String> filters = jsonObject != null && jsonObject.get(PARAM_FILTER) != null ?
-				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) : new MapOfSets<>();
+				parseFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) : new MapOfSets<>();
 
 		// get date range if defined
 		JsonObject rangeJ = jsonObject != null && jsonObject.get(PARAM_DATE_RANGE) != null ?
 				jsonObject.getAsJsonObject(PARAM_DATE_RANGE) : null;
 
-		ZonedDateTime from = getFrom(rangeJ);
-
-		ZonedDateTime to = getTo(rangeJ);
-
+		ZonedDateTime from = parseDateFrom(rangeJ);
+		ZonedDateTime to = parseDateTo(rangeJ);
 		JsonObject localeJ = getI18nData(request, cert);
 
 		// create CSV printer with header
@@ -362,116 +284,19 @@ public class ReportResource {
 			MapOfSets<String, String> filters, ZonedDateTime from, ZonedDateTime to, String action) {
 
 		return out -> {
-
 			try (StrolchTransaction tx = getInstance().openTx(cert, realm, action);
 			     Report report = new Report(tx, reportId)) {
 
-				prepareReport(reportId, tx, localeJ, report, from, to);
+				report.assertHasPrivilege(tx);
+				if (localeJ != null)
+					report.i18nData(localeJ);
 
-				// add filters from request
-				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
+				report.dateRange(from, to);
+				report.filter(filters);
 
-				// get headers
-				List<String> orderedColumnKeys = report.getColumnKeys();
-				String[] headers = new String[orderedColumnKeys.size()];
-				orderedColumnKeys.toArray(headers);
-
-				if (localeJ != null) {
-					for (int i = 0; i < headers.length; i++) {
-						if (localeJ.has(headers[i]))
-							headers[i] = localeJ.get(headers[i]).getAsString();
-					}
-				}
-
-				// get report content and add to the buffer
-				out.write(UTF8_BOM.getBytes(StandardCharsets.UTF_8));
-				try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
-						CSVFormat.DEFAULT.builder().setHeader(headers).setDelimiter(';').get())) {
-
-					if (report.isParallel())
-						report.doReport().forEachOrdered(row -> writeCsv(csvP, row));
-					else
-						report.doReport().forEach(row -> writeCsv(csvP, row));
-				}
+				report.doReportAsCsv(out, localeJ);
 			}
 		};
-	}
-
-	private void writeCsv(CSVPrinter csvP, ReportElement row) {
-		try {
-			csvP.printRecord(row.valueStream().collect(Collectors.toList())); // add to CSV
-		} catch (Exception e) {
-			logger.error("Could not write CSV row", e);
-		}
-	}
-
-	private static void prepareReport(String id, StrolchTransaction tx, JsonObject localeJ, Report report,
-			ZonedDateTime from, ZonedDateTime to) {
-		assertHasReportPrivilege(id, tx);
-
-		// set i18n data if possible
-		if (localeJ != null)
-			report.getReportPolicy().setI18nData(localeJ);
-
-		// add filters from request
-		if (report.hasDateRangeSelector()) {
-			DateRange dateRange = new DateRange();
-			if (from != null)
-				dateRange = dateRange.from(from, true);
-			if (to != null)
-				dateRange = dateRange.to(to, true);
-
-			report.dateRange(dateRange);
-		}
-	}
-
-	private static ZonedDateTime getTo(JsonObject rangeJ) {
-		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
-				rangeJ.get(PARAM_TO).getAsString() : null;
-		ZonedDateTime to;
-		try {
-			to = (toS != null) ? ISO8601.parseToZdt(toS).with(MAX_LOCAL_TIME) : null;
-		} catch (Exception e) {
-			logger.error("Could not parse 'to' date, setting it to null.", e);
-			to = null;
-		}
-		return to;
-	}
-
-	private static ZonedDateTime getFrom(JsonObject rangeJ) {
-		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
-				rangeJ.get(PARAM_FROM).getAsString() : null;
-		ZonedDateTime from;
-		try {
-			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
-		} catch (Exception e) {
-			logger.error("Could not parse 'from' date, setting it to null.", e);
-			from = null;
-		}
-		return from;
-	}
-
-	private MapOfSets<String, String> getFiltersFromJson(JsonArray filters) {
-		MapOfSets<String, String> result = new MapOfSets<>();
-		if (filters == null) {
-			return result;
-		}
-
-		// go through all filters and add to the map of sets
-		for (JsonElement elem : filters.getAsJsonArray()) {
-			if (!elem.isJsonObject()) {
-				logger.warn("There are wrong formatted filters:\n{}", elem);
-				continue;
-			}
-
-			JsonObject filter = elem.getAsJsonObject();
-			filter
-					.get(PARAM_FACET_FILTERS)
-					.getAsJsonArray()
-					.forEach(f -> result.addElement(filter.get(PARAM_FACET_TYPE).getAsString(), f.getAsString()));
-		}
-
-		return result;
 	}
 
 	private static JsonObject getI18nData(HttpServletRequest request, Certificate cert) throws IOException {

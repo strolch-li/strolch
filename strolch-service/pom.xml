@@ -64,6 +64,12 @@
             <artifactId>strolch-privilege</artifactId>
         </dependency>
 
+        <!-- utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>li.strolch</groupId>

@@ -16,6 +16,7 @@
 
 package li.strolch.report;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -23,12 +24,18 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 import org.hamcrest.MatcherAssert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -352,6 +359,78 @@ public class GenericReportTest {
 			});
 
 			assertEquals(6, slotsFound.get());
+		}
+	}
+
+	@Test
+	public void shouldExportReportAsCsv() throws IOException {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
+			 Report report = new Report(tx, "stockReport")) {
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			report.doReportAsCsv(out);
+
+			String csv = out.toString(StandardCharsets.UTF_8);
+			assertTrue(csv.startsWith(StringHelper.UTF8_BOM));
+
+			String[] lines = csv.substring(StringHelper.UTF8_BOM.length()).split("\r?\n");
+			assertTrue(lines.length >= 5); // 1 header + 4 data rows
+			String header = lines[0];
+			assertTrue(header.contains("slot"));
+			assertTrue(header.contains("product"));
+			assertTrue(header.contains("quantity"));
+		}
+	}
+
+	@Test
+	public void shouldGenerateReportWithPage() {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
+			 Report report = new Report(tx, "stockReport")) {
+
+			JsonObject page = report.generateReportWithPage(0, 2);
+			assertEquals(4L, page.get("size").getAsLong());
+			assertEquals(2, page.get("limit").getAsInt());
+			assertEquals(0, page.get("offset").getAsInt());
+			assertEquals(2, page.get("nextOffset").getAsInt());
+			assertEquals(2, page.get("lastOffset").getAsInt());
+			assertEquals(0, page.get("previousOffset").getAsInt());
+			JsonArray rows = page.getAsJsonArray("rows");
+			assertEquals(2, rows.size());
+			JsonArray columns = page.getAsJsonArray("columns");
+			assertFalse(columns.isEmpty());
+		}
+	}
+
+	@Test
+	public void shouldGenerateFacetsAsJson() {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
+			 Report report = new Report(tx, "stockReport")) {
+
+			JsonArray facets = report.generateFacetsAsJson(10);
+			assertNotNull(facets);
+			assertFalse(facets.isEmpty());
+
+			JsonArray facetValues = report.generateFacetValuesAsJson("Product", 10, null);
+			assertNotNull(facetValues);
+			assertFalse(facetValues.isEmpty());
+		}
+	}
+
+	@Test
+	public void shouldFilterByZonedDateTimeRange() {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
+			 Report report = new Report(tx, "stockReport")) {
+
+			ZonedDateTime from = ISO8601.parseToZdt("2016-01-01T00:00:00Z");
+			ZonedDateTime to = ISO8601.parseToZdt("2017-01-01T00:00:00Z");
+
+			List<JsonObject> result = report
+					.filter("Product", "product01")
+					.dateRange(from, to)
+					.doReportAsJson()
+					.toList();
+
+			assertTrue(result.isEmpty());
 		}
 	}
 }

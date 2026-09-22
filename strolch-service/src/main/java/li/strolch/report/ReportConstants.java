@@ -49,6 +49,19 @@ public class ReportConstants {
 	public static final String PARAM_DURATION = "duration";
 	public static final String PARAM_FACET_FILTERS = "facetFilters";
 	public static final String PARAM_FACET_TYPE = "facetType";
+	public static final String PARAM_FACETS = "facets";
+	public static final String PARAM_REPORTS = "reports";
+	public static final String PARAM_DATE_RANGE = "dateRange";
+	public static final String PARAM_FROM = "from";
+	public static final String PARAM_TO = "to";
+	public static final String PARAM_FILTER = "filter";
+	public static final String PARAM_QUERY = "query";
+	public static final String PARAM_OFFSET = "offset";
+	public static final String PARAM_LIMIT = "limit";
+	public static final String PARAM_SIZE = "size";
+	public static final String PARAM_LAST_OFFSET = "lastOffset";
+	public static final String PARAM_NEXT_OFFSET = "nextOffset";
+	public static final String PARAM_PREVIOUS_OFFSET = "previousOffset";
 
 	public static final String COL_OBJECT = "$object";
 	public static final String COL_ID = "$id";

@@ -234,6 +234,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return instance;
 	}
 
+	public static boolean hasInstance() {
+		return instance != null;
+	}
+
 	public StrolchAgent getAgent() {
 		return super.getAgent();
 	}
