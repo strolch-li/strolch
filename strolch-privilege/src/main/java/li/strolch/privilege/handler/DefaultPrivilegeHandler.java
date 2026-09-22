@@ -1064,7 +1064,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// validate that challenge certificate is not expired (1 hour only) 
-		if (sessionCertificate.getUsage() != Usage.ANY) {
+		if (sessionCertificate.getUsage().isSingle() || sessionCertificate.getUsage().isSetPassword()) {
 			ZonedDateTime dateTime = sessionCertificate.getLoginTime();
 			if (dateTime.plusHours(1).isBefore(ZonedDateTime.now())) {
 				invalidate(sessionCertificate);

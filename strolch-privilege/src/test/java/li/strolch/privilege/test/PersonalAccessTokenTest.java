@@ -308,6 +308,33 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
+	public void shouldValidateApiSessionAfterOneHour() {
+		login("admin", "admin".toCharArray());
+		Certificate cert = this.ctx.getCertificate();
+
+		ZonedDateTime validFrom = ZonedDateTime.now().minusDays(1);
+		ZonedDateTime validTo = validFrom.plusYears(1);
+
+		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Long Lived API Token", validFrom, validTo,
+				null, null);
+		assertNotNull(token);
+
+		Certificate apiCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+		assertNotNull(apiCert);
+		assertTrue(apiCert.getUsage().isApi());
+
+		// Validate certificate with login time older than 1 hour
+		Certificate oldLoginCert = new Certificate(apiCert.getUsage(), apiCert.getSessionId(), apiCert.getUserId(),
+				apiCert.getUsername(), apiCert.getFirstname(), apiCert.getLastname(), apiCert.getUserState(),
+				apiCert.getAuthToken(), apiCert.getSource(), ZonedDateTime.now().minusHours(2), apiCert.isKeepAlive(),
+				apiCert.getLocale(), apiCert.getUserGroups(), apiCert.getUserRoles(), apiCert.getProperties());
+
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(oldLoginCert, "api-test");
+		assertNotNull(prvCtx);
+		assertEquals("admin", prvCtx.getUsername());
+	}
+
+	@Test
 	public void shouldNotEscalatePrivilegesForOtherUser() {
 		login("admin", "admin".toCharArray());
 		Certificate adminCert = this.ctx.getCertificate();
