@@ -99,6 +99,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean hideVersionFromUnauthorizedClients;
 
 	private String webPath;
+	private String realPath;
 
 	public RestfulStrolchComponent(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -106,6 +107,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public String getWebPath() {
 		return this.webPath;
+	}
+
+	public String getRealPath() {
+		return this.realPath;
 	}
 
 	public boolean isCorsEnabled() {
@@ -270,6 +275,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
 		return getContainer().getRealm(certificate).openTx(certificate, clazz, true);
 	}
+
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
 		return getContainer().getRealm(certificate).openTx(certificate, clazz, readOnly);
 	}
@@ -294,8 +300,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		if (!initialized)
 			throw new IllegalStateException("Strolch Component not yet initialized!");
 
-		if (getConfiguration().isVerbose())
-			logger.info("Local web path is {}", servletContext.getRealPath("/"));
+		this.realPath = servletContext.getRealPath("/");
+		if (getConfiguration().isVerbose()) {
+			logger.info("Local path is {}", this.realPath);
+		}
 
 		this.webPath = servletContext.getContextPath();
 		if (getConfiguration().isVerbose())
