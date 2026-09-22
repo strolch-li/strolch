@@ -836,6 +836,18 @@ public class StringHelper {
 	}
 
 	/**
+	 * Replaces all whitespace characters in the input string with underscores. Alphanumeric
+	 * characters and underscores are preserved.
+	 *
+	 * @param str the input string to process, which may contain whitespace or special characters
+	 *
+	 * @return a new string where all whitespace characters are replaced with underscores
+	 */
+	public static String replaceWhitespaceWithUnderscore(String str) {
+		return str.replaceAll("\\s", "_");
+	}
+
+	/**
 	 * Replaces all whitespace characters and special characters in the input string with underscores. Alphanumeric
 	 * characters and underscores are preserved.
 	 *
