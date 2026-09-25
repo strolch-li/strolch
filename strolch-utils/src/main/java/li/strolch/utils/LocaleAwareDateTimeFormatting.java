@@ -39,9 +39,9 @@ public class LocaleAwareDateTimeFormatting {
 	private static DateTimeFormatter evaluateDateTimeFormatter(Locale locale, DateFormattingHint hint) {
 		return switch (hint) {
 			case None -> ISO_LOCAL_DATE_TIME;
-			case Date -> ISO_LOCAL_DATE;
+			case Date, DateDashIfEmpty -> ISO_LOCAL_DATE;
 			case DateTime, DateTimeDashIfEmpty -> getDateTimeFormatter(locale);
-			case DateTimeSeconds -> getDateTimeSecondsFormatter(locale);
+			case DateTimeSeconds, DateTimeSecondsDashIfEmpty -> getDateTimeSecondsFormatter(locale);
 			case Time -> getTimeFormatter(locale);
 			case TimeSeconds -> ISO_LOCAL_TIME;
 		};

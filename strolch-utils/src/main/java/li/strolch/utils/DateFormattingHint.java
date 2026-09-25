@@ -22,11 +22,17 @@ import java.util.Locale;
 public enum DateFormattingHint {
 	None,
 	Date,
+	DateDashIfEmpty,
 	DateTime,
 	DateTimeDashIfEmpty,
 	DateTimeSeconds,
+	DateTimeSecondsDashIfEmpty,
 	Time,
 	TimeSeconds;
+
+	public boolean dashIfEmpty() {
+		return this == DateDashIfEmpty || this == DateTimeDashIfEmpty || this == DateTimeSecondsDashIfEmpty;
+	}
 
 	public String format(Locale locale, ZonedDateTime dt) {
 		return LocaleAwareDateTimeFormatting.getFormatter(locale, this).format(dt);

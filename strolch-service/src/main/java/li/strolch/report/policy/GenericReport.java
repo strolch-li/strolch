@@ -558,7 +558,7 @@ public class GenericReport extends ReportPolicy {
 		if (isEmpty(hint))
 			return DateFormattingHint.None.format(tx().getLocale(), dt);
 		DateFormattingHint formattingHint = DateFormattingHint.valueOf(hint);
-		if (formattingHint.equals(DateFormattingHint.DateTimeDashIfEmpty) && dt.getYear() == 1970)
+		if (formattingHint.dashIfEmpty() && dt.getYear() == 1970)
 			return "-";
 		return formattingHint.format(tx().getLocale(), dt);
 	}
