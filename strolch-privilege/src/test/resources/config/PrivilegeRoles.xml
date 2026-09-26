@@ -87,10 +87,10 @@
         <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
+        <Privilege name="PrivilegePersonalAccessToken" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-		<Privilege name="PrivilegePersonalAccessTokenUser" policy="DefaultPrivilege">
+		<Privilege name="PrivilegePersonalAccessTokenUser" policy="UserAccessPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
         <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">

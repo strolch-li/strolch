@@ -69,7 +69,7 @@
 		<Privilege name="StrolchConfiguration" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
-		<Privilege name="PrivilegePersonalAccessTokenUser" policy="DefaultPrivilege">
+		<Privilege name="PrivilegePersonalAccessTokenUser" policy="UserAccessPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
