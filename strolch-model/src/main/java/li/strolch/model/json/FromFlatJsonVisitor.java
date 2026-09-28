@@ -30,6 +30,7 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,6 +81,11 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 	public void setLenient(boolean lenient) {
 		this.lenient = lenient;
+	}
+
+	public FromFlatJsonVisitor lenient() {
+		this.lenient = true;
+		return this;
 	}
 
 	public boolean isLenient() {
@@ -224,10 +230,9 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 				String asString = jsonElement.getAsString();
 				if (asString.isEmpty() && this.nonEmptyParameters.containsElement(bagId, paramId)) {
-					throw new StrolchModelException("JsonElement "
-							+ paramId
-							+ " is required to be a non empty value for "
-							+ parameter.getLocator());
+					throw new StrolchModelException(
+							MessageFormat.format("JsonElement {0} is required to be a non empty value for {1}", paramId,
+									parameter.getLocator()));
 				}
 
 				try {
