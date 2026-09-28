@@ -1,0 +1,102 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="AutoCloseableResource" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="METHOD_MATCHER_CONFIG" value="java.util.Formatter,format,java.io.Writer,append,com.google.common.base.Preconditions,checkNotNull,org.hibernate.Session,close,java.io.PrintWriter,printf,java.io.PrintStream,printf,java.lang.foreign.Arena,ofAuto,java.lang.foreign.Arena,global,li.strolch.service.api.Command,tx,li.strolch.policy.StrolchPolicy,tx,ch.atexxi.printing.printer.PdfCreator,createSimplePdf,li.strolch.runtime.privilege.TransactedRestrictable,tx" />
+    </inspection_tool>
+    <inspection_tool class="ES6ConvertVarToLetConst" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="10">
+            <item index="0" class="java.lang.String" itemvalue="include" />
+            <item index="1" class="java.lang.String" itemvalue="if" />
+            <item index="2" class="java.lang.String" itemvalue="items" />
+            <item index="3" class="java.lang.String" itemvalue="as" />
+            <item index="4" class="java.lang.String" itemvalue="class$" />
+            <item index="5" class="java.lang.String" itemvalue="hidden$" />
+            <item index="6" class="java.lang.String" itemvalue="name" />
+            <item index="7" class="java.lang.String" itemvalue="on-tap" />
+            <item index="8" class="java.lang.String" itemvalue="restamp" />
+            <item index="9" class="java.lang.String" itemvalue="on-atx-wc-util-number-pick" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="63">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="dom-module" />
+            <item index="7" class="java.lang.String" itemvalue="iron-ajax" />
+            <item index="8" class="java.lang.String" itemvalue="ebx-activity-checker" />
+            <item index="9" class="java.lang.String" itemvalue="paper-button" />
+            <item index="10" class="java.lang.String" itemvalue="strolch-wc-debounced-input" />
+            <item index="11" class="java.lang.String" itemvalue="atx-wc-animated-badge" />
+            <item index="12" class="java.lang.String" itemvalue="paper-icon-button" />
+            <item index="13" class="java.lang.String" itemvalue="ebx-orders-positions-table" />
+            <item index="14" class="java.lang.String" itemvalue="ebx-orders-upload-dlg" />
+            <item index="15" class="java.lang.String" itemvalue="iron-icon" />
+            <item index="16" class="java.lang.String" itemvalue="paper-dialog" />
+            <item index="17" class="java.lang.String" itemvalue="iron-a11y-keys" />
+            <item index="18" class="java.lang.String" itemvalue="paper-dialog-scrollable" />
+            <item index="19" class="java.lang.String" itemvalue="paper-listbox" />
+            <item index="20" class="java.lang.String" itemvalue="paper-item" />
+            <item index="21" class="java.lang.String" itemvalue="paper-checkbox" />
+            <item index="22" class="java.lang.String" itemvalue="paper-radio-group" />
+            <item index="23" class="java.lang.String" itemvalue="paper-radio-button" />
+            <item index="24" class="java.lang.String" itemvalue="ebx-horizon-selection" />
+            <item index="25" class="java.lang.String" itemvalue="paper-input" />
+            <item index="26" class="java.lang.String" itemvalue="paper-spinner" />
+            <item index="27" class="java.lang.String" itemvalue="atx-wc-number-picker" />
+            <item index="28" class="java.lang.String" itemvalue="ebx-storage-batches" />
+            <item index="29" class="java.lang.String" itemvalue="strolch-wc-dialog-button" />
+            <item index="30" class="java.lang.String" itemvalue="ebx-storage-batch-selection-dlg" />
+            <item index="31" class="java.lang.String" itemvalue="ebx-storage-batch" />
+            <item index="32" class="java.lang.String" itemvalue="ebx-storage-add-batch-dlg" />
+            <item index="33" class="java.lang.String" itemvalue="atx-wc-date-picker" />
+            <item index="34" class="java.lang.String" itemvalue="iron-pages" />
+            <item index="35" class="java.lang.String" itemvalue="atx-wc-generic-search" />
+            <item index="36" class="java.lang.String" itemvalue="paper-menu" />
+            <item index="37" class="java.lang.String" itemvalue="paper-card" />
+            <item index="38" class="java.lang.String" itemvalue="ebx-stockmanage-product-slot" />
+            <item index="39" class="java.lang.String" itemvalue="ebx-product-info" />
+            <item index="40" class="java.lang.String" itemvalue="ebx-stockmanage-requests" />
+            <item index="41" class="java.lang.String" itemvalue="ebx-stockmanage-message-dialog" />
+            <item index="42" class="java.lang.String" itemvalue="ebx-stockmanage-section-dialog" />
+            <item index="43" class="java.lang.String" itemvalue="atx-wc-breadcrumb-widget" />
+            <item index="44" class="java.lang.String" itemvalue="ebx-stockmanage-action-view" />
+            <item index="45" class="java.lang.String" itemvalue="ebx-stockmanage-security-views" />
+            <item index="46" class="java.lang.String" itemvalue="ebx-stockmanage-page-views" />
+            <item index="47" class="java.lang.String" itemvalue="ebx-stockmanage-pickings-time-line" />
+            <item index="48" class="java.lang.String" itemvalue="atx-wc-tool-tip" />
+            <item index="49" class="java.lang.String" itemvalue="ebx-person-headline" />
+            <item index="50" class="java.lang.String" itemvalue="ebx-stockmanage-picking-item" />
+            <item index="51" class="java.lang.String" itemvalue="atx-wc-raw-text" />
+            <item index="52" class="java.lang.String" itemvalue="paper-textarea" />
+            <item index="53" class="java.lang.String" itemvalue="c-batch-no" />
+            <item index="54" class="java.lang.String" itemvalue="ebx-storage-restrictions" />
+            <item index="55" class="java.lang.String" itemvalue="ebx-slot-config" />
+            <item index="56" class="java.lang.String" itemvalue="paper-fab-speed-dial" />
+            <item index="57" class="java.lang.String" itemvalue="paper-fab" />
+            <item index="58" class="java.lang.String" itemvalue="paper-dropdown-menu" />
+            <item index="59" class="java.lang.String" itemvalue="ebx-storage-import-export" />
+            <item index="60" class="java.lang.String" itemvalue="paper-toggle-button" />
+            <item index="61" class="java.lang.String" itemvalue="ebx-stockmanage-patient-dose-card" />
+            <item index="62" class="java.lang.String" itemvalue="ebx-stockmanage-comment" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="SimplifyStreamApiCallChains" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>
