@@ -17,7 +17,9 @@
 package li.strolch.model.parameter;
 
 import li.strolch.model.ModelGenerator;
+import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchValueType;
 import li.strolch.utils.time.PeriodDuration;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import java.util.Date;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ENUMERATION;
 import static org.junit.Assert.*;
 
 public class ParameterTest {
@@ -347,5 +350,46 @@ public class ParameterTest {
 		p.addValueIfNotContains(43.43D);
 		assertTrue(p.containsAll(asList(42.42D, 88.88D, 43.43D)));
 		assertEquals(asList(42.42D, 88.88D, 43.43D), p.getValue());
+	}
+
+	@Test
+	public void testSetEnum() {
+		// Test on ParameterBagContainer with default bag
+		this.resource.setEnum("valueType", StrolchValueType.STRING);
+		assertEquals(StrolchValueType.STRING.name(), this.resource.getString("valueType"));
+		StringParameter param = this.resource.getStringP("valueType");
+		assertEquals("ValueType", param.getName());
+		assertEquals(INTERPRETATION_ENUMERATION, param.getInterpretation());
+		assertEquals("StrolchValueType", param.getUom());
+
+		// Update on default bag
+		this.resource.setEnum("valueType", StrolchValueType.INTEGER);
+		assertEquals(StrolchValueType.INTEGER.name(), this.resource.getString("valueType"));
+		param = this.resource.getStringP("valueType");
+		assertEquals(INTERPRETATION_ENUMERATION, param.getInterpretation());
+		assertEquals("StrolchValueType", param.getUom());
+
+		// Test on ParameterBagContainer with specific bag
+		this.resource.setEnum(BAG_ID, "customEnum", StrolchValueType.FLOAT);
+		assertEquals(StrolchValueType.FLOAT.name(), this.resource.getString(BAG_ID, "customEnum"));
+		param = this.resource.getStringP(BAG_ID, "customEnum");
+		assertEquals("CustomEnum", param.getName());
+		assertEquals(INTERPRETATION_ENUMERATION, param.getInterpretation());
+		assertEquals("StrolchValueType", param.getUom());
+
+		// Test on ParameterizedElement (ParameterBag)
+		ParameterBag bag = this.resource.getParameterBag(BAG_ID);
+		bag.setEnum("bagEnum", StrolchValueType.BOOLEAN);
+		assertEquals(StrolchValueType.BOOLEAN.name(), bag.getString("bagEnum"));
+		param = bag.getStringP("bagEnum");
+		assertEquals("BagEnum", param.getName());
+		assertEquals(INTERPRETATION_ENUMERATION, param.getInterpretation());
+		assertEquals("StrolchValueType", param.getUom());
+
+		bag.setEnum("bagEnum", StrolchValueType.LONG);
+		assertEquals(StrolchValueType.LONG.name(), bag.getString("bagEnum"));
+		param = bag.getStringP("bagEnum");
+		assertEquals(INTERPRETATION_ENUMERATION, param.getInterpretation());
+		assertEquals("StrolchValueType", param.getUom());
 	}
 }

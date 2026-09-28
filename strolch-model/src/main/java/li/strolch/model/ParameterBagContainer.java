@@ -584,6 +584,20 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the
+	 * {@link ParameterBag} with the ID {@link StrolchModelConstants#BAG_PARAMETERS} and sets interpretation to
+	 * {@link StrolchModelConstants#INTERPRETATION_ENUMERATION} and UOM to the enum's simple class name
+	 *
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
+	 *
+	 * @throws StrolchModelException if the parameter does not exist
+	 */
+	default void setEnum(String paramKey, Enum<?> value) throws StrolchModelException {
+		defaultBag().setEnum(paramKey, value);
+	}
+
+	/**
 	 * Sets the given value on the {@link StringParameter} with the given paramKey on the {@link ParameterBag} with the
 	 * given bagKey
 	 *
@@ -611,6 +625,22 @@ public interface ParameterBagContainer extends StrolchElement {
 	default void setString(String bagKey, String paramKey, Enum<?> value) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(bagKey, true);
 		bag.setString(paramKey, value.name());
+	}
+
+	/**
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the
+	 * {@link ParameterBag} with the given bagKey and sets interpretation to
+	 * {@link StrolchModelConstants#INTERPRETATION_ENUMERATION} and UOM to the enum's simple class name
+	 *
+	 * @param bagKey   the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
+	 *
+	 * @throws StrolchModelException if the parameter does not exist
+	 */
+	default void setEnum(String bagKey, String paramKey, Enum<?> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setEnum(paramKey, value);
 	}
 
 	/**
