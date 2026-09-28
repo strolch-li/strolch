@@ -23,9 +23,9 @@
     - Constants: `UPPER_SNAKE_CASE` (e.g., `TYPE_PERSON`, `BAG_PARAMETERS`). Centrally defined in `ModelConstants.java`
       classes within each module where applicable.
 
-### Best Practices for Classes, Interfaces, and Enums
+## Best Practices for Classes, Interfaces, and Enums
 
-#### Use Records for data holder classes
+### Use Records for data holder classes
 
 Prefer using Java records for storing data holder classes.
 
@@ -35,12 +35,12 @@ public record CustomerDTO(String name, String email) {
 }
 ```
 
-#### Immutability
+### Immutability
 
 Prefer immutable classes whenever possible. Immutable objects are inherently thread-safe and make the code easier to
 reason about.
 
-#### Use Interfaces
+### Use Interfaces
 
 Program to interfaces, not implementations. This makes the code more flexible and easier to test.
 
@@ -49,36 +49,36 @@ Program to interfaces, not implementations. This makes the code more flexible an
 List<String> names = new ArrayList<>();
 ```
 
-#### Use Enums
+### Use Enums
 
 Use enums instead of string constants or integer constants. Enums are type-safe and provide more readable and
 maintainable code.
 
-### Exception Handling
+## Exception Handling
 
 - **Catch Specific Exceptions**: Catch specific exceptions instead of `Exception` or `Throwable`.
 - **Don't Ignore Exceptions**: Never ignore exceptions. If you catch an exception, either handle it or rethrow it.
 
-### Concurrency
+## Concurrency
 
 - **Use `java.util.concurrent`**: Prefer the high-level concurrency utilities in the `java.util.concurrent` package over
   low-level primitives like `wait()` and `notify()`.
 - **Avoid `volatile` for Complex Operations**: Use `volatile` only for simple atomic operations. For more complex
   operations, use `java.util.concurrent.atomic` or locks.
 
-### Use of `Optional`
+## Use of `Optional`
 
 - **Return Types**: Use `Optional` for return types when a method might not return a value. This makes the API clearer
   and helps prevent `NullPointerException`.
 - **Don't Use for Fields or Parameters**: Do not use `Optional` for class fields or method parameters. For optional
   dependencies, use method overloading or a nullable annotation.
 
-### Stream API Best Practices
+## Stream API Best Practices
 
 - **Avoid Side Effects**: Avoid side effects in stream operations like `map()` and `filter()`.
 - **Prefer Method References**: Prefer method references over lambdas when possible.
 
-### Collections
+## Collections
 
 - **Use the Right Collection**: Choose the right collection for the job. Use `List` for ordered collections, `Set` for
   unordered collections with no duplicates, and `Map` for key-value pairs.
@@ -88,23 +88,23 @@ maintainable code.
 - **Use Diamond Operator**: Use the diamond operator (`<>`) for generic type inference.
 - **Use `for-each` loop**: Prefer the `for-each` loop for iterating over collections.
 
-### Date and Time
+## Date and Time
 
 Prefer using the Java 8 Date-Time API (`java.time.*`) over legacy `java.util.Date` and `java.util.Calendar`. The
 `java.time` API is immutable, thread-safe, and more expressive.
 
-### Strings
+## Strings
 
 Use text blocks (`"""`), available since Java 15, for multi-line string literals (e.g., SQL, JSON, XML) instead of
 concatenation or `\n` escapes.
 
-### Debugging
+## Debugging
 
 - **Logging**: Use SLF4J with `LoggerFactory.getLogger(Class.class)`. When possible always use SLF4J, never `System.out`
   or `printStackTrace` and related methods.
 - **Strolch Transactions**: Ensure transactions are properly committed or rolled back.
 
-### Documentation
+## Documentation
 
 When a new feature is implemented, the `README.md` file in the root of the repository (not in atx-dev directly) must be
 updated (or created if it doesn't exist) to document the feature for the end user. This documentation should include

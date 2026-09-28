@@ -1,12 +1,12 @@
 # Generic Strolch Specification
 
-### Overview & Goals
+## Overview & Goals
 This specification outlines the standard architecture and implementation patterns for projects built on the **Strolch** framework. Strolch is a Resource-Order-Activity based runtime designed for high-performance, in-memory domain modeling and transaction management.
 
-### Architecture
+## Architecture
 A typical Strolch project is organized as a multi-module Maven project to ensure clear separation of concerns.
 
-#### Module Breakdown
+### Module Breakdown
 1.  **`<ProjectName>-core`**:
     - **Domain Model**: Contains Strolch Resource and Order templates (defined in XML).
     - **Business Logic**: Encapsulated in **Services** (entry points) and **Commands** (atomic operations).
@@ -19,13 +19,13 @@ A typical Strolch project is organized as a multi-module Maven project to ensure
     - **Frontend**: Deployment unit for web assets (typically Lit/Web Components and `strolchjs`).
     - **Packaging**: Usually a WAR file for deployment in a servlet container (e.g., Tomcat).
 
-### Data Model (Strolch XML)
+## Data Model (Strolch XML)
 The domain is modeled using three primary elements:
 - **Resources**: Represent static or master data (e.g., Users, Products, Locations).
 - **Orders**: Represent transactional or process-oriented data (e.g., Tasks, Bookings, Orders).
 - **Activities**: Represent complex workflows or hierarchical execution plans.
 
-#### XML Structure Example
+### XML Structure Example
 Strolch elements are defined in XML files (typically `templates.xml` or `Model.xml`) using the following structure:
 
 ```xml
@@ -52,13 +52,13 @@ Elements are further detailed using **ParameterBags** and **Parameters** (String
 
 Note: All attribute names e.g. `Id`, `Name`, `Interpretation`, `Uom`, etc. are **case-sensitive** and must be capitalized as shown.
 
-### Key Design Patterns
+## Key Design Patterns
 - **Service Pattern**: All business operations must be wrapped in an `AbstractService`. Services manage the lifecycle of a `StrolchTransaction` (TX).
 - **Command Pattern**: Reusable atomic changes within a TX are implemented as `Command` classes.
 - **Search Pattern**: Complex queries are implemented by extending `ResourceSearch`, `OrderSearch`, or `ActivitySearch`.
 - **Policy Pattern**: Algorithms that may vary by type or customer are implemented as `StrolchPolicy` and configured in `StrolchPolicies.xml`.
 
-### Component Diagram
+## Component Diagram
 ```mermaid
 graph TD
     UI[Web UI - Web Components] -->|REST| API[REST Module / Resources]
@@ -67,23 +67,23 @@ graph TD
     Model -->|Persistence| DB[(XML / SQL Storage)]
 ```
 
-### Deployment Structure
+## Deployment Structure
 A Strolch application expects a `runtime/` directory structure:
 - `runtime/config/`: Configuration files (`StrolchConfiguration.xml`, `PrivilegeConfig.xml`, `StrolchPolicies.xml`).
 - `runtime/data/`: Initial and persisted data (`Model.xml`, `templates.xml`).
 - `runtime/temp/`: Temporary files and logs.
 
 
-# Delivery Steps
+## Delivery Steps
 
-###   Step 1: Project Structure & Parent POM Setup
+### Step 1: Project Structure & Parent POM Setup
 Initialize the parent POM and sub-module structure following the Strolch project pattern.
 - Update `MyStrolchProject/pom.xml` to `packaging: pom`.
 - Set `jdk.version` property to 24 (or latest supported).
 - Define `MyStrolchProject-core` and `MyStrolchProject-web` modules.
 - Add `strolch-bom` to `dependencyManagement` for version alignment.
 
-###   Step 2: Core Module & Domain Logic Implementation
+### Step 2: Core Module & Domain Logic Implementation
 Implement the domain model and business logic in the core module.
 - Create `MyStrolchProject-core` module.
 - Define Strolch templates for Resources and Orders in `runtime/data/templates.xml`.
@@ -91,7 +91,7 @@ Implement the domain model and business logic in the core module.
 - Implement custom data retrieval logic using Strolch Searches in `ch.example.core.search`.
 - Add core configuration files (e.g., `StrolchPolicies.xml`) in `runtime/config`.
 
-###   Step 3: Web Module & REST API Implementation
+### Step 3: Web Module & REST API Implementation
 Implement the web entry point and RESTful API.
 - Create `MyStrolchProject-web` module with `war` packaging.
 - Implement `StartupListener` to bootstrap the `StrolchAgent`.

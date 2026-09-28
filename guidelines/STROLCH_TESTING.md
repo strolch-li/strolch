@@ -2,11 +2,11 @@
 
 Testing Strolch applications requires a specific approach to handle the in-memory model, transactions, and the component-based architecture.
 
-### RuntimeMock
+## RuntimeMock
 
 The `RuntimeMock` class (from `li.strolch.testbase.runtime`) is the central tool for Strolch testing. It allows you to programmatically set up a Strolch environment.
 
-#### Usage
+### Usage
 - **Initialization**: Typically done in a `@BeforeClass` method.
 - **Environment**: It creates a runtime directory in `target/` and copies configuration from a source directory (e.g., `src/test/resources/runtime`).
 - **Lifecycle**: Ensure you call `startContainer()` in `@BeforeClass` and `destroyRuntime()` in `@AfterClass`.
@@ -29,7 +29,7 @@ public static void afterClass() {
 }
 ```
 
-#### Convenience Methods
+### Convenience Methods
 `RuntimeMock` provides several helper methods to simplify testing:
 - `getContainer()`: Access the Strolch `ComponentContainer`.
 - `getPrivilegeHandler()`: Access the `PrivilegeHandler` for authentication.
@@ -38,7 +38,7 @@ public static void afterClass() {
 
 ---
 
-### Service Testing
+## Service Testing
 
 Services are best tested by extending `AbstractServiceTest`.
 
@@ -63,7 +63,7 @@ public class MyServiceTest extends AbstractServiceTest {
 
 ---
 
-### Command Testing
+## Command Testing
 
 Commands should be tested for both success and failure (rollback) scenarios, often across different realm types.
 
@@ -74,7 +74,7 @@ Commands should be tested for both success and failure (rollback) scenarios, oft
 
 ---
 
-### Search Testing
+## Search Testing
 
 Search tests verify that data retrieval logic works as expected against a populated model.
 
@@ -95,7 +95,7 @@ public void shouldFindResources() {
 }
 ```
 
-### Best Practices
+## Best Practices
 
 - **Target Directory**: Always use a unique directory under `target/` for the mocked runtime to avoid interference between parallel tests.
 - **Transaction Management**: Always use try-with-resources for `StrolchTransaction`.

@@ -2,13 +2,13 @@
 
 The project is a multi-module Maven project.
 
-### Prerequisites
+## Prerequisites
 
 - Java (JDK 25 or higher recommended, as it is common for modern Strolch projects). Code should be written using latest
   Java 24 concepts, APIs, etc.
 - Maven 3.6+.
 
-### Build Instructions
+## Build Instructions
 
 To build the entire project from the root:
 
@@ -22,6 +22,6 @@ If you want to skip tests (e.g., for faster initial setup):
 mvn clean install -DskipTests
 ```
 
-### Key Modules
+## Key Modules
 
 TBD

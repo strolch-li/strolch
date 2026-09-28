@@ -7,18 +7,18 @@
 - **Activities**: Represent entities with a hierarchical structure actionable tasks, (e.g. `FromStock` to plan/control an activity of dispensing a product).
 - **Transactions**: Use `StrolchTransaction` for data access and modification.
 
-### Strolch Object Model
+## Strolch Object Model
 
 The project uses the Strolch framework, which is based on **Resources**, **Orders**, and **Activities**. These elements
 share a common hierarchy for managing data through **ParameterBags** and **Parameters**.
 
-#### Element Hierarchy
+### Element Hierarchy
 
 - `Resource`, `Order`, `Activity` inherit from `AbstractStrolchRootElement`.
 - `Action` (used within Activities) inherits from `GroupedParameterizedElement`.
 - Both `AbstractStrolchRootElement` and `GroupedParameterizedElement` implement the `ParameterBagContainer` interface.
 
-#### Relationships
+### Relationships
 
 Relationships between root elements are defined using parameters, typically stored in a `ParameterBag` with the ID `relations`.
 
@@ -74,7 +74,7 @@ List<String> partIds = resource.getRelationIds("parts");
 ```
 The `relationsBag()` method provides access to the dedicated bag, creating it if it doesn't exist.
 
-#### Convenience Methods for Parameters
+### Convenience Methods for Parameters
 
 Instead of manually retrieving a `ParameterBag` and then a `Parameter` object, use the convenience methods provided by
 `ParameterBagContainer`. These methods simplify code and handle the default parameter bag (`parameters`) automatically.
@@ -135,7 +135,7 @@ hierarchy if it's not found on the current element.
 String theme = action.findParameter(PARAM_THEME).getValue();
 ```
 
-#### Timed States
+### Timed States
 
 Timed states are owned by `Resource` elements and represent values whose history or schedule is part of the model (e.g., availability, stock).
 
@@ -145,7 +145,7 @@ Resources provide lookup and filtering methods:
 - `streamOfTimedStates();`
 - `streamOfTimedStatesByInterpretation(String interpretation);`
 
-#### Builders
+### Builders
 
 The `li.strolch.model.builder` package provides a fluent API for constructing Strolch elements programmatically, useful for creating test data or default model fragments.
 
@@ -165,7 +165,7 @@ Resource resource = new ResourceBuilder("res01", "Resource 1", "Type1")
     .build();
 ```
 
-#### JSON Serialization
+### JSON Serialization
 
 Strolch supports **Full Serialization** (preserving all metadata) and **Flat Serialization** (mapping parameter values directly to key-value pairs). Flat serialization is preferred for REST APIs.
 
@@ -177,7 +177,7 @@ JsonObject json = resource.accept(new StrolchRootElementToJsonVisitor().flat());
 resource.accept(new FromFlatJsonVisitor(json));
 ```
 
-#### Exceptions
+### Exceptions
 
 Strolch uses a hierarchy of runtime exceptions derived from `StrolchException`:
 - `StrolchModelException`: Model-specific errors (e.g., accessing non-existent elements).
@@ -185,12 +185,12 @@ Strolch uses a hierarchy of runtime exceptions derived from `StrolchException`:
 - `StrolchAccessDeniedException`: Privilege check failed.
 - `StrolchUserMessageException`: Error message intended for display to the user.
 
-### Strolch Services, Commands, Searches and Policies
+## Strolch Services, Commands, Searches and Policies
 
 Business logic in Strolch is encapsulated in Services and Commands. Data retrieval is done via Searches, and extensible
 behavior is implemented through Policies.
 
-#### Strolch Transactions
+### Strolch Transactions
 
 Transactions (`StrolchTransaction`) are the primary way to interact with the data model. They handle locking, auditing, and ensure data consistency.
 
@@ -232,7 +232,7 @@ resource.setString("color", "blue");
 tx.update(resource);
 ```
 
-#### Services
+### Services
 
 Services are the entry point for business logic. They are typically called from REST resources or other high-level
 components.
@@ -273,7 +273,7 @@ public class RemoveGatewayService extends AbstractService<StringArgument, Servic
 }
 ```
 
-#### Commands
+### Commands
 
 Commands are used within a transaction to perform a specific, reusable atomic operation.
 
@@ -300,7 +300,7 @@ public class MyCommand extends Command {
 }
 ```
 
-#### Querying / Searches
+### Querying / Searches
 
 Searches provide a fluent API for querying Strolch elements. Use `ResourceSearch`, `OrderSearch`, or `ActivitySearch`.
 
@@ -339,7 +339,7 @@ The `search(tx)` method returns a `SearchResult` with many terminal operations:
 - `forEach(consumer)`, `isEmpty()`, `isNotEmpty()`.
 - `orderById(reversed)`, `orderByName(reversed)`, `orderByParam(bagId, paramId, reversed)`.
 
-#### Policies
+### Policies
 
 Policies allow for extensible and interchangeable logic defined in XML configuration.
 
@@ -361,11 +361,11 @@ MyPolicy policy = tx().getPolicy(MyPolicy.class, policyDef);
 policy.execute();
 ```
 
-### Entity Model Migrations (MigrationsHandler, CodeMigration, DataMigration)
+## Entity Model Migrations (MigrationsHandler, CodeMigration, DataMigration)
 
 As application domain models evolve over time, existing data in Strolch realms must be migrated safely. Strolch provides the `MigrationsHandler` component (`li.strolch.migrations.MigrationsHandler`) to manage and execute both file-based data migrations and programmatic code migrations across realms.
 
-#### Version Tracking
+### Version Tracking
 
 Strolch tracks migration progress per realm using a dedicated `Resource`:
 - **Locator / Identity**: `Resource/Migrations/migrations`
@@ -374,7 +374,7 @@ Strolch tracks migration progress per realm using a dedicated `Resource`:
 	- `currentCodeVersion`: `StringParameter` representing the current version of applied Java code migrations.
 - **Versioning**: Uses `li.strolch.utils.Version` (e.g., `0.7.0`, `1.2.0`). Migrations are executed in ascending version order, and only migrations with a version strictly greater than the realm's current version are executed.
 
-#### Migration Types
+### Migration Types
 
 1. **Data Migrations (`DataMigration`)**:
 	- File-based XML model imports located at `runtime/data/migrations/data/<realmName>/<version>.xml`.
@@ -386,7 +386,7 @@ Strolch tracks migration progress per realm using a dedicated `Resource`:
 	- Used for complex model evolution: renaming/restructuring parameters, migrating relations, updating timed states, removing deprecated fields, or performing calculations/backfills across existing entities.
 	- Updates `currentCodeVersion` on completion.
 
-#### Implementing a Code Migration
+### Implementing a Code Migration
 
 When updating entity models in an existing application:
 
@@ -451,7 +451,7 @@ When updating entity models in an existing application:
 - **Ensure modifiability**: Always invoke `element.ensureModifiable()` or `tx.readLock(element)` before mutating elements.
 - **Extract transformation logic**: Extract entity transformation into helper methods (e.g., `migrateProduct(Resource)`) to enable isolated unit testing.
 
-#### Executing Migrations in Applications
+### Executing Migrations in Applications
 
 In applications code migrations are typically triggered on application boot via a `StrolchJob`:
 
@@ -503,7 +503,7 @@ In applications code migrations are typically triggered on application boot via 
    </Component>
    ```
 
-#### Unit Testing Migrations
+### Unit Testing Migrations
 
 Unit test the transformation logic in isolation by constructing legacy elements and verifying the migrated state:
 
@@ -526,7 +526,7 @@ public class MigrateProductStorageAfterOpeningMigrationTest {
 }
 ```
 
-### Generic Strolch Specification
+## Generic Strolch Specification
 
 When building Strolch based applications, it is important to follow certain guidelines and best practices to ensure
 consistency, maintainability, and readability. These guidelines are specified in the following document:
