@@ -18,8 +18,6 @@
 <Privilege>
 	<Container>
 		<Parameters>
-			<Parameter name="secretKey" value="CHANGE-ME"/>
-			<Parameter name="secretSalt" value="CHANGE-ME"/>
 			<Parameter name="autoPersistOnUserChangesData" value="true" />
 		</Parameters>
 		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
