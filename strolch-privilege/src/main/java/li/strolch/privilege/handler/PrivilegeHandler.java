@@ -102,12 +102,10 @@ public interface PrivilegeHandler {
 
 	///
 
-	String PARAM_SECRET_KEY = "secretKey";
 	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh";
 	String PARAM_ALLOW_PASSWORD_RESET = "allowPasswordReset";
 	String PARAM_DISALLOW_SOURCE_CHANGE = "disallowSourceChange";
 	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername";
-	String PARAM_SECRET_SALT = "secretSalt";
 	String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData";
 	String PARAM_PERSIST_SESSIONS = "persistSessions";
 	String PARAM_PERSIST_SESSIONS_PATH = "persistSessionsPath";

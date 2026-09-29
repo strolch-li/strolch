@@ -17,11 +17,13 @@ package li.strolch.privilege.handler;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.xml.*;
+import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
@@ -60,11 +62,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private final Map<String, Group> groups;
 	private final Map<String, Role> roles;
 	private final Map<String, PersonalAccessToken> tokens;
+	private final Map<String, CertificateStub> sessions;
 
 	private boolean usersDirty;
 	private boolean groupsDirty;
 	private boolean rolesDirty;
 	private boolean tokensDirty;
+	private boolean sessionsDirty;
 
 	private Map<String, String> parameterMap;
 	private boolean verbose;
@@ -73,8 +77,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private File groupsPath;
 	private File rolesPath;
 	private File tokensPath;
+	private File sessionsPath;
 
 	private boolean caseInsensitiveUsername;
+	private boolean persistSessions;
 
 	public XmlPersistenceHandler() {
 		this.roles = new ConcurrentHashMap<>();
@@ -82,6 +88,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.usersByUsername = new ConcurrentHashMap<>();
 		this.usersById = new ConcurrentHashMap<>();
 		this.tokens = new ConcurrentHashMap<>();
+		this.sessions = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -291,6 +298,45 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 	}
 
+	@Override
+	public List<CertificateStub> getAllSessions() {
+		if (!this.persistSessions)
+			return List.of();
+		synchronized (this.sessions) {
+			return new LinkedList<>(this.sessions.values());
+		}
+	}
+
+	@Override
+	public void addSession(Certificate certificate) {
+		if (!this.persistSessions)
+			return;
+		synchronized (this.sessions) {
+			this.sessions.put(certificate.getSessionId(), new CertificateStub(certificate));
+			this.sessionsDirty = true;
+		}
+	}
+
+	@Override
+	public void updateSession(Certificate certificate) {
+		if (!this.persistSessions)
+			return;
+		synchronized (this.sessions) {
+			this.sessions.put(certificate.getSessionId(), new CertificateStub(certificate));
+			this.sessionsDirty = true;
+		}
+	}
+
+	@Override
+	public void removeSession(String sessionId) {
+		if (!this.persistSessions)
+			return;
+		synchronized (this.sessions) {
+			if (this.sessions.remove(sessionId) != null)
+				this.sessionsDirty = true;
+		}
+	}
+
 	/**
 	 * Initializes this {@link XmlPersistenceHandler} by reading the following parameters:
 	 * <ul>
@@ -299,6 +345,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * <li>{@link XmlConstants#PARAM_GROUPS_FILE}</li>
 	 * <li>{@link XmlConstants#PARAM_ROLES_FILE}</li>
 	 * <li>{@link XmlConstants#PARAM_TOKENS_FILE}</li>
+	 * <li>{@link XmlConstants#PARAM_SESSIONS_FILE}</li>
 	 * </ul>
 	 */
 	@Override
@@ -319,15 +366,19 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File groupsPath = getFile(basePath, PARAM_GROUPS_FILE, PARAM_GROUPS_FILE_DEF, false);
 		File rolesPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_ROLES_FILE_DEF, true);
 		File tokensPath = getFile(basePath, PARAM_TOKENS_FILE, PARAM_TOKENS_FILE_DEF, false);
+		File sessionsPath = getFile(basePath, PARAM_SESSIONS_FILE, PARAM_SESSIONS_FILE_DEF, false);
 
 		// save path to model
 		this.usersPath = usersPath;
 		this.groupsPath = groupsPath;
 		this.rolesPath = rolesPath;
 		this.tokensPath = tokensPath;
+		this.sessionsPath = sessionsPath;
 
 		this.caseInsensitiveUsername = parseBoolean(
 				this.parameterMap.getOrDefault(PARAM_CASE_INSENSITIVE_USERNAME, "true"));
+		this.persistSessions = parseBoolean(
+				this.parameterMap.getOrDefault(PARAM_PERSIST_SESSIONS, PARAM_PERSIST_SESSIONS_DEF));
 
 		reload();
 	}
@@ -343,8 +394,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 		}
 
-		String path = basePath + "/" + fileName;
-		File file = new File(path);
+		File file;
+		if (new File(fileName).isAbsolute()) {
+			file = new File(fileName);
+		} else {
+			String path = basePath + "/" + fileName;
+			file = new File(path);
+		}
 		if (required && !file.exists()) {
 			String msg = "[{0}] Defined parameter {1} is invalid as file does not exist at path {2}";
 			msg = format(msg, PersistenceHandler.class.getName(), param, file.getAbsolutePath());
@@ -413,13 +469,26 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			this.tokens.putAll(tokensXmlHandler.getTokens());
 		}
 
+		// SESSIONS
+		Map<String, CertificateStub> sessions = new ConcurrentHashMap<>();
+		if (this.persistSessions && this.sessionsPath != null && this.sessionsPath.exists()) {
+			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(this.sessionsPath);
+			List<CertificateStub> readSessions = reader.read();
+			readSessions.forEach(s -> sessions.put(s.getSessionId(), s));
+		}
+		synchronized (this.sessions) {
+			this.sessions.clear();
+			this.sessions.putAll(sessions);
+		}
+
 		this.usersDirty = false;
 		this.groupsDirty = false;
 		this.rolesDirty = false;
 		this.tokensDirty = false;
+		this.sessionsDirty = false;
 
-		logger.info("Read {} Users, {} Groups, {} Roles, {} Tokens", this.usersByUsername.size(), this.groups.size(),
-				this.roles.size(), this.tokens.size());
+		logger.info("Read {} Users, {} Groups, {} Roles, {} Tokens, {} Sessions", this.usersByUsername.size(),
+				this.groups.size(), this.roles.size(), this.tokens.size(), this.sessions.size());
 
 		// validate referenced elements exist
 		for (User user : this.usersByUsername.values()) {
@@ -525,6 +594,22 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				saved = true;
 			} catch (Exception e) {
 				this.tokensDirty = true;
+				throw e;
+			}
+		}
+
+		// write sessions file
+		if (this.persistSessions && this.sessionsDirty) {
+			List<CertificateStub> sessions;
+			synchronized (this.sessions) {
+				sessions = new LinkedList<>(this.sessions.values());
+				this.sessionsDirty = false;
+			}
+			try {
+				new CertificateStubsSaxWriter(sessions, this.sessionsPath).write();
+				saved = true;
+			} catch (Exception e) {
+				this.sessionsDirty = true;
 				throw e;
 			}
 		}

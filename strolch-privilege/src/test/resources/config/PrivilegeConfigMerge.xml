@@ -21,8 +21,6 @@
 
         <Parameters>
             <!-- parameters for the container itself -->
-            <Parameter name="secretKey" value="secret-key"/>
-            <Parameter name="secretSalt" value="secret-key"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>
             <Parameter name="privilegeConflictResolution" value="MERGE"/>
             <Parameter name="allowPasswordReset" value="true"/>

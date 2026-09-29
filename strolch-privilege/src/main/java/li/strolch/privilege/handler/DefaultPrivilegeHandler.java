@@ -19,24 +19,16 @@ import li.strolch.privilege.base.*;
 import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.policy.PrivilegePolicy;
-import li.strolch.privilege.xml.CertificateStubsSaxReader;
 import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
-import li.strolch.privilege.xml.CertificateStubsSaxWriter;
 import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.AesCryptoHelper;
-import li.strolch.utils.helper.AesCryptoHelper.SecretKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXParseException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
@@ -45,7 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toList;
@@ -132,16 +123,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected boolean persistSessions;
 
 	/**
-	 * Path to sessions file for persistence
-	 */
-	protected File persistSessionsPath;
-
-	/**
-	 * Secret key
-	 */
-	protected SecretKeys secretKey;
-
-	/**
 	 * flag if session refreshing is allowed
 	 */
 	protected boolean allowSessionRefresh;
@@ -156,7 +137,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected Map<String, PersonalAccessTokenCacheEntry> personalAccessTokenCache;
 	protected ScheduledExecutorService executorService;
 	protected Future<?> persistSessionsTask;
-	protected Future<?> persistModelTask;
 	protected Future<?> prunePersonalAccessTokenCacheTask;
 	private boolean verbose;
 
@@ -476,7 +456,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					userChallenge.getSource(), source);
 		}
 
-		persistSessionsAsync();
+		if (this.persistSessions && certificate.getUsage().isAny() && !certificate.getUserState().isSystem()) {
+			this.persistenceHandler.addSession(certificate);
+			persistSessionsAsync();
+		}
 
 		logger.info("Challenge validated for user {} with usage {}", username, usage);
 		return certificate;
@@ -645,7 +628,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			switch (usage) {
 				case ANY -> {
-					persistSessionsAsync();
+					if (this.persistSessions && !certificate.getUserState().isSystem()) {
+						this.persistenceHandler.addSession(certificate);
+						persistSessionsAsync();
+					}
 					logger.info("User {} authenticated with password: {}", username, certificate);
 				}
 				case SINGLE ->
@@ -735,7 +721,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Certificate certificate = buildPrivilegeContext(Usage.ANY, user, source, ZonedDateTime.now(),
 				keepAlive).getCertificate();
 
-		persistSessionsAsync();
+		if (this.persistSessions && !certificate.getUserState().isSystem()) {
+			this.persistenceHandler.addSession(certificate);
+			persistSessionsAsync();
+		}
 
 		// log
 		logger.info("User {} authenticated with single sign on: {}", user.getUsername(), certificate);
@@ -789,6 +778,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// log
 			Certificate refreshedCertificate = refreshedContext.getCertificate();
+			if (this.persistSessions && refreshedCertificate.getUsage().isAny() && !refreshedCertificate.getUserState().isSystem()) {
+				this.persistenceHandler.addSession(refreshedCertificate);
+				persistSessionsAsync();
+			}
+
 			logger.info("User {} refreshed session: {}", user.getUsername(), refreshedCertificate);
 
 			// return the certificate
@@ -816,30 +810,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	protected void internalPersistSessions() {
-		// get sessions reference
-		AtomicReference<List<Certificate>> sessions = new AtomicReference<>();
-		this.lockingHandler.lockedExecute("persist-sessions", () -> sessions.set(
-				new ArrayList<>(this.privilegeContextMap.values())
-						.stream()
-						.map(PrivilegeContext::getCertificate)
-						.filter(c -> c.getUsage().isAny())
-						.filter(c -> !c.getUserState().isSystem())
-						.collect(toList())));
-
-		// write the sessions
-		try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
-		     OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
-
-			CertificateStubsSaxWriter writer = new CertificateStubsSaxWriter(sessions.get(), outputStream);
-			writer.write();
-			outputStream.flush();
-
+		try {
+			this.persistenceHandler.persist();
 		} catch (Exception e) {
-			logger.error("Failed to persist sessions!", e);
-			if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-				logger.error("Failed to delete sessions file after failing to write to it, at {}",
-						this.persistSessionsPath.getAbsolutePath());
-			}
+			logger.error("Failed to persist sessions via persistence handler!", e);
 		}
 	}
 
@@ -849,33 +823,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return;
 		}
 
-		if (!this.persistSessionsPath.exists()) {
-			logger.info("Sessions file does not exist");
-			return;
-		}
-
-		if (!this.persistSessionsPath.isFile())
-			throw new PrivilegeModelException(
-					"Sessions data file is not a file but exists at " + this.persistSessionsPath.getAbsolutePath());
-
 		List<CertificateStub> certificateStubs;
-		try (InputStream fin = Files.newInputStream(this.persistSessionsPath.toPath());
-		     InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
-
-			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(inputStream);
-			certificateStubs = reader.read();
-
+		try {
+			certificateStubs = this.persistenceHandler.getAllSessions();
 		} catch (Exception e) {
-			if (getRootCause(e) instanceof SAXParseException)
-				logger.error("Failed to load sessions: {}", getRootCause(e).getMessage());
-			else
-				logger.error("Failed to load sessions!", e);
-			if (!this.persistSessionsPath.delete())
-				logger.error("Failed to delete session file at {}", this.persistSessionsPath.getAbsolutePath());
+			logger.error("Failed to load sessions!", e);
 			return;
 		}
 
-		if (certificateStubs.isEmpty()) {
+		if (certificateStubs == null || certificateStubs.isEmpty()) {
 			logger.info("No persisted sessions exist to be loaded.");
 			return;
 		}
@@ -885,16 +841,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			User user = this.persistenceHandler.getUser(username);
 			if (user == null) {
 				logger.error("Ignoring session data for missing user {}", username);
+				this.persistenceHandler.removeSession(stub.getSessionId());
 				continue;
 			}
 
 			if (user.getUserState() == UserState.DISABLED || user.getUserState() == UserState.EXPIRED) {
 				logger.error("Ignoring session data for disabled/expired user {}", username);
+				this.persistenceHandler.removeSession(stub.getSessionId());
 				continue;
 			}
 
 			if (streamAllRolesForUser(this.persistenceHandler, user).findAny().isEmpty()) {
 				logger.error("Ignoring session data for user {} which has no roles or groups defined!", username);
+				this.persistenceHandler.removeSession(stub.getSessionId());
 				continue;
 			}
 
@@ -1002,8 +961,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return false;
 
 		// persist sessions
-		if (privilegeContext.getCertificate().getUsage().isAny())
+		if (this.persistSessions && privilegeContext.getCertificate().getUsage().isAny() && !privilegeContext.getCertificate().getUserState().isSystem()) {
+			this.persistenceHandler.removeSession(privilegeContext.getCertificate());
 			persistSessionsAsync();
+		}
 
 		// return true if object was really removed
 		if (certificate.getUsage().isAny())
@@ -1081,6 +1042,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		certificate.setLastAccess(ZonedDateTime.now());
+		if (this.persistSessions && certificate.getUsage().isAny() && !certificate.getUserState().isSystem()) {
+			this.persistenceHandler.updateSession(certificate);
+			persistSessionsAsync();
+		}
 
 		// assert source did not change
 		if (this.disallowSourceChange && !source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
@@ -1209,7 +1174,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		handleAutoPersistOnUserDataChange(parameterMap);
 		handlePersistSessionsParam(parameterMap);
 		handleConflictResolutionParam(parameterMap);
-		handleSecretParams(parameterMap);
 
 		this.allowSessionRefresh = Boolean.parseBoolean(parameterMap.get(PARAM_ALLOW_SESSION_REFRESH));
 		this.allowPasswordReset = Boolean.parseBoolean(parameterMap.get(PARAM_ALLOW_PASSWORD_RESET));
@@ -1256,39 +1220,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.persistSessions = false;
 		} else if (persistSessionsS.equals(Boolean.TRUE.toString())) {
 			this.persistSessions = true;
-
-			String persistSessionsPathS = parameterMap.get(PARAM_PERSIST_SESSIONS_PATH);
-			if (isEmpty(persistSessionsPathS)) {
-				String msg = "Parameter {0} has illegal value {1}.";
-				msg = format(msg, PARAM_PERSIST_SESSIONS_PATH, persistSessionsPathS);
-				throw new PrivilegeModelException(msg);
-			}
-
-			this.persistSessionsPath = getPersistSessionFile(persistSessionsPathS);
 			if (this.verbose)
-				logger.info("Enabling persistence of sessions to {}", this.persistSessionsPath.getAbsolutePath());
+				logger.info("Enabling persistence of sessions.");
 		} else {
 			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}";
 			msg = format(msg, PARAM_PERSIST_SESSIONS, persistSessionsS, Boolean.FALSE);
 			logger.error(msg);
 			this.persistSessions = false;
 		}
-	}
-
-	protected File getPersistSessionFile(String persistSessionsPathS) {
-		File persistSessionsPath = new File(persistSessionsPathS);
-		if (!persistSessionsPath.getParentFile().isDirectory()) {
-			String msg = "Path for param {0} is invalid as parent does not exist or is not a directory. Value: {1}";
-			msg = format(msg, PARAM_PERSIST_SESSIONS_PATH, persistSessionsPath.getAbsolutePath());
-			throw new PrivilegeModelException(msg);
-		}
-
-		if (persistSessionsPath.exists() && (!persistSessionsPath.isFile() || !persistSessionsPath.canWrite())) {
-			String msg = "Path for param {0} is invalid as file exists but is not a file or not writeable. Value: {1}";
-			msg = format(msg, PARAM_PERSIST_SESSIONS_PATH, persistSessionsPath.getAbsolutePath());
-			throw new PrivilegeModelException(msg);
-		}
-		return persistSessionsPath;
 	}
 
 	private void handleConflictResolutionParam(Map<String, String> parameterMap) {
@@ -1311,29 +1250,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 		if (this.verbose)
 			logger.info("Privilege conflict resolution set to {}", this.privilegeConflictResolution);
-	}
-
-	private void handleSecretParams(Map<String, String> parameterMap) {
-
-		String secretKeyS = parameterMap.get(PARAM_SECRET_KEY);
-		if (isEmpty(secretKeyS)) {
-			String msg = "Parameter {0} may not be empty";
-			msg = format(msg, PARAM_SECRET_KEY);
-			throw new PrivilegeModelException(msg);
-		}
-
-		String secretSaltS = parameterMap.get(PARAM_SECRET_SALT);
-		if (isEmpty(secretSaltS)) {
-			String msg = "Parameter {0} may not be empty";
-			msg = format(msg, PARAM_SECRET_SALT);
-			throw new PrivilegeModelException(msg);
-		}
-
-		this.secretKey = AesCryptoHelper.buildSecret(secretKeyS.toCharArray(), secretSaltS.getBytes());
-
-		// remove secrets
-		parameterMap.remove(PARAM_SECRET_KEY);
-		parameterMap.remove(PARAM_SECRET_SALT);
 	}
 
 	private void validatePrivilegeConflicts() {

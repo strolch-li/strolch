@@ -202,6 +202,9 @@ public class PrivilegeInitializer {
 		String persistenceHandlerClassName = this.containerModel.getPersistenceHandlerClassName();
 		PersistenceHandler persistenceHandler = instantiateClass(persistenceHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getPersistenceHandlerParameterMap();
+		if (this.containerModel.getParameterMap().containsKey(PARAM_PERSIST_SESSIONS))
+			parameterMap.putIfAbsent(PARAM_PERSIST_SESSIONS,
+					this.containerModel.getParameterMap().get(PARAM_PERSIST_SESSIONS));
 		parameterMap.put(PARAM_BASE_PATH, this.containerModel.getBasePath().getAbsolutePath());
 		if (this.verbose)
 			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));

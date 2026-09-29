@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.Restrictable;
@@ -22,6 +23,7 @@ import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
+import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -228,6 +230,43 @@ public interface PersistenceHandler {
 	 * @return a list of access tokens associated with the specified user
 	 */
 	List<PersonalAccessToken> getAccessTokensForUser(String username);
+
+	/**
+	 * Returns all persisted session stubs from the underlying storage.
+	 *
+	 * @return a list of all persisted session stubs
+	 */
+	List<CertificateStub> getAllSessions();
+
+	/**
+	 * Adds a newly created session to storage.
+	 *
+	 * @param certificate the session certificate to persist
+	 */
+	void addSession(Certificate certificate);
+
+	/**
+	 * Updates an existing session's runtime state (e.g. lastAccess).
+	 *
+	 * @param certificate the session certificate to update
+	 */
+	void updateSession(Certificate certificate);
+
+	/**
+	 * Removes a persisted session by session ID.
+	 *
+	 * @param sessionId the session ID to remove
+	 */
+	void removeSession(String sessionId);
+
+	/**
+	 * Removes a persisted session.
+	 *
+	 * @param certificate the session certificate to remove
+	 */
+	default void removeSession(Certificate certificate) {
+		removeSession(certificate.getSessionId());
+	}
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved

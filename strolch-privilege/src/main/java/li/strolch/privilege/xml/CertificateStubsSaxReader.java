@@ -23,6 +23,7 @@ import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.File;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -39,15 +40,25 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
 public class CertificateStubsSaxReader extends DefaultHandler {
 
 	private final InputStream inputStream;
+	private final File file;
 	private List<CertificateStub> stubs;
 
 	public CertificateStubsSaxReader(InputStream inputStream) {
 		this.inputStream = inputStream;
+		this.file = null;
+	}
+
+	public CertificateStubsSaxReader(File file) {
+		this.inputStream = null;
+		this.file = file;
 	}
 
 	public List<CertificateStub> read() {
 		this.stubs = new ArrayList<>();
-		XmlHelper.parseDocument(this.inputStream, this);
+		if (this.file != null)
+			XmlHelper.parseDocument(this.file, this);
+		else
+			XmlHelper.parseDocument(this.inputStream, this);
 		return stubs;
 	}
 
@@ -89,6 +100,38 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		private ZonedDateTime loginTime;
 		private ZonedDateTime lastAccess;
 		private boolean keepAlive;
+
+		public CertificateStub() {
+		}
+
+		public CertificateStub(Usage usage, String sessionId, String username, String authToken, String source,
+				Locale locale, ZonedDateTime loginTime, ZonedDateTime lastAccess, boolean keepAlive) {
+			this.usage = usage;
+			this.sessionId = sessionId;
+			this.username = username;
+			this.authToken = authToken;
+			this.source = source;
+			this.locale = locale;
+			this.loginTime = loginTime;
+			this.lastAccess = lastAccess;
+			this.keepAlive = keepAlive;
+		}
+
+		public CertificateStub(li.strolch.privilege.model.Certificate cert) {
+			this.usage = cert.getUsage();
+			this.sessionId = cert.getSessionId();
+			this.username = cert.getUsername();
+			this.authToken = cert.getAuthToken();
+			this.source = cert.getSource();
+			this.locale = cert.getLocale();
+			this.loginTime = cert.getLoginTime();
+			this.lastAccess = cert.getLastAccess();
+			this.keepAlive = cert.isKeepAlive();
+		}
+
+		public void setLastAccess(ZonedDateTime lastAccess) {
+			this.lastAccess = lastAccess;
+		}
 
 		public Usage getUsage() {
 			return this.usage;

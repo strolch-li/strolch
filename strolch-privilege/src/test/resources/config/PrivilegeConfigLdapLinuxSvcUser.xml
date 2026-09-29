@@ -18,8 +18,6 @@
 <Privilege>
     <Container>
         <Parameters>
-            <Parameter name="secretKey" value="CHANGE-ME"/>
-            <Parameter name="secretSalt" value="CHANGE-ME"/>
             <Parameter name="persistSessions" value="true"/>
             <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>
