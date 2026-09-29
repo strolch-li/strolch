@@ -44,7 +44,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static li.strolch.persistence.api.TransactionThreadLocal.getTx;
 import static li.strolch.persistence.api.TransactionThreadLocal.hasTx;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
-import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_SESSIONS_FILE;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_VERBOSE;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
@@ -114,16 +114,19 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
 			XmlHelper.parseDocument(inputStream, xmlHandler);
 
-			// set sessions data path
 			Map<String, String> parameterMap = containerModel.getParameterMap();
+
+			// set sessions data path
+			Map<String, String> persistenceParameterMap = containerModel.getPersistenceHandlerParameterMap();
 			if (parseBoolean(parameterMap.get(PARAM_PERSIST_SESSIONS))) {
 				File dataPath = runtimeConfig.getTempPath();
-				String sessionsPath = new File(dataPath, "sessions.dat").getAbsolutePath();
-				parameterMap.put(PARAM_PERSIST_SESSIONS_PATH, sessionsPath);
+				String sessionsPath = new File(dataPath, "sessions.xml").getAbsolutePath();
+				persistenceParameterMap.put(PARAM_SESSIONS_FILE, sessionsPath);
 			}
 
-			if (getConfiguration().isVerbose())
+			if (getConfiguration().isVerbose()) {
 				parameterMap.put(PARAM_VERBOSE, "true");
+			}
 
 			return new PrivilegeInitializer(getConfiguration().isVerbose(),
 					getScheduledExecutor(getName())).initializeFromXml(containerModel);
