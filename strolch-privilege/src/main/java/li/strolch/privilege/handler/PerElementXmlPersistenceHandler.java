@@ -59,6 +59,10 @@ import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE_ZONED_DATE;
 public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PerElementXmlPersistenceHandler.class);
+	public static final String TOKEN = "token";
+	public static final String PROPERTIES_SUFFIX = ".properties";
+	public static final String GROUP = "group";
+	public static final String SESSION = "session";
 
 	private final Map<String, User> usersByUsername;
 	private final Map<String, User> usersById;
@@ -74,8 +78,6 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	private boolean autoMigrateMonolithic;
 
 	private File basePath;
-	private File modelDir;
-	private File stateDir;
 
 	private File modelUsersDir;
 	private File modelRolesDir;
@@ -348,7 +350,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void addGroup(Group group) {
 		DBC.PRE.assertNotNull("group may not be null", group);
-		ReentrantLock lock = getLock("group", group.name());
+		ReentrantLock lock = getLock(GROUP, group.name());
 		lock.lock();
 		try {
 			if (this.groups.containsKey(group.name()))
@@ -367,7 +369,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void replaceGroup(Group group) {
 		DBC.PRE.assertNotNull("group may not be null", group);
-		ReentrantLock lock = getLock("group", group.name());
+		ReentrantLock lock = getLock(GROUP, group.name());
 		lock.lock();
 		try {
 			if (!this.groups.containsKey(group.name()))
@@ -386,7 +388,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public Group removeGroup(String groupName) {
 		DBC.PRE.assertNotEmpty("groupName must not be empty", groupName);
-		ReentrantLock lock = getLock("group", groupName);
+		ReentrantLock lock = getLock(GROUP, groupName);
 		lock.lock();
 		try {
 			Group group = this.groups.remove(groupName);
@@ -401,7 +403,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void addAccessToken(PersonalAccessToken accessToken) {
 		DBC.PRE.assertNotNull("accessToken may not be null", accessToken);
-		ReentrantLock lock = getLock("token", accessToken.tokenId());
+		ReentrantLock lock = getLock(TOKEN, accessToken.tokenId());
 		lock.lock();
 		try {
 			if (this.tokens.containsKey(accessToken.tokenId()))
@@ -423,7 +425,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public PersonalAccessToken removeAccessToken(String tokenId) {
 		DBC.PRE.assertNotEmpty("tokenId must not be empty", tokenId);
-		ReentrantLock lock = getLock("token", tokenId);
+		ReentrantLock lock = getLock(TOKEN, tokenId);
 		lock.lock();
 		try {
 			PersonalAccessToken token = this.tokens.remove(tokenId);
@@ -439,7 +441,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	public boolean updateAccessTokenLastUsed(String tokenId, ZonedDateTime lastUsed) {
 		DBC.PRE.assertNotEmpty("tokenId must not be empty", tokenId);
 		DBC.PRE.assertNotNull("lastUsed may not be null", lastUsed);
-		ReentrantLock lock = getLock("token", tokenId);
+		ReentrantLock lock = getLock(TOKEN, tokenId);
 		lock.lock();
 		try {
 			PersonalAccessToken token = this.tokens.get(tokenId);
@@ -463,7 +465,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 			return List.of();
 		if (this.stateSessionsDir == null || !this.stateSessionsDir.exists())
 			return List.of();
-		File[] files = this.stateSessionsDir.listFiles((d, name) -> name.endsWith(".properties"));
+		File[] files = this.stateSessionsDir.listFiles((d, name) -> name.endsWith(PROPERTIES_SUFFIX));
 		if (files == null || files.length == 0)
 			return List.of();
 
@@ -481,7 +483,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		if (!this.persistSessions)
 			return;
 		DBC.PRE.assertNotNull("certificate may not be null", certificate);
-		ReentrantLock lock = getLock("session", certificate.getSessionId());
+		ReentrantLock lock = getLock(SESSION, certificate.getSessionId());
 		lock.lock();
 		try {
 			writeSessionState(certificate);
@@ -495,7 +497,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		if (!this.persistSessions)
 			return;
 		DBC.PRE.assertNotNull("certificate may not be null", certificate);
-		ReentrantLock lock = getLock("session", certificate.getSessionId());
+		ReentrantLock lock = getLock(SESSION, certificate.getSessionId());
 		lock.lock();
 		try {
 			writeSessionState(certificate);
@@ -509,7 +511,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		if (!this.persistSessions)
 			return;
 		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
-		ReentrantLock lock = getLock("session", sessionId);
+		ReentrantLock lock = getLock(SESSION, sessionId);
 		lock.lock();
 		try {
 			deleteSessionFile(sessionId);
@@ -551,17 +553,17 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		String modelDirName = this.parameterMap.getOrDefault(PARAM_MODEL_DIR, PARAM_MODEL_DIR_DEF);
 		String stateDirName = this.parameterMap.getOrDefault(PARAM_STATE_DIR, PARAM_STATE_DIR_DEF);
 
-		this.modelDir = new File(this.basePath, modelDirName);
-		this.stateDir = new File(this.basePath, stateDirName);
+		File modelDir = new File(this.basePath, modelDirName);
+		File stateDir = new File(this.basePath, stateDirName);
 
-		this.modelUsersDir = new File(this.modelDir, "users");
-		this.modelRolesDir = new File(this.modelDir, "roles");
-		this.modelGroupsDir = new File(this.modelDir, "groups");
-		this.modelTokensDir = new File(this.modelDir, "tokens");
+		this.modelUsersDir = new File(modelDir, "users");
+		this.modelRolesDir = new File(modelDir, "roles");
+		this.modelGroupsDir = new File(modelDir, "groups");
+		this.modelTokensDir = new File(modelDir, "tokens");
 
-		this.stateUsersDir = new File(this.stateDir, "users");
-		this.stateTokensDir = new File(this.stateDir, "tokens");
-		this.stateSessionsDir = new File(this.stateDir, "sessions");
+		this.stateUsersDir = new File(stateDir, "users");
+		this.stateTokensDir = new File(stateDir, "tokens");
+		this.stateSessionsDir = new File(stateDir, "sessions");
 
 		reload();
 	}
@@ -751,7 +753,10 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		File sessionsXml = new File(this.basePath,
 				this.parameterMap.getOrDefault(PARAM_SESSIONS_FILE, PARAM_SESSIONS_FILE_DEF));
 
-		if (!usersXml.exists() && !rolesXml.exists() && !groupsXml.exists() && !tokensXml.exists()
+		if (!usersXml.exists()
+				&& !rolesXml.exists()
+				&& !groupsXml.exists()
+				&& !tokensXml.exists()
 				&& (!this.persistSessions || !sessionsXml.exists()))
 			return;
 
@@ -802,6 +807,18 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 					writeSessionState(stub);
 				}
 			}
+
+			if (rolesXml.exists())
+				Files.deleteIfExists(rolesXml.toPath());
+			if (groupsXml.exists())
+				Files.deleteIfExists(groupsXml.toPath());
+			if (tokensXml.exists())
+				Files.deleteIfExists(tokensXml.toPath());
+			if (usersXml.exists())
+				Files.deleteIfExists(usersXml.toPath());
+			if (this.persistSessions && sessionsXml.exists())
+				Files.deleteIfExists(sessionsXml.toPath());
+
 		} catch (Exception e) {
 			throw new PrivilegeException("Failed to auto-migrate monolithic configuration", e);
 		}
@@ -823,12 +840,12 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 			try {
 				Files.move(tmpFile.toPath(), targetFile.toPath(), StandardCopyOption.ATOMIC_MOVE,
 						StandardCopyOption.REPLACE_EXISTING);
-			} catch (AtomicMoveNotSupportedException e) {
+			} catch (AtomicMoveNotSupportedException _) {
 				Files.move(tmpFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (Exception e) {
-			if (tmpFile.exists())
-				tmpFile.delete();
+			if (tmpFile.exists() && !tmpFile.delete())
+				throw new PrivilegeException("Failed to delete token file: " + tmpFile);
 			throw e;
 		}
 	}
@@ -856,11 +873,10 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	private void writeUserState(String userId, UserHistory history) throws Exception {
-		File targetFile = new File(this.stateUsersDir, FileHelper.toSafeFilename(userId) + ".properties");
+		File targetFile = new File(this.stateUsersDir, FileHelper.toSafeFilename(userId) + PROPERTIES_SUFFIX);
 		if (history == null || history.isEmpty()) {
-			if (targetFile.exists())
-				if (!targetFile.delete())
-					logger.warn("Failed to delete user state file: {}", targetFile.getAbsolutePath());
+			if (targetFile.exists() && !targetFile.delete())
+				logger.warn("Failed to delete user state file: {}", targetFile.getAbsolutePath());
 			return;
 		}
 
@@ -880,10 +896,10 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	private void writeTokenState(String tokenId, ZonedDateTime lastUsed) throws Exception {
-		File targetFile = new File(this.stateTokensDir, FileHelper.toSafeFilename(tokenId) + ".properties");
+		File targetFile = new File(this.stateTokensDir, FileHelper.toSafeFilename(tokenId) + PROPERTIES_SUFFIX);
 		if (lastUsed == null) {
-			if (targetFile.exists())
-				targetFile.delete();
+			if (targetFile.exists() && !targetFile.delete())
+				throw new PrivilegeException("Failed to delete token file: " + targetFile);
 			return;
 		}
 
@@ -898,36 +914,36 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 
 	private void deleteUserFiles(String userId) {
 		File userXml = new File(this.modelUsersDir, FileHelper.toSafeFilename(userId) + ".xml");
-		if (userXml.exists())
-			userXml.delete();
-		File userState = new File(this.stateUsersDir, FileHelper.toSafeFilename(userId) + ".properties");
-		if (userState.exists())
-			userState.delete();
+		if (userXml.exists() && !userXml.delete())
+			throw new PrivilegeException("Failed to delete user file: " + userXml);
+		File userState = new File(this.stateUsersDir, FileHelper.toSafeFilename(userId) + PROPERTIES_SUFFIX);
+		if (userState.exists() && !userState.delete())
+			throw new PrivilegeException("Failed to delete user file: " + userState);
 	}
 
 	private void deleteRoleFile(String roleName) {
 		File roleXml = new File(this.modelRolesDir, FileHelper.toSafeFilename(roleName) + ".xml");
-		if (roleXml.exists())
-			roleXml.delete();
+		if (roleXml.exists() && !roleXml.delete())
+			throw new PrivilegeException("Failed to delete role file: " + roleXml);
 	}
 
 	private void deleteGroupFile(String groupName) {
 		File groupXml = new File(this.modelGroupsDir, FileHelper.toSafeFilename(groupName) + ".xml");
-		if (groupXml.exists())
-			groupXml.delete();
+		if (groupXml.exists() && !groupXml.delete())
+			throw new PrivilegeException("Failed to delete group file: " + groupXml);
 	}
 
 	private void deleteTokenFiles(String tokenId) {
 		File tokenXml = new File(this.modelTokensDir, FileHelper.toSafeFilename(tokenId) + ".xml");
-		if (tokenXml.exists())
-			tokenXml.delete();
-		File tokenState = new File(this.stateTokensDir, FileHelper.toSafeFilename(tokenId) + ".properties");
-		if (tokenState.exists())
-			tokenState.delete();
+		if (tokenXml.exists() && !tokenXml.delete())
+			throw new PrivilegeException("Failed to delete token file: " + tokenXml);
+		File tokenState = new File(this.stateTokensDir, FileHelper.toSafeFilename(tokenId) + PROPERTIES_SUFFIX);
+		if (tokenState.exists() && !tokenState.delete())
+			throw new PrivilegeException("Failed to delete token file: " + tokenState);
 	}
 
 	private UserHistory readUserState(String userId) {
-		File targetFile = new File(this.stateUsersDir, FileHelper.toSafeFilename(userId) + ".properties");
+		File targetFile = new File(this.stateUsersDir, FileHelper.toSafeFilename(userId) + PROPERTIES_SUFFIX);
 		if (!targetFile.exists())
 			return null;
 
@@ -951,7 +967,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	private ZonedDateTime readTokenState(String tokenId) {
-		File targetFile = new File(this.stateTokensDir, FileHelper.toSafeFilename(tokenId) + ".properties");
+		File targetFile = new File(this.stateTokensDir, FileHelper.toSafeFilename(tokenId) + PROPERTIES_SUFFIX);
 		if (!targetFile.exists())
 			return null;
 
@@ -972,7 +988,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 
 	private void writeSessionState(CertificateStub cert) {
 		File targetFile = new File(this.stateSessionsDir,
-				FileHelper.toSafeFilename(cert.getSessionId()) + ".properties");
+				FileHelper.toSafeFilename(cert.getSessionId()) + PROPERTIES_SUFFIX);
 		try {
 			writeAtomically(targetFile, tmpFile -> {
 				Properties props = new Properties();
@@ -998,10 +1014,9 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	private void deleteSessionFile(String sessionId) {
-		File sessionState = new File(this.stateSessionsDir, FileHelper.toSafeFilename(sessionId) + ".properties");
-		if (sessionState.exists())
-			if (!sessionState.delete())
-				logger.warn("Failed to delete session state file: {}", sessionState.getAbsolutePath());
+		File sessionState = new File(this.stateSessionsDir, FileHelper.toSafeFilename(sessionId) + PROPERTIES_SUFFIX);
+		if (sessionState.exists() && !sessionState.delete())
+			logger.warn("Failed to delete session state file: {}", sessionState.getAbsolutePath());
 	}
 
 	private CertificateStub readSessionState(File targetFile) {
@@ -1009,7 +1024,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		try (InputStream in = new BufferedInputStream(Files.newInputStream(targetFile.toPath()))) {
 			props.load(in);
 		} catch (IOException e) {
-			logger.error("Failed to read session state from " + targetFile.getAbsolutePath(), e);
+			logger.error("Failed to read session state from {}", targetFile.getAbsolutePath(), e);
 			return null;
 		}
 
