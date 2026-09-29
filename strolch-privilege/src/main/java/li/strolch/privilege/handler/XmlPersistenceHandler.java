@@ -485,9 +485,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// SESSIONS
 		Map<String, CertificateStub> sessions = new ConcurrentHashMap<>();
 		if (this.persistSessions && this.sessionsPath != null && this.sessionsPath.exists()) {
-			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(this.sessionsPath);
-			List<CertificateStub> readSessions = reader.read();
-			readSessions.forEach(s -> sessions.put(s.getSessionId(), s));
+			try {
+				CertificateStubsSaxReader reader = new CertificateStubsSaxReader(this.sessionsPath);
+				reader.read().forEach(s -> sessions.put(s.getSessionId(), s));
+			} catch (Exception e) {
+				logger.error("Could not read sessions from file {}", this.sessionsPath, e);
+				if (!this.sessionsPath.delete())
+					throw new IllegalStateException("Could not delete sessions file " + this.sessionsPath);
+			}
 		}
 		synchronized (this.sessions) {
 			this.sessions.clear();
@@ -545,92 +550,113 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public boolean persist() throws XMLStreamException, IOException {
 		long start = System.nanoTime();
-		boolean saved = false;
 
-		// write users file
-		if (this.usersDirty) {
-			List<User> users;
-			synchronized (this) {
-				users = getAllUsers();
-				this.usersDirty = false;
-			}
-			try {
-				new PrivilegeUsersSaxWriter(users, this.usersPath).write();
-				saved = true;
-			} catch (Exception e) {
-				this.usersDirty = true;
-				throw e;
-			}
-		}
-
-		// write groups file
-		if (this.groupsDirty) {
-			List<Group> groups;
-			synchronized (this.groups) {
-				groups = new LinkedList<>(this.groups.values());
-				this.groupsDirty = false;
-			}
-			try {
-				new PrivilegeGroupsSaxWriter(groups, this.groupsPath).write();
-				saved = true;
-			} catch (Exception e) {
-				this.groupsDirty = true;
-				throw e;
-			}
-		}
-
-		// write roles file
-		if (this.rolesDirty) {
-			List<Role> roles;
-			synchronized (this.roles) {
-				roles = new LinkedList<>(this.roles.values());
-				this.rolesDirty = false;
-			}
-			try {
-				new PrivilegeRolesSaxWriter(roles, this.rolesPath).write();
-				saved = true;
-			} catch (Exception e) {
-				this.rolesDirty = true;
-				throw e;
-			}
-		}
-
-		// write tokens file
-		if (this.tokensDirty) {
-			List<PersonalAccessToken> tokens;
-			synchronized (this.tokens) {
-				tokens = new LinkedList<>(this.tokens.values());
-				this.tokensDirty = false;
-			}
-			try {
-				new PrivilegeTokensSaxWriter(tokens, this.tokensPath).write();
-				saved = true;
-			} catch (Exception e) {
-				this.tokensDirty = true;
-				throw e;
-			}
-		}
-
-		// write sessions file
-		if (this.persistSessions && this.sessionsDirty) {
-			List<CertificateStub> sessions;
-			synchronized (this.sessions) {
-				sessions = new LinkedList<>(this.sessions.values());
-				this.sessionsDirty = false;
-			}
-			try {
-				new CertificateStubsSaxWriter(sessions, this.sessionsPath).write();
-				saved = true;
-			} catch (Exception e) {
-				this.sessionsDirty = true;
-				throw e;
-			}
-		}
+		boolean saved;
+		saved = writeUsersFile();
+		saved = writeGroupsFile() || saved;
+		saved = writeRolesFile() || saved;
+		saved = writeTokensFile() || saved;
+		saved = writeSessionsFile() || saved;
 
 		long tookNanos = System.nanoTime() - start;
 		if (TimeUnit.NANOSECONDS.toMillis(tookNanos) > 100)
 			logger.warn("Persist took {}", formatNanoDuration(tookNanos));
 		return saved;
+	}
+
+	private boolean writeSessionsFile() throws IOException, XMLStreamException {
+		if (!this.persistSessions || !this.sessionsDirty)
+			return false;
+
+		List<CertificateStub> sessions;
+		synchronized (this.sessions) {
+			sessions = new LinkedList<>(this.sessions.values());
+			this.sessionsDirty = false;
+		}
+
+		try {
+			new CertificateStubsSaxWriter(sessions, this.sessionsPath).write();
+			return true;
+		} catch (Exception e) {
+			this.sessionsDirty = true;
+			throw e;
+		}
+	}
+
+	private boolean writeTokensFile() throws IOException, XMLStreamException {
+		if (!this.tokensDirty)
+			return false;
+
+		List<PersonalAccessToken> tokens;
+		synchronized (this.tokens) {
+			tokens = new LinkedList<>(this.tokens.values());
+			this.tokensDirty = false;
+		}
+
+		try {
+			new PrivilegeTokensSaxWriter(tokens, this.tokensPath).write();
+			return true;
+		} catch (Exception e) {
+			this.tokensDirty = true;
+			throw e;
+		}
+	}
+
+	private boolean writeRolesFile() throws IOException, XMLStreamException {
+		if (!this.rolesDirty)
+			return false;
+
+		List<Role> roles;
+		synchronized (this.roles) {
+			roles = new LinkedList<>(this.roles.values());
+			this.rolesDirty = false;
+		}
+
+		try {
+			new PrivilegeRolesSaxWriter(roles, this.rolesPath).write();
+			return true;
+		} catch (Exception e) {
+			this.rolesDirty = true;
+			throw e;
+		}
+	}
+
+	private boolean writeGroupsFile() throws IOException, XMLStreamException {
+		if (!this.groupsDirty)
+			return false;
+
+		List<Group> groups;
+		synchronized (this.groups) {
+			groups = new LinkedList<>(this.groups.values());
+			this.groupsDirty = false;
+		}
+
+		try {
+			new PrivilegeGroupsSaxWriter(groups, this.groupsPath).write();
+			return true;
+		} catch (Exception e) {
+			this.groupsDirty = true;
+			throw e;
+		}
+	}
+
+	private boolean writeUsersFile() throws IOException, XMLStreamException {
+		if (!this.usersDirty)
+			return false;
+
+		List<User> users;
+		synchronized (this) {
+			users = getAllUsers();
+			this.usersDirty = false;
+		}
+
+		try {
+			new PrivilegeUsersSaxWriter(users, this.usersPath).write();
+			return true;
+		} catch (Exception e) {
+			this.usersDirty = true;
+			throw e;
+		}
 	}
 
 	protected String evaluateUsername(String username) {
