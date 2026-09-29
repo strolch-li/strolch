@@ -16,18 +16,24 @@
 
 package li.strolch.privilege.test;
 
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.handler.XmlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PersonalAccessTokenRep;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.internal.Role;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
@@ -100,8 +106,8 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 		ZonedDateTime validFrom = ZonedDateTime.now().minusDays(2);
 		ZonedDateTime validTo = ZonedDateTime.now().minusDays(1);
 
-		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Expired Token", validFrom, validTo,
-				null, null);
+		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Expired Token", validFrom, validTo, null,
+				null);
 
 		try {
 			this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
@@ -303,7 +309,9 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 			fail("Should have failed to create token for admin as jill");
 		} catch (Exception e) {
 			// Either fails because Jill lacks PrivilegePersonalAccessToken or lacks UserAccessPrivilege
-			assertTrue(e.getMessage().contains("PrivilegePersonalAccessToken") || e.getMessage().contains("AccessDeniedException"));
+			assertTrue(e.getMessage().contains("PrivilegePersonalAccessToken") || e
+					.getMessage()
+					.contains("AccessDeniedException"));
 		}
 	}
 
@@ -350,5 +358,183 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 		} catch (Exception e) {
 			assertTrue(e.getMessage().contains("does not have any of the given roles or privileges"));
 		}
+	}
+
+	@Test
+	public void shouldHandleConcurrentAuthenticationAndRevocation() throws Exception {
+		login("admin", "admin".toCharArray());
+		Certificate adminCert = this.ctx.getCertificate();
+
+		ZonedDateTime validFrom = ZonedDateTime.now().minusDays(1);
+		ZonedDateTime validTo = validFrom.plusYears(1);
+
+		String token = this.privilegeHandler.createPersonalAccessToken(adminCert, "Concurrent Token", validFrom,
+				validTo, null, null);
+		String tokenId = token.split(":")[0];
+
+		int numAuthThreads = 8;
+		ExecutorService executor = Executors.newFixedThreadPool(numAuthThreads + 1);
+		CountDownLatch readyLatch = new CountDownLatch(numAuthThreads + 1);
+		CountDownLatch startLatch = new CountDownLatch(1);
+		AtomicInteger successfulAuths = new AtomicInteger();
+		AtomicInteger failedAuths = new AtomicInteger();
+
+		List<Future<?>> futures = new ArrayList<>();
+
+		for (int i = 0; i < numAuthThreads; i++) {
+			futures.add(executor.submit(() -> {
+				readyLatch.countDown();
+				try {
+					startLatch.await();
+					for (int j = 0; j < 50; j++) {
+						try {
+							Certificate cert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+							if (cert != null)
+								successfulAuths.incrementAndGet();
+						} catch (AccessDeniedException e) {
+							failedAuths.incrementAndGet();
+						}
+					}
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}));
+		}
+
+		futures.add(executor.submit(() -> {
+			readyLatch.countDown();
+			try {
+				startLatch.await();
+				Thread.sleep(5);
+				this.privilegeHandler.removePersonalAccessToken(adminCert, tokenId);
+			} catch (Exception e) {
+				logger.error("Failed to revoke token", e);
+			}
+		}));
+
+		readyLatch.await();
+		startLatch.countDown();
+
+		for (Future<?> future : futures) {
+			future.get(10, TimeUnit.SECONDS);
+		}
+		executor.shutdown();
+
+		// Token must be completely revoked and cannot be authenticated anymore
+		try {
+			this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+			fail("Token should be revoked!");
+		} catch (AccessDeniedException e) {
+			assertEquals("Invalid personal access token!", e.getMessage());
+		}
+
+		List<PersonalAccessTokenRep> tokens = this.privilegeHandler.getPersonalAccessTokens(adminCert);
+		assertTrue(tokens.isEmpty());
+	}
+
+	@Test
+	public void shouldHandleSimultaneousAuthentications() throws Exception {
+		login("admin", "admin".toCharArray());
+		Certificate adminCert = this.ctx.getCertificate();
+
+		ZonedDateTime validFrom = ZonedDateTime.now().minusDays(1);
+		ZonedDateTime validTo = validFrom.plusYears(1);
+
+		String token = this.privilegeHandler.createPersonalAccessToken(adminCert, "Simultaneous Token", validFrom,
+				validTo, null, null);
+
+		int numThreads = 8;
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		CountDownLatch readyLatch = new CountDownLatch(numThreads);
+		CountDownLatch startLatch = new CountDownLatch(1);
+		AtomicInteger successCount = new AtomicInteger();
+
+		List<Future<?>> futures = new ArrayList<>();
+		for (int i = 0; i < numThreads; i++) {
+			futures.add(executor.submit(() -> {
+				readyLatch.countDown();
+				try {
+					startLatch.await();
+					for (int j = 0; j < 20; j++) {
+						Certificate cert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+						assertNotNull(cert);
+						assertEquals("admin", cert.getUsername());
+						successCount.incrementAndGet();
+					}
+				} catch (Exception e) {
+					logger.error("Authentication failed", e);
+				}
+			}));
+		}
+
+		readyLatch.await();
+		startLatch.countDown();
+
+		for (Future<?> future : futures) {
+			future.get(10, TimeUnit.SECONDS);
+		}
+		executor.shutdown();
+
+		assertEquals(numThreads * 20, successCount.get());
+	}
+
+	@Test
+	public void shouldPersistAndReloadAfterRevocation() throws Exception {
+		login("admin", "admin".toCharArray());
+		Certificate adminCert = this.ctx.getCertificate();
+
+		ZonedDateTime validFrom = ZonedDateTime.now().minusDays(1);
+		ZonedDateTime validTo = validFrom.plusYears(1);
+
+		String token = this.privilegeHandler.createPersonalAccessToken(adminCert, "Persist Revoke Token", validFrom,
+				validTo, null, null);
+		String tokenId = token.split(":")[0];
+
+		// Authenticate to update lastUsed
+		Certificate apiCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+		assertNotNull(apiCert);
+
+		// Revoke token
+		this.privilegeHandler.removePersonalAccessToken(adminCert, tokenId);
+
+		// Persist model
+		this.privilegeHandler.persist(adminCert);
+
+		// Re-initialize privilegeHandler to simulate restart
+		initialize(TARGET_DIR, "PrivilegeConfig.xml");
+
+		login("admin", "admin".toCharArray());
+		adminCert = this.ctx.getCertificate();
+
+		List<PersonalAccessTokenRep> tokens = this.privilegeHandler.getPersonalAccessTokens(adminCert);
+		assertTrue(tokens.isEmpty());
+
+		try {
+			this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+			fail("Token should not exist after reload!");
+		} catch (AccessDeniedException e) {
+			assertEquals("Invalid personal access token!", e.getMessage());
+		}
+	}
+
+	@Test
+	public void shouldNotUpdateNonExistentTokenLastUsed() {
+		XmlPersistenceHandler persistenceHandler = new XmlPersistenceHandler();
+		boolean updated = persistenceHandler.updateAccessTokenLastUsed("non-existent-id", ZonedDateTime.now());
+		assertFalse(updated);
+		assertNull(persistenceHandler.getAccessToken("non-existent-id"));
+	}
+
+	@Test
+	public void shouldMaintainDirtyFlagOnFailedTokenRemoval() {
+		XmlPersistenceHandler persistenceHandler = new XmlPersistenceHandler();
+		// Add a role to make rolesDirty = true
+		persistenceHandler.addRole(new Role("TestRole", Map.of()));
+		// Try to remove non-existent token
+		persistenceHandler.removeAccessToken("non-existent-id");
+		// Verify persistence still has role and removing non-existent group/role also doesn't reset dirty flags
+		persistenceHandler.removeGroup("non-existent-group");
+		persistenceHandler.removeRole("non-existent-role");
+		assertNotNull(persistenceHandler.getRole("TestRole"));
 	}
 }

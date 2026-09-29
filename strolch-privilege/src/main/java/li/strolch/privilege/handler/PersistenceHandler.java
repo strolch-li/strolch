@@ -25,6 +25,7 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -208,6 +209,16 @@ public interface PersistenceHandler {
 	 * @param tokenId the id of the {@link PersonalAccessToken} to be removed
 	 */
 	PersonalAccessToken removeAccessToken(String tokenId);
+
+	/**
+	 * Updates the {@code lastUsed} timestamp of an existing {@link PersonalAccessToken}.
+	 *
+	 * @param tokenId  the id of the {@link PersonalAccessToken} to update
+	 * @param lastUsed the new {@code lastUsed} timestamp
+	 *
+	 * @return true if the token was found and updated, false otherwise
+	 */
+	boolean updateAccessTokenLastUsed(String tokenId, ZonedDateTime lastUsed);
 
 	/**
 	 * Retrieves a list of access tokens associated with a specified user.

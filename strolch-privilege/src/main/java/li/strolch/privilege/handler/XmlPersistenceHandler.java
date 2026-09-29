@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,16 +154,22 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public Group removeGroup(String groupName) {
-		Group group = this.groups.remove(groupName);
-		this.groupsDirty = group != null;
-		return group;
+		synchronized (this.groups) {
+			Group group = this.groups.remove(groupName);
+			if (group != null)
+				this.groupsDirty = true;
+			return group;
+		}
 	}
 
 	@Override
 	public Role removeRole(String roleName) {
-		Role role = this.roles.remove(roleName);
-		this.rolesDirty = role != null;
-		return role;
+		synchronized (this.roles) {
+			Role role = this.roles.remove(roleName);
+			if (role != null)
+				this.rolesDirty = true;
+			return role;
+		}
 	}
 
 	@Override
@@ -199,36 +206,44 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addGroup(Group group) {
-		if (this.groups.containsKey(group.name()))
-			throw new IllegalStateException(format("The group {0} already exists!", group.name()));
-		this.groups.put(group.name(), group);
-		this.groupsDirty = true;
+		synchronized (this.groups) {
+			if (this.groups.containsKey(group.name()))
+				throw new IllegalStateException(format("The group {0} already exists!", group.name()));
+			this.groups.put(group.name(), group);
+			this.groupsDirty = true;
+		}
 	}
 
 	@Override
 	public void replaceGroup(Group group) {
-		if (!this.groups.containsKey(group.name()))
-			throw new IllegalStateException(
-					format("The group {0} can not be replaced as it does not exist!", group.name()));
-		this.groups.put(group.name(), group);
-		this.groupsDirty = true;
+		synchronized (this.groups) {
+			if (!this.groups.containsKey(group.name()))
+				throw new IllegalStateException(
+						format("The group {0} can not be replaced as it does not exist!", group.name()));
+			this.groups.put(group.name(), group);
+			this.groupsDirty = true;
+		}
 	}
 
 	@Override
 	public void addRole(Role role) {
-		if (this.roles.containsKey(role.getName()))
-			throw new IllegalStateException(format("The role {0} already exists!", role.getName()));
-		this.roles.put(role.getName(), role);
-		this.rolesDirty = true;
+		synchronized (this.roles) {
+			if (this.roles.containsKey(role.getName()))
+				throw new IllegalStateException(format("The role {0} already exists!", role.getName()));
+			this.roles.put(role.getName(), role);
+			this.rolesDirty = true;
+		}
 	}
 
 	@Override
 	public void replaceRole(Role role) {
-		if (!this.roles.containsKey(role.getName()))
-			throw new IllegalStateException(
-					format("The role {0} can not be replaced as it does not exist!", role.getName()));
-		this.roles.put(role.getName(), role);
-		this.rolesDirty = true;
+		synchronized (this.roles) {
+			if (!this.roles.containsKey(role.getName()))
+				throw new IllegalStateException(
+						format("The role {0} can not be replaced as it does not exist!", role.getName()));
+			this.roles.put(role.getName(), role);
+			this.rolesDirty = true;
+		}
 	}
 
 	@Override
@@ -238,17 +253,35 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addAccessToken(PersonalAccessToken accessToken) {
-		if (this.tokens.containsKey(accessToken.tokenId()))
-			throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
-		this.tokens.put(accessToken.tokenId(), accessToken);
-		this.tokensDirty = true;
+		synchronized (this.tokens) {
+			if (this.tokens.containsKey(accessToken.tokenId()))
+				throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
+			this.tokens.put(accessToken.tokenId(), accessToken);
+			this.tokensDirty = true;
+		}
 	}
 
 	@Override
 	public PersonalAccessToken removeAccessToken(String tokenId) {
-		PersonalAccessToken token = this.tokens.remove(tokenId);
-		this.tokensDirty = token != null;
-		return token;
+		synchronized (this.tokens) {
+			PersonalAccessToken token = this.tokens.remove(tokenId);
+			if (token != null)
+				this.tokensDirty = true;
+			return token;
+		}
+	}
+
+	@Override
+	public boolean updateAccessTokenLastUsed(String tokenId, ZonedDateTime lastUsed) {
+		synchronized (this.tokens) {
+			PersonalAccessToken updated = this.tokens.computeIfPresent(tokenId,
+					(id, token) -> token.withLastUsed(lastUsed));
+			if (updated != null) {
+				this.tokensDirty = true;
+				return true;
+			}
+			return false;
+		}
 	}
 
 	@Override
@@ -434,30 +467,66 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// write users file
 		if (this.usersDirty) {
-			new PrivilegeUsersSaxWriter(getAllUsers(), this.usersPath).write();
-			this.usersDirty = false;
-			saved = true;
+			List<User> users;
+			synchronized (this) {
+				users = getAllUsers();
+				this.usersDirty = false;
+			}
+			try {
+				new PrivilegeUsersSaxWriter(users, this.usersPath).write();
+				saved = true;
+			} catch (Exception e) {
+				this.usersDirty = true;
+				throw e;
+			}
 		}
 
 		// write groups file
 		if (this.groupsDirty) {
-			new PrivilegeGroupsSaxWriter(getAllGroups(), this.groupsPath).write();
-			this.groupsDirty = false;
-			saved = true;
+			List<Group> groups;
+			synchronized (this.groups) {
+				groups = new LinkedList<>(this.groups.values());
+				this.groupsDirty = false;
+			}
+			try {
+				new PrivilegeGroupsSaxWriter(groups, this.groupsPath).write();
+				saved = true;
+			} catch (Exception e) {
+				this.groupsDirty = true;
+				throw e;
+			}
 		}
 
 		// write roles file
 		if (this.rolesDirty) {
-			new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath).write();
-			this.rolesDirty = false;
-			saved = true;
+			List<Role> roles;
+			synchronized (this.roles) {
+				roles = new LinkedList<>(this.roles.values());
+				this.rolesDirty = false;
+			}
+			try {
+				new PrivilegeRolesSaxWriter(roles, this.rolesPath).write();
+				saved = true;
+			} catch (Exception e) {
+				this.rolesDirty = true;
+				throw e;
+			}
 		}
 
 		// write tokens file
 		if (this.tokensDirty) {
-			new PrivilegeTokensSaxWriter(getAllAccessTokens(), this.tokensPath).write();
-			this.tokensDirty = false;
-			saved = true;
+			List<PersonalAccessToken> tokens;
+			synchronized (this.tokens) {
+				tokens = new LinkedList<>(this.tokens.values());
+				this.tokensDirty = false;
+			}
+			try {
+				new PrivilegeTokensSaxWriter(tokens, this.tokensPath).write();
+				saved = true;
+			} catch (Exception e) {
+				this.tokensDirty = true;
+				throw e;
+			}
 		}
 
 		long tookNanos = System.nanoTime() - start;

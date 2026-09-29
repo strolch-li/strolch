@@ -508,7 +508,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void removePersonalAccessToken(Certificate certificate, String tokenId) {
-		this.crudHandler.removePersonalAccessToken(certificate, tokenId);
+		this.lockingHandler.lockedExecute(tokenId,
+				() -> this.crudHandler.removePersonalAccessToken(certificate, tokenId));
 	}
 
 	@Override
@@ -524,6 +525,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String tokenId = parts[0];
 		String tokenValue = parts[1];
 
+		return this.lockingHandler.lockedExecuteWithResult(tokenId,
+				() -> internalAuthenticatePersonalAccessToken(tokenId, tokenValue, source));
+	}
+
+	protected Certificate internalAuthenticatePersonalAccessToken(String tokenId, String tokenValue, String source)
+			throws AccessDeniedException {
 		// check cache
 		PersonalAccessTokenCacheEntry cachedEntry = this.personalAccessTokenCache.get(tokenId);
 		if (cachedEntry != null) {
@@ -578,13 +585,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new AccessDeniedException("User " + pat.username() + " is " + user.getUserState());
 
 		// update last used
-		PersonalAccessToken updatedToken = pat.withLastUsed(ZonedDateTime.now());
-		this.persistenceHandler.removeAccessToken(pat.tokenId());
-		this.persistenceHandler.addAccessToken(updatedToken);
+		ZonedDateTime now = ZonedDateTime.now();
+		if (!this.persistenceHandler.updateAccessTokenLastUsed(pat.tokenId(), now)) {
+			throw new AccessDeniedException("Invalid personal access token!");
+		}
+		PersonalAccessToken updatedToken = pat.withLastUsed(now);
 
 		// Build context
-		PrivilegeContext prvCtx = getPrivilegeContextBuilder().buildPrivilegeContext(updatedToken, user, source,
-				ZonedDateTime.now());
+		PrivilegeContext prvCtx = getPrivilegeContextBuilder().buildPrivilegeContext(updatedToken, user, source, now);
 		this.privilegeContextMap.put(prvCtx.getCertificate().getSessionId(), prvCtx);
 		this.personalAccessTokenCache.put(tokenId,
 				new PersonalAccessTokenCacheEntry(prvCtx, tokenValue, passwordCrypt.salt()));
