@@ -132,4 +132,13 @@ public class FileHelperTest {
 				month, day, hour, timestamp);
 		assertEquals(new File(tempPath, expected), path);
 	}
+
+	@Test
+	public void shouldConvertSafeFilename() {
+		assertEquals("admin", FileHelper.toSafeFilename("admin"));
+		assertEquals("user_domain.com", FileHelper.toSafeFilename("user@domain.com"));
+		assertEquals("550e8400-e29b-41d4", FileHelper.toSafeFilename("550e8400-e29b-41d4"));
+		assertEquals("Domain_User", FileHelper.toSafeFilename("Domain\\User"));
+		assertEquals("Role_Name_123", FileHelper.toSafeFilename("Role Name/123"));
+	}
 }

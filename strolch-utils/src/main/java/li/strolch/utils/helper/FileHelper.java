@@ -419,4 +419,17 @@ public class FileHelper {
 			throw new RuntimeException("Something went wrong while hashing file: " + file.getAbsolutePath());
 		}
 	}
+
+	/**
+	 * Replaces unsafe characters in a filename with underscores
+	 *
+	 * @param name the filename or identifier to sanitize
+	 *
+	 * @return the sanitized safe filename
+	 */
+	public static String toSafeFilename(String name) {
+		if (name == null)
+			return null;
+		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
+	}
 }
