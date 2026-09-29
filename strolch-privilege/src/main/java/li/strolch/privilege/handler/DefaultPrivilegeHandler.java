@@ -647,13 +647,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				history = history.withFirstLogin(ZonedDateTime.now());
 
 			if (this.persistenceHandler.hasUser(user.getUsername())) {
-				// we replace the user
-				this.persistenceHandler.replaceUser(user.withHistory(history));
+				// we update the user state
+				this.persistenceHandler.updateUserState(user.withHistory(history));
 			} else {
 				// for remote, the user won't exist, if it is the user's first login
 				this.persistenceHandler.addUser(user.withHistory(history));
 			}
-			persistModelAsync();
 
 			// return the certificate
 			return certificate;
@@ -715,7 +714,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user.withHistory(history));
 		}
-		persistModelAsync();
 
 		// initialize a new privilege context
 		Certificate certificate = buildPrivilegeContext(Usage.ANY, user, source, ZonedDateTime.now(),
@@ -944,7 +942,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(user);
-			persistModelAsync();
 
 			logger.info("Updated password for {}", user.getUsername());
 		}
@@ -1075,23 +1072,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} catch (XMLStreamException | IOException e) {
 			throw new IllegalStateException("Failed to persist model", e);
 		}
-	}
-
-	protected synchronized void persistModelAsync() {
-		if (!this.autoPersistOnUserChangesData)
-			return;
-
-		// async execution, max. once per second
-		if (this.persistModelTask != null)
-			this.persistModelTask.cancel(true);
-		this.persistModelTask = this.executorService.schedule(
-				() -> this.lockingHandler.lockedExecute("persist-model", () -> {
-					try {
-						this.persistenceHandler.persist();
-					} catch (Exception e) {
-						logger.error("Failed to persist model!", e);
-					}
-				}), 1, TimeUnit.SECONDS);
 	}
 
 	@Override

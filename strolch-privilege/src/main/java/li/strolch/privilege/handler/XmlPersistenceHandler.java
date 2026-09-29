@@ -212,6 +212,19 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
+	public synchronized boolean updateUserState(User user) {
+		DBC.PRE.assertNotNull("user may not be null", user);
+		DBC.PRE.assertNotEmpty(() -> "userId must not be empty for user " + user.username(), user.userId());
+		String username = evaluateUsername(user.getUsername());
+		if (!this.usersByUsername.containsKey(username) || !this.usersById.containsKey(user.getUserId()))
+			return false;
+		this.usersByUsername.put(username, user);
+		this.usersById.put(user.getUserId(), user);
+		this.usersDirty = true;
+		return true;
+	}
+
+	@Override
 	public void addGroup(Group group) {
 		synchronized (this.groups) {
 			if (this.groups.containsKey(group.name()))

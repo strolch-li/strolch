@@ -25,6 +25,8 @@ import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static li.strolch.privilege.helper.XmlConstants.*;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;

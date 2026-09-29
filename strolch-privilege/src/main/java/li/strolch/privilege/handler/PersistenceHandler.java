@@ -162,6 +162,16 @@ public interface PersistenceHandler {
 	void replaceUser(User user);
 
 	/**
+	 * Updates the dynamic state (e.g. {@link li.strolch.privilege.model.internal.UserHistory}) of an existing
+	 * {@link User}.
+	 *
+	 * @param user the {@link User} containing updated state
+	 *
+	 * @return true if the user was found and updated, false otherwise
+	 */
+	boolean updateUserState(User user);
+
+	/**
 	 * Adds a {@link Role} object to the underlying database
 	 *
 	 * @param role the {@link Role} object to add

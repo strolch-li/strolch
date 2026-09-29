@@ -70,8 +70,8 @@ A group is a collection of roles and properties that can be associated with user
 
 The `PersistenceHandler` interface defines how the model is stored.
 
-### XML Persistence
-`XmlPersistenceHandler` stores the model in XML files.
+### XML Persistence (Monolithic)
+`XmlPersistenceHandler` stores the entire model in monolithic XML files:
 - `PrivilegeUsers.xml`: User definitions and history.
 - `PrivilegeRoles.xml`: Role and privilege definitions.
 - `PrivilegeGroups.xml`: Group definitions.
@@ -88,6 +88,24 @@ The `PersistenceHandler` interface defines how the model is stored.
 | `tokensXmlFile` | Name of the tokens XML file. | `PrivilegeTokens.xml` |
 | `caseInsensitiveUsername` | Treats usernames as case-insensitive. | `true` |
 
+### Per-Element XML Persistence (Recommended)
+`PerElementXmlPersistenceHandler` partitions static configuration and dynamic runtime state into separate per-element files under `basePath`:
+- `model/`: Individual XML files for `users/`, `roles/`, `groups/`, and `tokens/`.
+- `state/`: Individual `.properties` files for runtime volatile state (`firstLogin`, `lastLogin` for users; `lastUsed` for PATs).
+
+For full details, architecture, and configuration options, see the [Per-Element XML Persistence Specification](PerElementXmlPersistenceHandler.md).
+
+#### Properties
+
+| Property | Description | Default |
+| --- | --- | --- |
+| `basePath` | Base path containing model and state directories. | **Required** |
+| `modelDir` | Subdirectory name for static XML configuration. | `model` |
+| `stateDir` | Subdirectory name for dynamic runtime state. | `state` |
+| `caseInsensitiveUsername` | Treats usernames as case-insensitive. | `true` |
+| `autoMigrateMonolithic` | Auto-migrates legacy monolithic files if `model/` is empty. | `true` |
+| `verbose` | Enables verbose logging during parsing. | `false` |
+
 ## Configuration
 
 The `PrivilegeHandler` is configured via a `PrivilegeConfig.xml` file or within the `StrolchConfiguration.xml`.
@@ -103,8 +121,6 @@ The `PrivilegeHandler` is configured via a `PrivilegeConfig.xml` file or within 
 | `allowSessionRefresh` | Allows refreshing an expired session. | `false` |
 | `allowPasswordReset` | Allows password resets via `UserChallengeHandler`. | `false` |
 | `disallowSourceChange` | Prevents a session from being used from a different IP/source. | `false` |
-| `secretKey` | Secret key used for encryption (AES). | **Required** |
-| `secretSalt` | Secret salt used for encryption (AES). | **Required** |
 | `privilegeConflictResolution` | Resolution strategy when multiple roles define the same privilege (`STRICT`, `MERGE`). | `MERGE` |
 
 ### EncryptionHandler Properties
@@ -221,8 +237,6 @@ The main configuration file for the `PrivilegeHandler`.
 
         <Parameters>
             <!-- parameters for the container itself -->
-            <Parameter name="secretKey" value="secret-key"/>
-            <Parameter name="secretSalt" value="secret-key"/>
             <Parameter name="persistSessions" value="true"/>
             <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>

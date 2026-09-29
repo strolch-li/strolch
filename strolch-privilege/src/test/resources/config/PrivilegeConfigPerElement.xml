@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 Robert von Burg <eitch@eitchnet.ch>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<Privilege>
+
+    <Container>
+
+        <Parameters>
+            <!-- parameters for the container itself -->
+            <Parameter name="persistSessions" value="true"/>
+            <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
+            <Parameter name="autoPersistOnUserChangesData" value="true"/>
+            <Parameter name="privilegeConflictResolution" value="STRICT"/>
+            <Parameter name="allowPasswordReset" value="true"/>
+        </Parameters>
+
+        <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
+            <Parameters>
+                <Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512"/>
+                <Parameter name="hashIterations" value="10000"/>
+                <Parameter name="hashKeyLength" value="256"/>
+            </Parameters>
+        </EncryptionHandler>
+
+        <PersistenceHandler class="li.strolch.privilege.handler.PerElementXmlPersistenceHandler">
+            <Parameters>
+                <Parameter name="basePath" value="target/${target}"/>
+                <Parameter name="modelDir" value="model"/>
+                <Parameter name="stateDir" value="state"/>
+                <Parameter name="caseInsensitiveUsername" value="true"/>
+                <Parameter name="autoMigrateMonolithic" value="true"/>
+                <Parameter name="verbose" value="false"/>
+            </Parameters>
+        </PersistenceHandler>
+
+        <UserChallengeHandler class="li.strolch.privilege.test.model.TestUserChallengeHandler">
+        </UserChallengeHandler>
+
+        <SsoHandler class="li.strolch.privilege.test.model.DummySsoHandler"/>
+
+    </Container>
+
+    <Policies>
+        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
+        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege"/>
+        <Policy name="GroupAccessPrivilege" class="li.strolch.privilege.policy.GroupAccessPrivilege"/>
+        <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
+        <Policy name="UserSessionAccessPrivilege" class="li.strolch.privilege.policy.UsernameFromCertificatePrivilege"/>
+    </Policies>
+
+</Privilege>

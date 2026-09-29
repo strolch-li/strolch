@@ -19,6 +19,7 @@ The `strolch-privilege` module is a lightweight and extensible library for secur
 ## Documentation
 - [Technical Specification](docs/technical-spec.md) - Detailed architecture and configuration guide.
 - [Personal Access Tokens](docs/PersonalAccessToken.md) - Guide for using and managing PATs.
+- [Per-Element XML Persistence](docs/PerElementXmlPersistenceHandler.md) - Specification for granular, per-element XML and state persistence.
 
 ## Setup
 
