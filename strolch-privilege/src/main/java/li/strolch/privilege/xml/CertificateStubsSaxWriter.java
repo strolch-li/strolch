@@ -92,7 +92,7 @@ public class CertificateStubsSaxWriter {
 			xmlWriter.writeAttribute(ATTR_USERNAME, cert.getUsername());
 
 			// authToken;
-			xmlWriter.writeAttribute(ATTR_AUTH_TOKEN, cert.getAuthToken());
+			xmlWriter.writeAttribute(ATTR_AUTH_TOKEN, cert.getAuthTokenCrypt().buildPasswordString());
 
 			// source;
 			xmlWriter.writeAttribute(ATTR_SOURCE, cert.getSource());

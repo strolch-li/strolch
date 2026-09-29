@@ -334,7 +334,7 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 		// Validate certificate with login time older than 1 hour
 		Certificate oldLoginCert = new Certificate(apiCert.getUsage(), apiCert.getSessionId(), apiCert.getUserId(),
 				apiCert.getUsername(), apiCert.getFirstname(), apiCert.getLastname(), apiCert.getUserState(),
-				apiCert.getAuthToken(), apiCert.getSource(), ZonedDateTime.now().minusHours(2), apiCert.isKeepAlive(),
+				apiCert.getAuthTokenCrypt(), apiCert.getAuthToken(), apiCert.getSource(), ZonedDateTime.now().minusHours(2), apiCert.isKeepAlive(),
 				apiCert.getLocale(), apiCert.getUserGroups(), apiCert.getUserRoles(), apiCert.getProperties());
 
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(oldLoginCert, "api-test");

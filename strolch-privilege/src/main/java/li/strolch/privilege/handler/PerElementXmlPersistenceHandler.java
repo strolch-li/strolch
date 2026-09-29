@@ -19,6 +19,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Usage;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
@@ -995,7 +996,7 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 				props.setProperty(PROP_SESSION_ID, cert.getSessionId());
 				props.setProperty(PROP_USERNAME, cert.getUsername());
 				props.setProperty(PROP_USAGE, cert.getUsage().name());
-				props.setProperty(PROP_AUTH_TOKEN, cert.getAuthToken());
+				props.setProperty(PROP_AUTH_TOKEN, cert.getAuthTokenCrypt().buildPasswordString());
 				props.setProperty(PROP_SOURCE, cert.getSource());
 				props.setProperty(PROP_LOCALE, cert.getLocale().toLanguageTag());
 				props.setProperty(PROP_LOGIN_TIME, ISO8601.toString(cert.getLoginTime()));
@@ -1031,14 +1032,14 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		String sessionId = props.getProperty(PROP_SESSION_ID);
 		String username = props.getProperty(PROP_USERNAME);
 		String usageS = props.getProperty(PROP_USAGE);
-		String authToken = props.getProperty(PROP_AUTH_TOKEN);
+		String authTokenS = props.getProperty(PROP_AUTH_TOKEN);
 		String source = props.getProperty(PROP_SOURCE);
 		String localeS = props.getProperty(PROP_LOCALE);
 		String loginTimeS = props.getProperty(PROP_LOGIN_TIME);
 		String lastAccessS = props.getProperty(PROP_LAST_ACCESS);
 		String keepAliveS = props.getProperty(PROP_KEEP_ALIVE);
 
-		if (isEmpty(sessionId) || isEmpty(username) || isEmpty(authToken) || isEmpty(loginTimeS) || isEmpty(
+		if (isEmpty(sessionId) || isEmpty(username) || isEmpty(authTokenS) || isEmpty(loginTimeS) || isEmpty(
 				lastAccessS)) {
 			logger.warn("Corrupted session state file at {}", targetFile.getAbsolutePath());
 			return null;
@@ -1049,8 +1050,10 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		ZonedDateTime loginTime = ISO8601.parseToZdt(loginTimeS);
 		ZonedDateTime lastAccess = ISO8601.parseToZdt(lastAccessS);
 		boolean keepAlive = Boolean.parseBoolean(keepAliveS);
+		authTokenS = authTokenS.trim();
+		PasswordCrypt authTokenCrypt = authTokenS.startsWith("$") ? PasswordCrypt.parse(authTokenS) : PasswordCrypt.parse(authTokenS, null);
 
-		return new CertificateStub(usage, sessionId, username, authToken, source, locale, loginTime, lastAccess,
+		return new CertificateStub(usage, sessionId, username, authTokenCrypt, source, locale, loginTime, lastAccess,
 				keepAlive);
 	}
 }

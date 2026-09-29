@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
+import static li.strolch.privilege.handler.DefaultPrivilegeHandler.SOURCE_UNKNOWN;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
 
@@ -82,7 +83,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 						.getCertificates(cert)
 						.stream()
 						.filter(c -> !c.getUserState().isSystem())
-						.collect(Collectors.toMap(Certificate::getAuthToken, identity()));
+						.collect(Collectors.toMap(Certificate::getSessionId, identity()));
 			});
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to refresh sessions!", e);
@@ -155,7 +156,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage, keepAlive);
 
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		this.certificateMap.put(certificate.getSessionId(), certificate);
 		if (usage.isAny()) {
 			logger.info("{} sessions currently active.", this.certificateMap.size());
 			recordLogon();
@@ -171,7 +172,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate certificate = this.privilegeHandler.authenticatePersonalAccessToken(token, source);
 
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		this.certificateMap.put(certificate.getSessionId(), certificate);
 		return certificate;
 	}
 
@@ -179,7 +180,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public Certificate authenticateSingleSignOn(Object data) {
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
 
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		this.certificateMap.put(certificate.getSessionId(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
 		recordLogon();
 
@@ -190,7 +191,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public Certificate authenticateSingleSignOn(Object data, String source) {
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source);
 
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		this.certificateMap.put(certificate.getSessionId(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
 		recordLogon();
 
@@ -202,7 +203,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate refreshedSession = this.privilegeHandler.refreshSession(certificate, source);
 
 		invalidate(certificate);
-		this.certificateMap.put(refreshedSession.getAuthToken(), refreshedSession);
+		this.certificateMap.put(refreshedSession.getSessionId(), refreshedSession);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
 		recordLogon();
 
@@ -212,31 +213,32 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public boolean isSessionKnown(String authToken) {
 		DBC.PRE.assertNotEmpty("authToken must be set!", authToken);
-		return this.certificateMap.containsKey(authToken);
+		String sessionId = authToken.contains(":") ? authToken.substring(0, authToken.indexOf(':')) : authToken;
+		return this.certificateMap.containsKey(sessionId);
 	}
 
 	@Override
 	public Certificate validate(String authToken) throws StrolchNotAuthenticatedException {
-		DBC.PRE.assertNotEmpty("authToken must be set!", authToken);
-
-		Certificate certificate = this.certificateMap.get(authToken);
-		if (certificate == null)
-			throw new StrolchNotAuthenticatedException(
-					MessageFormat.format("No certificate exists for sessionId {0}", authToken));
-
-		return validate(certificate).getCertificate();
+		return validate(authToken, SOURCE_UNKNOWN);
 	}
 
 	@Override
 	public Certificate validate(String authToken, String source) throws StrolchNotAuthenticatedException {
 		DBC.PRE.assertNotEmpty("authToken must be set!", authToken);
 
-		Certificate certificate = this.certificateMap.get(authToken);
-		if (certificate == null)
-			throw new StrolchNotAuthenticatedException(
-					MessageFormat.format("No certificate exists for sessionId {0}", authToken));
+		try {
+			PrivilegeContext privilegeContext = this.privilegeHandler.validate(authToken, source);
+			Certificate certificate = privilegeContext.getCertificate();
+			this.certificateMap.put(certificate.getSessionId(), certificate);
 
-		return validate(certificate, source).getCertificate();
+			if (this.persistSessionsTask != null)
+				this.persistSessionsTask = getScheduledExecutor("SessionHandler").schedule(this::persistSessions, 5,
+						TimeUnit.SECONDS);
+
+			return certificate;
+		} catch (Exception e) {
+			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -286,7 +288,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public void invalidate(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must be given!", certificate);
 
-		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
+		Certificate removedCert = this.certificateMap.remove(certificate.getSessionId());
 		if (removedCert == null)
 			logger.error("No session was registered with ID {}", certificate.getSessionId());
 
@@ -310,7 +312,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate certificate = this.privilegeHandler.getPrivilegeHandler().validateChallenge(username, challenge);
 
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		this.certificateMap.put(certificate.getSessionId(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
 		recordLogon();
 
@@ -326,7 +328,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				.getPrivilegeHandler()
 				.validateChallenge(username, challenge, source);
 
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		this.certificateMap.put(certificate.getSessionId(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
 		recordLogon();
 
@@ -360,7 +362,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	protected void sessionTimeout(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must be given!", certificate);
 
-		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
+		Certificate removedCert = this.certificateMap.remove(certificate.getSessionId());
 		if (removedCert == null)
 			logger.error("No session was registered with ID {}", certificate.getSessionId());
 

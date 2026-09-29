@@ -709,8 +709,9 @@ public class PerElementXmlPersistenceHandlerTest extends AbstractPrivilegeTest {
 
 		// Write a monolithic PrivilegeSessions.xml in base path
 		File monolithicSessions = new File(testBasePath, "PrivilegeSessions.xml");
+		PasswordCrypt crypt = PasswordCrypt.parse("$PBKDF2WithHmacSHA512,10000,256$01020304$05060708");
 		List<CertificateStub> stubs = List.of(
-				new CertificateStub(Usage.ANY, "migrated-session-123", "admin", "token-abc-123", "127.0.0.1",
+				new CertificateStub(Usage.ANY, "migrated-session-123", "admin", crypt, "127.0.0.1",
 						Locale.ENGLISH, ZonedDateTime.now().minusHours(1), ZonedDateTime.now().minusMinutes(10), false)
 		);
 		new CertificateStubsSaxWriter(stubs, monolithicSessions).write();
@@ -731,7 +732,7 @@ public class PerElementXmlPersistenceHandlerTest extends AbstractPrivilegeTest {
 		CertificateStub migratedStub = allSessions.get(0);
 		assertEquals("migrated-session-123", migratedStub.getSessionId());
 		assertEquals("admin", migratedStub.getUsername());
-		assertEquals("token-abc-123", migratedStub.getAuthToken());
+		assertEquals(crypt, migratedStub.getAuthTokenCrypt());
 
 		// Clean up
 		removeConfigs(testTarget);
@@ -763,7 +764,7 @@ public class PerElementXmlPersistenceHandlerTest extends AbstractPrivilegeTest {
 				"state", PARAM_AUTO_MIGRATE_MONOLITHIC, "false", PARAM_PERSIST_SESSIONS, "false"));
 
 		Certificate cert = new Certificate(Usage.ANY, "disabled-session-123", "admin", "admin", "First", "Last",
-				UserState.ENABLED, "token-123", "127.0.0.1", ZonedDateTime.now(), false, Locale.ENGLISH, Set.of(),
+				UserState.ENABLED, PasswordCrypt.of(new byte[0], new byte[0]), "token-123", "127.0.0.1", ZonedDateTime.now(), false, Locale.ENGLISH, Set.of(),
 				Set.of(), Map.of());
 
 		handler.addSession(cert);
@@ -784,8 +785,9 @@ public class PerElementXmlPersistenceHandlerTest extends AbstractPrivilegeTest {
 
 		// Write a monolithic PrivilegeSessions.xml in base path
 		File monolithicSessions = new File(testBasePath, "PrivilegeSessions.xml");
+		PasswordCrypt crypt = PasswordCrypt.parse("$PBKDF2WithHmacSHA512,10000,256$01020304$05060708");
 		List<CertificateStub> stubs = List.of(
-				new CertificateStub(Usage.ANY, "migrated-session-disabled", "admin", "token-abc-456", "127.0.0.1",
+				new CertificateStub(Usage.ANY, "migrated-session-disabled", "admin", crypt, "127.0.0.1",
 						Locale.ENGLISH, ZonedDateTime.now().minusHours(1), ZonedDateTime.now().minusMinutes(10), false)
 		);
 		new CertificateStubsSaxWriter(stubs, monolithicSessions).write();

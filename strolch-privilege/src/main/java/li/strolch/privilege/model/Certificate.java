@@ -17,6 +17,7 @@ package li.strolch.privilege.model;
 
 import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -45,6 +46,7 @@ public final class Certificate implements Comparable<Certificate> {
 	private final String firstname;
 	private final String lastname;
 	private final UserState userState;
+	private final PasswordCrypt authTokenCrypt;
 	private final String authToken;
 	private final String source;
 	private final ZonedDateTime loginTime;
@@ -61,31 +63,36 @@ public final class Certificate implements Comparable<Certificate> {
 	 * Default constructor initializing with all information needed for this certificate
 	 *
 	 * <p>
-	 * Note, both the authentication token and password are private fields which are generated on login and only known
+	 * Note, both the authentication token and password are secure fields which are generated on login and only known
 	 * by the {@link PrivilegeHandler}
 	 * </p>
 	 *
-	 * @param usage      the usage allowed for this certificate
-	 * @param sessionId  the users session id
-	 * @param userId     the users unique id
-	 * @param username   the users login name
-	 * @param firstName  the users first name
-	 * @param lastName   the users last name
-	 * @param authToken  the authentication token defining the users unique session and is a private field of this
-	 *                   certificate.
-	 * @param locale     the users {@link Locale}
-	 * @param userRoles  the user's roles
-	 * @param properties a {@link Map} containing string value pairs of properties for the logged in user. These
-	 *                   properties can be edited and can be used for the user to change settings of this session
+	 * @param usage          the usage allowed for this certificate
+	 * @param sessionId      the users session id
+	 * @param userId         the users unique id
+	 * @param username       the users login name
+	 * @param firstName      the users first name
+	 * @param lastName       the users last name
+	 * @param userState      the user state
+	 * @param authTokenCrypt the hashed authentication token
+	 * @param authToken      the plaintext authentication token (transient, only available on initial creation)
+	 * @param source         the source of the session
+	 * @param loginTime      the login time
+	 * @param keepAlive      whether keep alive is enabled
+	 * @param locale         the users {@link Locale}
+	 * @param userGroups     the user's groups
+	 * @param userRoles      the user's roles
+	 * @param properties     a {@link Map} containing string value pairs of properties for the logged in user.
 	 */
 	public Certificate(Usage usage, String sessionId, String userId, String username, String firstName, String lastName,
-			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
-			Locale locale, Set<String> userGroups, Set<String> userRoles, Map<String, String> properties) {
+			UserState userState, PasswordCrypt authTokenCrypt, String authToken, String source, ZonedDateTime loginTime,
+			boolean keepAlive, Locale locale, Set<String> userGroups, Set<String> userRoles,
+			Map<String, String> properties) {
 
 		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
 		DBC.PRE.assertNotEmpty("userId must not be empty", userId);
 		DBC.PRE.assertNotEmpty("username must not be empty", username);
-		DBC.PRE.assertNotEmpty("authToken must not be empty", authToken);
+		DBC.PRE.assertNotNull("authTokenCrypt must not be null", authTokenCrypt);
 		DBC.PRE.assertNotNull("userState must not be empty", userState);
 		DBC.PRE.assertNotNull("usage must not be empty", usage);
 		DBC.PRE.assertNotNull("source must not be null", source);
@@ -97,6 +104,7 @@ public final class Certificate implements Comparable<Certificate> {
 		this.firstname = firstName;
 		this.lastname = lastName;
 		this.userState = userState;
+		this.authTokenCrypt = authTokenCrypt;
 		this.authToken = authToken;
 		this.source = source;
 		this.loginTime = loginTime;
@@ -116,6 +124,14 @@ public final class Certificate implements Comparable<Certificate> {
 		this.userGroups = Set.copyOf(userGroups);
 		this.userRoles = Set.copyOf(userRoles);
 		this.lastAccess = ZonedDateTime.now();
+	}
+
+	public Certificate(Usage usage, String sessionId, String userId, String username, String firstName, String lastName,
+			UserState userState, PasswordCrypt authTokenCrypt, String source, ZonedDateTime loginTime,
+			boolean keepAlive, Locale locale, Set<String> userGroups, Set<String> userRoles,
+			Map<String, String> properties) {
+		this(usage, sessionId, userId, username, firstName, lastName, userState, authTokenCrypt, null, source,
+				loginTime, keepAlive, locale, userGroups, userRoles, properties);
 	}
 
 	public boolean isSystemUser() {
@@ -290,6 +306,10 @@ public final class Certificate implements Comparable<Certificate> {
 		return this.keepAlive;
 	}
 
+	public PasswordCrypt getAuthTokenCrypt() {
+		return this.authTokenCrypt;
+	}
+
 	public String getAuthToken() {
 		return this.authToken;
 	}
@@ -338,7 +358,7 @@ public final class Certificate implements Comparable<Certificate> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.authToken == null) ? 0 : this.authToken.hashCode());
+		result = prime * result + ((this.authTokenCrypt == null) ? 0 : this.authTokenCrypt.hashCode());
 		result = prime * result + ((this.locale == null) ? 0 : this.locale.hashCode());
 		result = prime * result + ((this.sessionId == null) ? 0 : this.sessionId.hashCode());
 		result = prime * result + ((this.username == null) ? 0 : this.username.hashCode());
@@ -353,10 +373,10 @@ public final class Certificate implements Comparable<Certificate> {
 			return false;
 		if (!(obj instanceof Certificate other))
 			return false;
-		if (this.authToken == null) {
-			if (other.authToken != null)
+		if (this.authTokenCrypt == null) {
+			if (other.authTokenCrypt != null)
 				return false;
-		} else if (!this.authToken.equals(other.authToken))
+		} else if (!this.authTokenCrypt.equals(other.authTokenCrypt))
 			return false;
 		if (this.sessionId == null) {
 			if (other.sessionId != null)

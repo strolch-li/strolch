@@ -8,6 +8,7 @@ package li.strolch.privilege.test;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.*;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.UserAccessPrivilege;
@@ -82,7 +83,7 @@ public class UserAccessPrivilegeTest {
 
 	private static PrivilegeContext context() {
 		Certificate certificate = new Certificate(Usage.SINGLE, "session", "id", "admin", "First", "Last",
-				UserState.ENABLED, "token", "test", ZonedDateTime.now(), false, Locale.ENGLISH, Set.of(), Set.of(),
+				UserState.ENABLED, PasswordCrypt.of(new byte[0], new byte[0]), "token", "test", ZonedDateTime.now(), false, Locale.ENGLISH, Set.of(), Set.of(),
 				Map.of());
 		return new PrivilegeContext(certificate, Map.of(PRIVILEGE_GET_USER, privilege(Set.of(), Set.of())), Map.of());
 	}

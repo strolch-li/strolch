@@ -794,6 +794,31 @@ public interface PrivilegeHandler {
 	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
 
 	/**
+	 * Checks if the session for the given authentication token is valid.
+	 *
+	 * @param authToken the authentication token (sessionId:tokenValue)
+	 *
+	 * @return the {@link PrivilegeContext} for the session
+	 *
+	 * @throws PrivilegeException        if there is anything wrong with this token
+	 * @throws NotAuthenticatedException if the session has expired or does not exist
+	 */
+	PrivilegeContext validate(String authToken) throws PrivilegeException;
+
+	/**
+	 * Checks if the session for the given authentication token is valid and from the given source.
+	 *
+	 * @param authToken the authentication token (sessionId:tokenValue)
+	 * @param source    the source of the request
+	 *
+	 * @return the {@link PrivilegeContext} for the session
+	 *
+	 * @throws PrivilegeException        if there is anything wrong with this token
+	 * @throws NotAuthenticatedException if the session has expired or does not exist
+	 */
+	PrivilegeContext validate(String authToken, String source) throws PrivilegeException;
+
+	/**
 	 * @see li.strolch.privilege.handler.PasswordStrengthHandler#validateStrength(char[])
 	 */
 	void validatePassword(Locale locale, char[] password) throws PasswordStrengthException;

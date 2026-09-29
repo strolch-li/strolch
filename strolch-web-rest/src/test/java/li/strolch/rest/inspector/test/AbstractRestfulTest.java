@@ -53,6 +53,7 @@ import java.util.logging.Level;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -104,7 +105,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		}
 
 		assertEquals(username, loginResult.get("username").getAsString());
-		assertEquals(64, loginResult.get("authToken").getAsString().length());
+		assertTrue(loginResult.get("authToken").getAsString().contains(":"));
 		assertNull(loginResult.get("msg"));
 
 		return loginResult.get("authToken").getAsString();

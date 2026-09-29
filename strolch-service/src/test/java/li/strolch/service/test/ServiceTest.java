@@ -20,6 +20,7 @@ import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.service.StringArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.model.GreetingResult;
@@ -45,7 +46,7 @@ public class ServiceTest extends AbstractServiceTest {
 		assertThrows(DBC.DbcException.class, () -> {
 			TestService testService = new TestService();
 			getServiceHandler().doService(
-					new Certificate(null, null, null, null, null, null, null, null, null, ZonedDateTime.now(), false,
+					new Certificate(null, null, null, null, null, null, null, (PasswordCrypt) null, null, null, ZonedDateTime.now(), false,
 							null, new HashSet<>(), new HashSet<>(), null), testService,
 					testService.getArgumentInstance());
 		});
@@ -54,8 +55,9 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
-		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf",
-				"asd", ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), null);
+		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "bob", "Bob", "Brown", UserState.ENABLED,
+				PasswordCrypt.of(new byte[0], new byte[0]), "dsdf", "asd", ZonedDateTime.now(), false, null, new HashSet<>(),
+				new HashSet<>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService,
 				testService.getArgumentInstance());
 		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));

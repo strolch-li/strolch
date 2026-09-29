@@ -147,6 +147,31 @@ public interface PrivilegeHandler {
 	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
 
 	/**
+	 * Returns the {@link PrivilegeContext} for the given authentication token
+	 *
+	 * @param authToken the authentication token
+	 *
+	 * @return the {@link PrivilegeContext} for the given token
+	 *
+	 * @throws PrivilegeException if the token is not valid anymore
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(String)
+	 */
+	PrivilegeContext validate(String authToken) throws PrivilegeException;
+
+	/**
+	 * Returns the {@link PrivilegeContext} for the given authentication token
+	 *
+	 * @param authToken the authentication token
+	 * @param source    the source of the request
+	 *
+	 * @return the {@link PrivilegeContext} for the given token
+	 *
+	 * @throws PrivilegeException if the token is not valid anymore
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(String, String)
+	 */
+	PrivilegeContext validate(String authToken, String source) throws PrivilegeException;
+
+	/**
 	 * Validates that the given {@link PrivilegeContext} is still valid
 	 *
 	 * @param ctx the {@link PrivilegeContext} to validate

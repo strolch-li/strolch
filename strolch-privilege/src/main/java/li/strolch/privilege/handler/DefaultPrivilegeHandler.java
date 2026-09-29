@@ -135,6 +135,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected ElementLockingHandler<String> lockingHandler;
 	protected Map<String, PersonalAccessTokenCacheEntry> personalAccessTokenCache;
+	protected Map<String, SessionCacheEntry> sessionCache;
 	protected ScheduledExecutorService executorService;
 	protected Future<?> persistSessionsTask;
 	protected Future<?> prunePersonalAccessTokenCacheTask;
@@ -954,6 +955,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// remove registration
 		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
+		if (this.sessionCache != null)
+			this.sessionCache.remove(certificate.getSessionId());
 		if (privilegeContext == null)
 			return false;
 
@@ -971,8 +974,125 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public PrivilegeContext validate(String authToken) throws PrivilegeException {
+		return validate(authToken, SOURCE_UNKNOWN);
+	}
+
+	@Override
+	public PrivilegeContext validate(String authToken, String source) throws PrivilegeException {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
+		if (isEmpty(authToken))
+			throw new NotAuthenticatedException("Authentication token may not be empty!");
+
+		String sessionId;
+		String tokenValue;
+		int index = authToken.indexOf(':');
+		if (index > 0) {
+			sessionId = authToken.substring(0, index);
+			tokenValue = authToken.substring(index + 1);
+		} else {
+			sessionId = authToken;
+			tokenValue = authToken;
+		}
+
+		// check fast hash cache
+		SessionCacheEntry cachedEntry = this.sessionCache.get(sessionId);
+		if (cachedEntry != null) {
+			Certificate cert = cachedEntry.context.getCertificate();
+			PasswordCrypt authTokenCrypt = cert.getAuthTokenCrypt();
+			if (authTokenCrypt != null && cachedEntry.matches(tokenValue, authTokenCrypt.salt())) {
+				// validate that challenge certificate is not expired (1 hour only)
+				if (cert.getUsage().isSingle() || cert.getUsage().isSetPassword()) {
+					ZonedDateTime dateTime = cert.getLoginTime();
+					if (dateTime.plusHours(1).isBefore(ZonedDateTime.now())) {
+						invalidate(cert);
+						throw new NotAuthenticatedException("Certificate has already expired!");
+					}
+				}
+
+				// assert source did not change
+				if (this.disallowSourceChange && !source.equals(SOURCE_UNKNOWN) && !cert.getSource().equals(source)) {
+					invalidate(cert);
+					String msg = "Source of certificate {0} has changed from {1} to {2}";
+					msg = format(msg, cert.getUsername(), cert.getSource(), source);
+					throw new AccessDeniedException(msg);
+				}
+
+				cert.setLastAccess(ZonedDateTime.now());
+				cachedEntry.lastAccess = System.currentTimeMillis();
+
+				if (this.persistSessions && cert.getUsage().isAny() && !cert.getUserState().isSystem()) {
+					this.persistenceHandler.updateSession(cert);
+					persistSessionsAsync();
+				}
+
+				return cachedEntry.context;
+			}
+
+			// invalid token for cached session
+			this.sessionCache.remove(sessionId);
+			throw new AccessDeniedException("Invalid authentication token!");
+		}
+
+		// cache miss: check privilegeContextMap
+		PrivilegeContext privilegeContext = this.privilegeContextMap.get(sessionId);
+		if (privilegeContext == null) {
+			String msg = format("There is no session information for {0}", sessionId);
+			throw new NotAuthenticatedException(msg);
+		}
+
+		Certificate sessionCertificate = privilegeContext.getCertificate();
+		PasswordCrypt authTokenCrypt = sessionCertificate.getAuthTokenCrypt();
+		if (authTokenCrypt == null)
+			throw new AccessDeniedException("Invalid session state!");
+
+		// PBKDF2 cold path
+		try {
+			PasswordCrypt hashedToken = this.encryptionHandler.hashPassword(tokenValue.toCharArray(),
+					authTokenCrypt.salt(), authTokenCrypt.hashAlgorithm(), authTokenCrypt.hashIterations(),
+					authTokenCrypt.hashKeyLength());
+			if (!Arrays.equals(authTokenCrypt.password(), hashedToken.password())) {
+				throw new AccessDeniedException("Invalid authentication token!");
+			}
+		} catch (AccessDeniedException e) {
+			throw e;
+		} catch (Exception e) {
+			logger.error("Failed to hash session token for comparison", e);
+			throw new AccessDeniedException("Failed to validate authentication token!");
+		}
+
+		// validate that challenge certificate is not expired (1 hour only)
+		if (sessionCertificate.getUsage().isSingle() || sessionCertificate.getUsage().isSetPassword()) {
+			ZonedDateTime dateTime = sessionCertificate.getLoginTime();
+			if (dateTime.plusHours(1).isBefore(ZonedDateTime.now())) {
+				invalidate(sessionCertificate);
+				throw new NotAuthenticatedException("Certificate has already expired!");
+			}
+		}
+
+		// assert source did not change
+		if (this.disallowSourceChange && !source.equals(SOURCE_UNKNOWN) && !sessionCertificate.getSource().equals(source)) {
+			invalidate(sessionCertificate);
+			String msg = "Source of certificate {0} has changed from {1} to {2}";
+			msg = format(msg, sessionCertificate.getUsername(), sessionCertificate.getSource(), source);
+			throw new AccessDeniedException(msg);
+		}
+
+		sessionCertificate.setLastAccess(ZonedDateTime.now());
+		if (this.persistSessions && sessionCertificate.getUsage().isAny() && !sessionCertificate.getUserState().isSystem()) {
+			this.persistenceHandler.updateSession(sessionCertificate);
+			persistSessionsAsync();
+		}
+
+		// populate fast hash cache
+		this.sessionCache.put(sessionId, new SessionCacheEntry(privilegeContext, tokenValue, authTokenCrypt.salt()));
+
+		return privilegeContext;
+	}
+
+	@Override
 	public PrivilegeContext validate(Certificate certificate) throws PrivilegeException {
-		return validate(certificate, "unknown");
+		return validate(certificate, SOURCE_UNKNOWN);
 	}
 
 	@Override
@@ -1096,6 +1216,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		long now = System.currentTimeMillis();
 		long tenMinutesAgo = now - TimeUnit.MINUTES.toMillis(10);
 		this.personalAccessTokenCache.entrySet().removeIf(entry -> entry.getValue().lastAccess < tenMinutesAgo);
+		if (this.sessionCache != null)
+			this.sessionCache.entrySet().removeIf(entry -> entry.getValue().lastAccess < tenMinutesAgo);
 	}
 
 	@Override
@@ -1171,6 +1293,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		this.privilegeContextMap = new ConcurrentHashMap<>();
 		this.personalAccessTokenCache = new ConcurrentHashMap<>();
+		this.sessionCache = new ConcurrentHashMap<>();
 
 		loadSessions();
 
@@ -1416,7 +1539,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected void buildPrivilegeContext(User user, CertificateStub stub) {
 		PrivilegeContext privilegeContext = getPrivilegeContextBuilder().buildPrivilegeContext(stub.getUsage(), user,
-				stub.getAuthToken(), stub.getSessionId(), stub.getSource(), stub.getLoginTime(), stub.isKeepAlive());
+				stub.getAuthTokenCrypt(), stub.getSessionId(), stub.getSource(), stub.getLoginTime(), stub.isKeepAlive());
 		Certificate certificate = privilegeContext.getCertificate();
 		certificate.setLocale(stub.getLocale());
 		certificate.setLastAccess(stub.getLastAccess());
@@ -1425,20 +1548,69 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected void replacePrivilegeContextForCert(User user, Certificate cert) {
 		PrivilegeContext ctx = getPrivilegeContextBuilder().buildPrivilegeContext(cert.getUsage(), user,
-				cert.getAuthToken(), cert.getSessionId(), cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
+				cert.getAuthTokenCrypt(), cert.getAuthToken(), cert.getSessionId(), cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
 		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
+		if (cert.getAuthToken() != null && this.sessionCache != null) {
+			String tokenValue;
+			int idx = cert.getAuthToken().indexOf(':');
+			if (idx > 0)
+				tokenValue = cert.getAuthToken().substring(idx + 1);
+			else
+				tokenValue = cert.getAuthToken();
+			this.sessionCache.put(ctx.getCertificate().getSessionId(),
+					new SessionCacheEntry(ctx, tokenValue, cert.getAuthTokenCrypt().salt()));
+		}
 	}
 
 	protected PrivilegeContext buildPrivilegeContext(Usage usage, User user, String source, ZonedDateTime loginTime,
 			boolean keepAlive) {
 		PrivilegeContext ctx = getPrivilegeContextBuilder().buildPrivilegeContext(usage, user, source, loginTime,
 				keepAlive);
-		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
+		Certificate cert = ctx.getCertificate();
+		this.privilegeContextMap.put(cert.getSessionId(), ctx);
+		if (cert.getAuthToken() != null && this.sessionCache != null) {
+			String tokenValue;
+			int idx = cert.getAuthToken().indexOf(':');
+			if (idx > 0)
+				tokenValue = cert.getAuthToken().substring(idx + 1);
+			else
+				tokenValue = cert.getAuthToken();
+			this.sessionCache.put(cert.getSessionId(),
+					new SessionCacheEntry(ctx, tokenValue, cert.getAuthTokenCrypt().salt()));
+		}
 		return ctx;
 	}
 
 	protected PrivilegeContextBuilder getPrivilegeContextBuilder() {
 		return new PrivilegeContextBuilder(this);
+	}
+
+	protected static class SessionCacheEntry {
+		public final PrivilegeContext context;
+		public final byte[] fastHash;
+		public long lastAccess;
+
+		public SessionCacheEntry(PrivilegeContext context, String tokenValue, byte[] salt) {
+			this.context = context;
+			this.fastHash = hashTokenFast(tokenValue, salt);
+			this.lastAccess = System.currentTimeMillis();
+		}
+
+		public boolean matches(String tokenValue, byte[] salt) {
+			byte[] candidate = hashTokenFast(tokenValue, salt);
+			return MessageDigest.isEqual(this.fastHash, candidate);
+		}
+
+		private static byte[] hashTokenFast(String tokenValue, byte[] salt) {
+			try {
+				MessageDigest digest = MessageDigest.getInstance("SHA-256");
+				if (salt != null)
+					digest.update(salt);
+				return digest.digest(tokenValue.getBytes(StandardCharsets.UTF_8));
+			} catch (NoSuchAlgorithmException e) {
+				throw new IllegalStateException("SHA-256 not available!", e);
+			}
+		}
 	}
 
 	protected static class PersonalAccessTokenCacheEntry {

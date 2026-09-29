@@ -376,15 +376,23 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			return Optional.empty();
 		}
 
+		StrolchSessionHandler sessionHandler = getSessionHandler();
+		if (sessionHandler.isSessionKnown(token)) {
+			return validateCertificate(requestContext, token, remoteIp);
+		}
+
 		if (token.contains(":")) {
 			String[] parts = token.split(":", 2);
 			if (isUuid(parts[0])) {
-				logger.debug("Performing personal access token auth via bearer token...");
-				StrolchSessionHandler sessionHandler = getSessionHandler();
-				Certificate certificate = sessionHandler.authenticatePersonalAccessToken(token, remoteIp);
-				requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
-				requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
-				return Optional.ofNullable(certificate);
+				try {
+					logger.debug("Performing personal access token auth via bearer token...");
+					Certificate certificate = sessionHandler.authenticatePersonalAccessToken(token, remoteIp);
+					requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+					requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
+					return Optional.ofNullable(certificate);
+				} catch (Exception e) {
+					// Fall back to validateCertificate (e.g. cold session cache after restart)
+				}
 			}
 		}
 
@@ -395,28 +403,44 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			String remoteIp) {
 		StrolchSessionHandler sessionHandler = getSessionHandler();
 
-		if (sessionId.contains(":")) {
-			String[] parts = sessionId.split(":", 2);
-			if (isUuid(parts[0])) {
-				logger.debug("Performing personal access token auth via authorization header...");
-				Certificate certificate = sessionHandler.authenticatePersonalAccessToken(sessionId, remoteIp);
-				requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
-				requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
-				return Optional.ofNullable(certificate);
+		Certificate certificate;
+		try {
+			certificate = sessionHandler.validate(sessionId, remoteIp);
+		} catch (Exception e) {
+			if (sessionId.contains(":")) {
+				String[] parts = sessionId.split(":", 2);
+				if (isUuid(parts[0])) {
+					try {
+						logger.debug("Performing personal access token auth via authorization header...");
+						certificate = sessionHandler.authenticatePersonalAccessToken(sessionId, remoteIp);
+					} catch (Exception patEx) {
+						logger.debug("Ignoring unknown session: {}", e.getMessage());
+						requestContext.abortWith(Response
+								.status(Response.Status.UNAUTHORIZED)
+								.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
+								.entity("User is not authenticated!")
+								.build());
+						return Optional.empty();
+					}
+				} else {
+					logger.debug("Ignoring unknown session: {}", e.getMessage());
+					requestContext.abortWith(Response
+							.status(Response.Status.UNAUTHORIZED)
+							.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User is not authenticated!")
+							.build());
+					return Optional.empty();
+				}
+			} else {
+				logger.debug("Ignoring unknown session: {}", e.getMessage());
+				requestContext.abortWith(Response
+						.status(Response.Status.UNAUTHORIZED)
+						.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("User is not authenticated!")
+						.build());
+				return Optional.empty();
 			}
 		}
-
-		if (!sessionHandler.isSessionKnown(sessionId)) {
-			logger.debug("Ignoring unknown session!");
-			requestContext.abortWith(Response
-					.status(Response.Status.UNAUTHORIZED)
-					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("User is not authenticated!")
-					.build());
-			return Optional.empty();
-		}
-
-		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
 			String allowedPwUrl = ("strolch/privilege/users/" + certificate.getUserId() + "/password").toLowerCase();

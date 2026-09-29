@@ -16,7 +16,9 @@
 package li.strolch.privilege.xml;
 
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import li.strolch.utils.iso8601.ISO8601;
@@ -73,7 +75,10 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 				stub.usage = Usage.valueOf(attributes.getValue(ATTR_USAGE).trim());
 				stub.sessionId = attributes.getValue(ATTR_SESSION_ID).trim();
 				stub.username = attributes.getValue(ATTR_USERNAME).trim();
-				stub.authToken = attributes.getValue(ATTR_AUTH_TOKEN).trim();
+				String authTokenS = attributes.getValue(ATTR_AUTH_TOKEN);
+				DBC.INTERIM.assertNotEmpty("authToken missing on sessions data!", authTokenS);
+				authTokenS = authTokenS.trim();
+				stub.authTokenCrypt = authTokenS.startsWith("$") ? PasswordCrypt.parse(authTokenS) : PasswordCrypt.parse(authTokenS, null);
 				stub.source = attributes.getValue(ATTR_SOURCE).trim();
 				stub.locale = Locale.forLanguageTag(attributes.getValue(ATTR_LOCALE).trim());
 				stub.loginTime = ISO8601.parseToZdt(attributes.getValue(ATTR_LOGIN_TIME).trim());
@@ -81,7 +86,6 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 				stub.keepAlive = Boolean.parseBoolean(attributes.getValue(ATTR_KEEP_ALIVE).trim());
 				DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
 				DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);
-				DBC.INTERIM.assertNotEmpty("authToken missing on sessions data!", stub.authToken);
 				if (isEmpty(stub.source))
 					stub.source = SOURCE_UNKNOWN;
 				this.stubs.add(stub);
@@ -94,7 +98,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		private Usage usage;
 		private String sessionId;
 		private String username;
-		private String authToken;
+		private PasswordCrypt authTokenCrypt;
 		private String source;
 		private Locale locale;
 		private ZonedDateTime loginTime;
@@ -104,12 +108,12 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		public CertificateStub() {
 		}
 
-		public CertificateStub(Usage usage, String sessionId, String username, String authToken, String source,
+		public CertificateStub(Usage usage, String sessionId, String username, PasswordCrypt authTokenCrypt, String source,
 				Locale locale, ZonedDateTime loginTime, ZonedDateTime lastAccess, boolean keepAlive) {
 			this.usage = usage;
 			this.sessionId = sessionId;
 			this.username = username;
-			this.authToken = authToken;
+			this.authTokenCrypt = authTokenCrypt;
 			this.source = source;
 			this.locale = locale;
 			this.loginTime = loginTime;
@@ -117,11 +121,11 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			this.keepAlive = keepAlive;
 		}
 
-		public CertificateStub(li.strolch.privilege.model.Certificate cert) {
+		public CertificateStub(Certificate cert) {
 			this.usage = cert.getUsage();
 			this.sessionId = cert.getSessionId();
 			this.username = cert.getUsername();
-			this.authToken = cert.getAuthToken();
+			this.authTokenCrypt = cert.getAuthTokenCrypt();
 			this.source = cert.getSource();
 			this.locale = cert.getLocale();
 			this.loginTime = cert.getLoginTime();
@@ -145,8 +149,8 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			return username;
 		}
 
-		public String getAuthToken() {
-			return authToken;
+		public PasswordCrypt getAuthTokenCrypt() {
+			return authTokenCrypt;
 		}
 
 		public String getSource() {

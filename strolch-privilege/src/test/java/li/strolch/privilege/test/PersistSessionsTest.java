@@ -20,6 +20,7 @@ import li.strolch.privilege.handler.XmlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -86,7 +87,7 @@ public class PersistSessionsTest extends AbstractPrivilegeTest {
 				PARAM_PERSIST_SESSIONS, "false"));
 
 		Certificate cert = new Certificate(Usage.ANY, "disabled-xml-session-123", "admin", "admin", "First",
-				"Last", UserState.ENABLED, "token-123", "127.0.0.1", ZonedDateTime.now(), false, Locale.ENGLISH,
+				"Last", UserState.ENABLED, PasswordCrypt.of(new byte[0], new byte[0]), "token-123", "127.0.0.1", ZonedDateTime.now(), false, Locale.ENGLISH,
 				Set.of(), Set.of(), Map.of());
 
 		handler.addSession(cert);

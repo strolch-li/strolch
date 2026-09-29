@@ -22,6 +22,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.helper.ModelHelper;
 import li.strolch.privilege.model.*;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
@@ -61,9 +62,12 @@ public class PrivilegeContextBuilder {
 
 	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, String source, ZonedDateTime loginTime,
 			boolean keepAlive) {
-		String authToken = this.privilegeHandler.getEncryptionHandler().nextToken();
+		String tokenValue = this.privilegeHandler.getEncryptionHandler().nextToken();
 		String sessionId = UUID.randomUUID().toString();
-		return buildPrivilegeContext(usage, user, authToken, sessionId, source, loginTime, keepAlive);
+		PasswordCrypt authTokenCrypt = this.privilegeHandler.getEncryptionHandler()
+				.hashPassword(tokenValue.toCharArray(), this.privilegeHandler.getEncryptionHandler().nextSalt());
+		String authToken = sessionId + ":" + tokenValue;
+		return buildPrivilegeContext(usage, user, authTokenCrypt, authToken, sessionId, source, loginTime, keepAlive);
 	}
 
 	public PrivilegeContext buildPrivilegeContext(PersonalAccessToken personalAccessToken, User user, String source,
@@ -84,18 +88,21 @@ public class PrivilegeContextBuilder {
 			addPolicyForPrivilege(policies, privilege, privilegeName);
 		}
 
-		String authToken = this.privilegeHandler.getEncryptionHandler().nextToken();
+		String tokenValue = this.privilegeHandler.getEncryptionHandler().nextToken();
 		String sessionId = UUID.randomUUID().toString();
+		PasswordCrypt authTokenCrypt = this.privilegeHandler.getEncryptionHandler()
+				.hashPassword(tokenValue.toCharArray(), this.privilegeHandler.getEncryptionHandler().nextSalt());
+		String authToken = sessionId + ":" + tokenValue;
 
 		Certificate certificate = new Certificate(Usage.API, sessionId, user.getUserId(), user.getUsername(),
-				user.getFirstname(), user.getLastname(), user.getUserState(), authToken, source, loginTime, false,
+				user.getFirstname(), user.getLastname(), user.getUserState(), authTokenCrypt, authToken, source, loginTime, false,
 				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
 
 		return new PrivilegeContext(certificate, privileges, policies);
 	}
 
-	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, String authToken, String sessionId,
-			String source, ZonedDateTime loginTime, boolean keepAlive) {
+	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, PasswordCrypt authTokenCrypt,
+			String authToken, String sessionId, String source, ZonedDateTime loginTime, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		keepAlive = keepAlive && this.privilegeHandler.allowSessionRefresh;
@@ -109,10 +116,15 @@ public class PrivilegeContextBuilder {
 		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, policies);
 
 		Certificate certificate = new Certificate(usage, sessionId, user.getUserId(), user.getUsername(),
-				user.getFirstname(), user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive,
-				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
+				user.getFirstname(), user.getLastname(), user.getUserState(), authTokenCrypt, authToken, source,
+				loginTime, keepAlive, user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
 
 		return new PrivilegeContext(certificate, privileges, policies);
+	}
+
+	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, PasswordCrypt authTokenCrypt,
+			String sessionId, String source, ZonedDateTime loginTime, boolean keepAlive) {
+		return buildPrivilegeContext(usage, user, authTokenCrypt, null, sessionId, source, loginTime, keepAlive);
 	}
 
 	public UserPrivileges buildUserPrivilege(User user) {

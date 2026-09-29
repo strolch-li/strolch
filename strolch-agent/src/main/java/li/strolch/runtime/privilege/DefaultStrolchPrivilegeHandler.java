@@ -224,6 +224,16 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
+	public PrivilegeContext validate(String authToken) throws PrivilegeException {
+		return this.privilegeHandler.validate(authToken);
+	}
+
+	@Override
+	public PrivilegeContext validate(String authToken, String source) throws PrivilegeException {
+		return this.privilegeHandler.validate(authToken, source);
+	}
+
+	@Override
 	public void validateSystemSession(PrivilegeContext ctx) throws PrivilegeException {
 		this.privilegeHandler.validateSystemSession(ctx);
 	}
