@@ -66,10 +66,10 @@
 	</Role>
 
 	<Role name="AppUser">
-		<Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
+		<Privilege name="PrivilegePersonalAccessToken" policy="UserAccessPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
-		<Privilege name="PrivilegePersonalAccessTokenUser" policy="DefaultPrivilege">
+		<Privilege name="PrivilegePersonalAccessTokenUser" policy="UserAccessPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
