@@ -80,21 +80,29 @@ Instead of manually retrieving a `ParameterBag` and then a `Parameter` object, u
 `ParameterBagContainer`. These methods simplify code and handle the default parameter bag (`parameters`) automatically.
 
 **1. Retrieving Values directly (preferred)**
-Use these when you just need the value. They handle null checks (returning default values for primitives) or throwing
-exceptions if the parameter is missing (if `assertExists` is used internally).
+Use these when you just need the value. Standard getters return safe default values when the parameter or bag is missing (e.g., `""` for strings, `0` for numbers, `false` for booleans).
 
 ```java
 // Good: Direct value retrieval from default bag
 String updatedBy = element.getString(PARAM_UPDATED_BY);
 int version = element.getInteger(PARAM_VERSION);
 double weight = element.getDouble(PARAM_WEIGHT);
-boolean active = element.getBoolean(PARAM_ACTIVE);
+boolean active = element.is(PARAM_ACTIVE); // Prefer is() over getBoolean()
 ZonedDateTime date = element.getDate(PARAM_DATE);
 
 // Bad: Manual retrieval
 StringParameter updatedByP = element.getParameter(BAG_PARAMETERS, PARAM_UPDATED_BY);
 String updatedBy = updatedByP.getValue();
 ```
+
+**BooleanParameter: Prefer `is()` over `getBoolean()`**
+When working with a `BooleanParameter`, prefer the `is()` method (e.g. `element.is(PARAM_ACTIVE)` or `element.is(BAG_CUSTOM, PARAM_ACTIVE)`) over `getBoolean()`.
+
+**Checking Parameter Existence with `hasParameter()`**
+Because standard getters (`getString()`, `getInteger()`, `is()`, etc.) return default values safely when a parameter is missing without throwing exceptions, checking `hasParameter()` beforehand is usually not necessary.
+The use of `hasParameter()` is only necessary if:
+- You need to retrieve the actual `Parameter` object itself (e.g., `getParameter()`, `getStringP()`), or
+- A missing parameter has a special meaning where the default return value of standard getters (`""`, `0`, `false`, etc.) is not correct or ambiguous (e.g., distinguishing an absent parameter from one explicitly set to its default value).
 
 **2. Accessing Parameters in specific bags**
 If the parameter is not in the default `parameters` bag, you can still use convenience methods by providing the bag ID.
