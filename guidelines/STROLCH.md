@@ -104,6 +104,27 @@ The use of `hasParameter()` is only necessary if:
 - You need to retrieve the actual `Parameter` object itself (e.g., `getParameter()`, `getStringP()`), or
 - A missing parameter has a special meaning where the default return value of standard getters (`""`, `0`, `false`, etc.) is not correct or ambiguous (e.g., distinguishing an absent parameter from one explicitly set to its default value).
 
+**Checking if a Parameter is Set with `isParamSet()` and `isParamEmpty()`**
+Use `isParamSet()` or `isParamEmpty()` to check whether a parameter is set (present and not empty) or has an empty default value.
+Thus, one does not need to do `!element.getString(PARAM_KEY).isEmpty()` — instead a simple `isParamSet()` or `isParamEmpty()` suffices.
+
+```java
+// Good: Check if parameter is set and non-empty
+if (element.isParamSet(PARAM_DESCRIPTION)) {
+    // ...
+}
+
+// Good: Check if parameter is missing or has empty default value
+if (element.isParamEmpty(PARAM_DESCRIPTION)) {
+    // ...
+}
+
+// Also supports specific bags
+if (element.isParamSet(BAG_CUSTOM, PARAM_DESCRIPTION)) {
+    // ...
+}
+```
+
 **2. Accessing Parameters in specific bags**
 If the parameter is not in the default `parameters` bag, you can still use convenience methods by providing the bag ID.
 
