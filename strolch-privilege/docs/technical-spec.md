@@ -438,7 +438,7 @@ Defines the roles and their associated privileges.
         <Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="li.strolch.privilege.model.internal.PersonalAccessToken" policy="UserAccessPrivilege">
+        <Privilege name="PersonalAccessToken" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
