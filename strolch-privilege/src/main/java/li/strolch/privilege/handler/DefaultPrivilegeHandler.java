@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -43,7 +42,6 @@ import static java.util.stream.Collectors.toList;
 import static li.strolch.privilege.handler.PrivilegeCrudHandler.clearPassword;
 import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForUser;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_VERBOSE;
-import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
@@ -697,13 +695,23 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// persist this user
 		User internalUser = this.persistenceHandler.getUser(user.getUsername());
 		if (internalUser == null) {
+			if (user.getUserId() != null)
+				internalUser = this.persistenceHandler.getUserById(user.getUserId());
 
-			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
-			if (user.getUserId() == null)
-				user = user.withUserId(UUID.randomUUID().toString());
+			if (internalUser == null) {
+				// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
+				if (user.getUserId() == null)
+					user = user.withUserId(UUID.randomUUID().toString());
 
-			history = history.withFirstLogin(ZonedDateTime.now());
-			this.persistenceHandler.addUser(user.withHistory(history));
+				history = history.withFirstLogin(ZonedDateTime.now());
+				this.persistenceHandler.addUser(user.withHistory(history));
+			} else {
+				user = copyCustomProperties(user, internalUser);
+
+				history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
+				this.persistenceHandler.removeUserById(user.getUserId());
+				this.persistenceHandler.addUser(user.withHistory(history));
+			}
 		} else {
 
 			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
@@ -777,7 +785,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// log
 			Certificate refreshedCertificate = refreshedContext.getCertificate();
-			if (this.persistSessions && refreshedCertificate.getUsage().isAny() && !refreshedCertificate.getUserState().isSystem()) {
+			if (this.persistSessions && refreshedCertificate.getUsage().isAny() && !refreshedCertificate
+					.getUserState()
+					.isSystem()) {
 				this.persistenceHandler.addSession(refreshedCertificate);
 				persistSessionsAsync();
 			}
@@ -961,7 +971,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return false;
 
 		// persist sessions
-		if (this.persistSessions && privilegeContext.getCertificate().getUsage().isAny() && !privilegeContext.getCertificate().getUserState().isSystem()) {
+		if (this.persistSessions && privilegeContext.getCertificate().getUsage().isAny() && !privilegeContext
+				.getCertificate()
+				.getUserState()
+				.isSystem()) {
 			this.persistenceHandler.removeSession(privilegeContext.getCertificate());
 			persistSessionsAsync();
 		}
@@ -1071,7 +1084,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// assert source did not change
-		if (this.disallowSourceChange && !source.equals(SOURCE_UNKNOWN) && !sessionCertificate.getSource().equals(source)) {
+		if (this.disallowSourceChange && !source.equals(SOURCE_UNKNOWN) && !sessionCertificate
+				.getSource()
+				.equals(source)) {
 			invalidate(sessionCertificate);
 			String msg = "Source of certificate {0} has changed from {1} to {2}";
 			msg = format(msg, sessionCertificate.getUsername(), sessionCertificate.getSource(), source);
@@ -1079,7 +1094,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		sessionCertificate.setLastAccess(ZonedDateTime.now());
-		if (this.persistSessions && sessionCertificate.getUsage().isAny() && !sessionCertificate.getUserState().isSystem()) {
+		if (this.persistSessions && sessionCertificate.getUsage().isAny() && !sessionCertificate
+				.getUserState()
+				.isSystem()) {
 			this.persistenceHandler.updateSession(sessionCertificate);
 			persistSessionsAsync();
 		}
@@ -1539,7 +1556,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected void buildPrivilegeContext(User user, CertificateStub stub) {
 		PrivilegeContext privilegeContext = getPrivilegeContextBuilder().buildPrivilegeContext(stub.getUsage(), user,
-				stub.getAuthTokenCrypt(), stub.getSessionId(), stub.getSource(), stub.getLoginTime(), stub.isKeepAlive());
+				stub.getAuthTokenCrypt(), stub.getSessionId(), stub.getSource(), stub.getLoginTime(),
+				stub.isKeepAlive());
 		Certificate certificate = privilegeContext.getCertificate();
 		certificate.setLocale(stub.getLocale());
 		certificate.setLastAccess(stub.getLastAccess());
@@ -1548,7 +1566,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected void replacePrivilegeContextForCert(User user, Certificate cert) {
 		PrivilegeContext ctx = getPrivilegeContextBuilder().buildPrivilegeContext(cert.getUsage(), user,
-				cert.getAuthTokenCrypt(), cert.getAuthToken(), cert.getSessionId(), cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
+				cert.getAuthTokenCrypt(), cert.getAuthToken(), cert.getSessionId(), cert.getSource(),
+				cert.getLoginTime(), cert.isKeepAlive());
 		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
 		if (cert.getAuthToken() != null && this.sessionCache != null) {
 			String tokenValue;
