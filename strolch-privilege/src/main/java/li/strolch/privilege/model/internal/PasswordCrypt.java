@@ -38,7 +38,7 @@ public record PasswordCrypt(byte[] password, byte[] salt, String hashAlgorithm, 
 
 	public String buildPasswordString() {
 		if (isInvalid())
-			return "invalid";
+			return "";
 
 		return buildPasswordString(this.hashAlgorithm, this.hashIterations, this.hashKeyLength, this.salt,
 				this.password);
