@@ -68,6 +68,7 @@ public class CertificateTokenHashingTest extends AbstractPrivilegeTest {
 		assertNotNull(crypt.password());
 		assertNotNull(crypt.salt());
 		assertNotNull(crypt.buildPasswordString());
+		assertFalse(crypt.buildPasswordString().isBlank());
 		assertTrue("Password string should start with $ algorithm", crypt.buildPasswordString().startsWith("$"));
 
 		String tokenValue = cert.getAuthToken().substring(cert.getAuthToken().indexOf(':') + 1);
