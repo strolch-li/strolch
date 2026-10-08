@@ -36,6 +36,9 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
  */
 public abstract class GroupedParameterizedElement extends AbstractStrolchElement implements ParameterBagContainer {
 
+	protected String id;
+	protected String name;
+	protected boolean readOnly;
 	protected Map<String, ParameterBag> parameterBagMap;
 	protected String type;
 
@@ -56,6 +59,38 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	protected GroupedParameterizedElement(String id, String name, String type) {
 		super(id, name);
 		setType(type);
+	}
+
+	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
+	public void setId(String id) {
+		assertNotReadonly();
+		if (isEmpty(id)) {
+			String msg = "The id may never be empty for {0}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName());
+			throw new StrolchException(msg);
+		}
+		this.id = id;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public void setName(String name) {
+		assertNotReadonly();
+		if (isEmpty(name)) {
+			String msg = "The name may never be empty for {0} {1}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
+			throw new StrolchException(msg);
+		}
+		this.name = name;
 	}
 
 	@Override
@@ -276,8 +311,9 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	@Override
 	protected void fillClone(AbstractStrolchElement clone) {
-		super.fillClone(clone);
 		GroupedParameterizedElement cloneGpe = (GroupedParameterizedElement) clone;
+		cloneGpe.id = this.id;
+		cloneGpe.name = this.name;
 		cloneGpe.type = this.type;
 
 		if (this.parameterBagMap != null) {
@@ -293,11 +329,16 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	public abstract int hashCode();
 
 	@Override
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	@Override
 	public void setReadOnly() {
 		if (this.parameterBagMap != null) {
 			for (ParameterBag bag : this.parameterBagMap.values())
 				bag.setReadOnly();
 		}
-		super.setReadOnly();
+		this.readOnly = true;
 	}
 }

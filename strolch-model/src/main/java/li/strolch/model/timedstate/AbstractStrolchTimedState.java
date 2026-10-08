@@ -21,7 +21,10 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.exception.StrolchException;
 import li.strolch.utils.helper.StringHelper;
+
+import java.text.MessageFormat;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
@@ -36,6 +39,9 @@ import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 public abstract class AbstractStrolchTimedState<T extends IValue> extends AbstractStrolchElement
 		implements StrolchTimedState<T> {
 
+	protected String id;
+	protected String name;
+	protected boolean readOnly;
 	protected boolean hidden = false;
 	protected int index;
 	protected String interpretation = INTERPRETATION_NONE;
@@ -44,23 +50,47 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	protected Resource parent;
 	protected ITimedState<T> state;
 
-	public AbstractStrolchTimedState() {
+	protected AbstractStrolchTimedState() {
 		this.state = new TimedState<>();
 	}
 
-	public AbstractStrolchTimedState(String id, String name) {
+	protected AbstractStrolchTimedState(String id, String name) {
 		super(id, name);
 		this.state = new TimedState<>();
 	}
 
 	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
 	public void setId(String id) {
-		super.setId(trimOrEmpty(id).intern());
+		assertNotReadonly();
+		id = trimOrEmpty(id).intern();
+		if (StringHelper.isEmpty(id)) {
+			String msg = "The id may never be empty for {0}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName());
+			throw new StrolchException(msg);
+		}
+		this.id = id;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
 	}
 
 	@Override
 	public void setName(String name) {
-		super.setName(trimOrEmpty(name).intern());
+		assertNotReadonly();
+		name = trimOrEmpty(name).intern();
+		if (StringHelper.isEmpty(name)) {
+			String msg = "The name may never be empty for {0} {1}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
+			throw new StrolchException(msg);
+		}
+		this.name = name;
 	}
 
 	@Override
@@ -198,9 +228,9 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 
 	@Override
 	protected void fillClone(AbstractStrolchElement clone) {
-		super.fillClone(clone);
-
 		@SuppressWarnings("unchecked") AbstractStrolchTimedState<T> cloneT = (AbstractStrolchTimedState<T>) clone;
+		cloneT.id = this.id;
+		cloneT.name = this.name;
 		cloneT.hidden = this.hidden;
 		cloneT.index = this.index;
 		cloneT.interpretation = this.interpretation;
@@ -209,9 +239,14 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	@Override
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	@Override
 	public void setReadOnly() {
 		this.state.setReadonly();
-		super.setReadOnly();
+		this.readOnly = true;
 	}
 
 	@Override

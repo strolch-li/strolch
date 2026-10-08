@@ -34,6 +34,9 @@ import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
  */
 public abstract class AbstractParameter<T> extends AbstractStrolchElement implements Parameter<T> {
 
+	protected String id;
+	protected String name;
+	protected boolean readOnly;
 	protected boolean hidden = false;
 	protected int index;
 	protected String interpretation = INTERPRETATION_NONE;
@@ -54,18 +57,42 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * @param id   the id
 	 * @param name the name
 	 */
-	public AbstractParameter(String id, String name) {
+	protected AbstractParameter(String id, String name) {
 		super(trimOrEmpty(id).intern(), trimOrEmpty(name).intern());
 	}
 
 	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
 	public void setId(String id) {
-		super.setId(trimOrEmpty(id).intern());
+		assertNotReadonly();
+		id = trimOrEmpty(id).intern();
+		if (StringHelper.isEmpty(id)) {
+			String msg = "The id may never be empty for {0}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName());
+			throw new StrolchException(msg);
+		}
+		this.id = id;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
 	}
 
 	@Override
 	public void setName(String name) {
-		super.setName(trimOrEmpty(name).intern());
+		assertNotReadonly();
+		name = trimOrEmpty(name).intern();
+		if (StringHelper.isEmpty(name)) {
+			String msg = "The name may never be empty for {0} {1}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
+			throw new StrolchException(msg);
+		}
+		this.name = name;
 	}
 
 	@Override
@@ -197,9 +224,9 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 */
 	@Override
 	protected void fillClone(AbstractStrolchElement clone) {
-		super.fillClone(clone);
-
 		AbstractParameter<?> cloneP = (AbstractParameter<?>) clone;
+		cloneP.id = this.id;
+		cloneP.name = this.name;
 		cloneP.hidden = this.hidden;
 		cloneP.interpretation = this.interpretation;
 		cloneP.uom = this.uom;
@@ -218,13 +245,13 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 				+ "]";
 	}
 
-	/**
-	 * Compares the value of the given parameter to this parameter
-	 *
-	 * @param otherParam the parameter for which the value is to be compared to
-	 *
-	 * @return the {@link Comparable#compareTo(Object)} result
-	 */
 	@Override
-	public abstract int compareTo(Parameter<?> otherParam);
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	@Override
+	public void setReadOnly() {
+		this.readOnly = true;
+	}
 }

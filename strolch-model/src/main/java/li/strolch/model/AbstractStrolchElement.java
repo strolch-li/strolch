@@ -15,26 +15,18 @@
  */
 package li.strolch.model;
 
-import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.utils.helper.StringHelper;
-
-import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class AbstractStrolchElement implements StrolchElement {
 
-	protected String id;
-	protected String name;
-	protected boolean readOnly;
-
 	/**
 	 * Empty constructor - for marshalling only!
 	 */
-	public AbstractStrolchElement() {
+	protected AbstractStrolchElement() {
 		super();
 	}
 
@@ -44,41 +36,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * @param id   id of this {@link StrolchElement}
 	 * @param name name of this {@link StrolchElement}
 	 */
-	public AbstractStrolchElement(String id, String name) {
+	protected AbstractStrolchElement(String id, String name) {
 		setId(id);
 		setName(name);
-	}
-
-	@Override
-	public String getId() {
-		return this.id;
-	}
-
-	@Override
-	public void setId(String id) {
-		assertNotReadonly();
-		if (StringHelper.isEmpty(id)) {
-			String msg = "The id may never be empty for {0}";
-			msg = MessageFormat.format(msg, getClass().getSimpleName());
-			throw new StrolchException(msg);
-		}
-		this.id = id;
-	}
-
-	@Override
-	public String getName() {
-		return this.name;
-	}
-
-	@Override
-	public void setName(String name) {
-		assertNotReadonly();
-		if (StringHelper.isEmpty(name)) {
-			String msg = "The name may never be empty for {0} {1}";
-			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
-			throw new StrolchException(msg);
-		}
-		this.name = name;
 	}
 
 	/**
@@ -95,24 +55,11 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 *
 	 * @param clone the clone to fill
 	 */
-	protected void fillClone(AbstractStrolchElement clone) {
-		clone.id = this.id;
-		clone.name = this.name;
-	}
-
-	@Override
-	public boolean isReadOnly() {
-		return this.readOnly;
-	}
-
-	@Override
-	public void setReadOnly() {
-		this.readOnly = true;
-	}
+	protected abstract void fillClone(AbstractStrolchElement clone);
 
 	@Override
 	public void assertNotReadonly() throws StrolchModelException {
-		if (this.readOnly) {
+		if (isReadOnly()) {
 			throw new StrolchModelException(
 					"The element " + getLocator() + " is currently readOnly, to modify clone first!");
 		}
@@ -126,6 +73,6 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public String toString() {
-		return getLocator() + ", Name: " + this.name;
+		return getLocator() + ", Name: " + getName();
 	}
 }
