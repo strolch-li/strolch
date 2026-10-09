@@ -16,15 +16,20 @@
 
 package li.strolch.utils;
 
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.api.MessageEncryptionMechanism;
+import org.bouncycastle.openpgp.api.OpenPGPCertificate;
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.bouncycastle.util.io.Streams;
 import org.junit.Test;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.DocumentSignatureType;
 import org.pgpainless.algorithm.HashAlgorithm;
 import org.pgpainless.algorithm.SymmetricKeyAlgorithm;
-import org.pgpainless.encryption_signing.*;
+import org.pgpainless.encryption_signing.EncryptionOptions;
+import org.pgpainless.encryption_signing.EncryptionResult;
+import org.pgpainless.encryption_signing.EncryptionStream;
+import org.pgpainless.encryption_signing.ProducerOptions;
+import org.pgpainless.encryption_signing.SigningOptions;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
 import org.pgpainless.util.Passphrase;
 import org.slf4j.Logger;
@@ -51,21 +56,22 @@ public class PGPPainlessTest {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(plainBytes);
 
 		// get secret key (sender/signer)
-		PGPSecretKeyRing signingKeyRing = PGPainless
-				.readKeyRing()
-				.secretKeyRing(new FileInputStream(SIGNING_KEY_FILE_NAME));
-		if (signingKeyRing == null)
-			throw new IllegalStateException("No secret key ring found for signing key file " + SIGNING_KEY_FILE_NAME);
+		OpenPGPKey signingKey;
+		try (FileInputStream in = new FileInputStream(SIGNING_KEY_FILE_NAME)) {
+			signingKey = PGPainless.getInstance().readKey().parseKey(in);
+		}
+		if (signingKey == null)
+			throw new IllegalStateException("No secret key found for signing key file " + SIGNING_KEY_FILE_NAME);
 
 		ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
 
 		SecretKeyRingProtector secretKeyDecryptor = SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(CHAR_ARRAY));
-		EncryptionStream encryptionStream = PGPainless
-				.encryptAndOrSign()
+		EncryptionStream encryptionStream = PGPainless.getInstance()
+				.generateMessage()
 				.onOutputStream(signatureResult)
 				.withOptions(ProducerOptions
-						.sign(new SigningOptions()
-								.addDetachedSignature(secretKeyDecryptor, signingKeyRing)
+						.sign(SigningOptions.get(PGPainless.getInstance())
+								.addDetachedSignature(secretKeyDecryptor, signingKey)
 								.overrideHashAlgorithm(HashAlgorithm.SHA256))
 						.setCleartextSigned()
 						.setVersion("")
@@ -88,34 +94,38 @@ public class PGPPainlessTest {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(plainBytes);
 
 		// get public key (recipient)
-		PGPPublicKeyRing recipientKeyRing = PGPainless
-				.readKeyRing()
-				.publicKeyRing(new FileInputStream(RECIPIENT_PUBLIC_KEY_FILE_NAME));
-		if (recipientKeyRing == null)
+		OpenPGPCertificate recipientCertificate;
+		try (FileInputStream in = new FileInputStream(RECIPIENT_PUBLIC_KEY_FILE_NAME)) {
+			recipientCertificate = PGPainless.getInstance().readKey().parseCertificate(in);
+		}
+		if (recipientCertificate == null)
 			throw new IllegalStateException(
-					"No public key found for recipient key file " + RECIPIENT_PUBLIC_KEY_FILE_NAME);
+					"No public certificate found for recipient key file " + RECIPIENT_PUBLIC_KEY_FILE_NAME);
 
 		// get secret key (sender/signer)
-
-		PGPSecretKeyRing signingKeyRing = PGPainless
-				.readKeyRing()
-				.secretKeyRing(new FileInputStream(SIGNING_KEY_FILE_NAME));
-		if (signingKeyRing == null)
-			throw new IllegalStateException("No secret key ring found for signing key file " + SIGNING_KEY_FILE_NAME);
+		OpenPGPKey signingKey;
+		try (FileInputStream in = new FileInputStream(SIGNING_KEY_FILE_NAME)) {
+			signingKey = PGPainless.getInstance().readKey().parseKey(in);
+		}
+		if (signingKey == null)
+			throw new IllegalStateException("No secret key found for signing key file " + SIGNING_KEY_FILE_NAME);
 
 		ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
 
 		// If you use a single passphrase for all (sub-) keys, take this:
 		SecretKeyRingProtector secretKeyDecryptor = SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(CHAR_ARRAY));
-		EncryptionStream encryptionStream = PGPainless
-				.encryptAndOrSign()
+		EncryptionStream encryptionStream = PGPainless.getInstance()
+				.generateMessage()
 				.onOutputStream(signatureResult)
 				.withOptions(ProducerOptions
-						.signAndEncrypt(new EncryptionOptions().addRecipient(recipientKeyRing)
+						.signAndEncrypt(EncryptionOptions.get(PGPainless.getInstance())
+								.addRecipient(recipientCertificate)
 								// optionally override symmetric encryption algorithm
-								.overrideEncryptionAlgorithm(SymmetricKeyAlgorithm.AES_256), new SigningOptions()
+								.overrideEncryptionMechanism(MessageEncryptionMechanism.integrityProtected(
+										SymmetricKeyAlgorithm.AES_256.getAlgorithmId())),
+								SigningOptions.get(PGPainless.getInstance())
 								// Sign in-line (using one-pass-signature packet)
-								.addInlineSignature(secretKeyDecryptor, signingKeyRing,
+								.addInlineSignature(secretKeyDecryptor, signingKey,
 										DocumentSignatureType.CANONICAL_TEXT_DOCUMENT)
 								// optionally override hash algorithm
 								.overrideHashAlgorithm(HashAlgorithm.SHA256))

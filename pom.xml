@@ -107,8 +107,7 @@
         <csv.version>1.14.0</csv.version>
         <cron.version>1.6.2</cron.version>
         <bouncycastle.version>1.86</bouncycastle.version>
-        <gppainless.version>1.7.4</gppainless.version>
-        <eclipse-storage.version>2.1.3</eclipse-storage.version>
+        <gppainless.version>2.0.4</gppainless.version>
 
         <jakarta.xml.bind-api.version>4.0.4</jakarta.xml.bind-api.version>
         <!-- TODO 3.0.0 available: -->
