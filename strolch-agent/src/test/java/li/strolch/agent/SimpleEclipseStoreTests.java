@@ -41,7 +41,8 @@ public class SimpleEclipseStoreTests {
 
 			// print the last loaded root instance,
 			// replace it with a current version and store it
-			System.out.println(storageManager.root());
+			String root = storageManager.root();
+			System.out.println(root);
 			storageManager.setRoot("Hello World! @ " + ZonedDateTime.now());
 			storageManager.storeRoot();
 
