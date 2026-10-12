@@ -19,10 +19,13 @@ package li.strolch.utils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.pgpainless.algorithm.DocumentSignatureType;
 
 import java.util.Properties;
 
-@Ignore("Requires configured username and password")
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SmtpMailerTest {
 
 	public static final String SIGNING_KEY_FILE_NAME = "src/test/resources/strolch_example.key";
@@ -38,16 +41,18 @@ public class SmtpMailerTest {
 	@Before
 	public void setUpBefore() {
 		int port = 587;
-		boolean auth = true;
-		boolean startTls = true;
 		String username = System.getenv("email.username");
 		String password = System.getenv("email.password");
+		boolean auth = username != null && password != null;
+		boolean startTls = true;
 
 		Properties props = new Properties();
 		props.setProperty(SmtpMailer.PARAM_FROM_ADDR, SENDER);
 		props.setProperty(SmtpMailer.PARAM_AUTH, String.valueOf(auth));
-		props.setProperty(SmtpMailer.PARAM_USERNAME, username);
-		props.setProperty(SmtpMailer.PARAM_PASSWORD, password);
+		if (auth) {
+			props.setProperty(SmtpMailer.PARAM_USERNAME, username);
+			props.setProperty(SmtpMailer.PARAM_PASSWORD, password);
+		}
 		props.setProperty(SmtpMailer.PARAM_START_TLS, String.valueOf(startTls));
 		props.setProperty(SmtpMailer.PARAM_HOST, SMTP_HOST);
 		props.setProperty(SmtpMailer.PARAM_PORT, String.valueOf(port));
@@ -58,6 +63,29 @@ public class SmtpMailerTest {
 	}
 
 	@Test
+	public void shouldSignCanonicalTextDocument() {
+		String plainText = "Hello world!\nThis is a signed text document.";
+		String signed = this.emailSender.sign(plainText, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
+		assertNotNull(signed);
+		assertTrue(signed.contains("-----BEGIN PGP SIGNED MESSAGE-----"));
+		assertTrue(signed.contains("-----BEGIN PGP SIGNATURE-----"));
+		assertTrue(signed.contains("-----END PGP SIGNATURE-----"));
+		assertTrue(signed.contains(plainText));
+	}
+
+	@Test
+	public void shouldSignBinaryDocument() {
+		String plainText = "Hello binary document!";
+		String signed = this.emailSender.sign(plainText, DocumentSignatureType.BINARY_DOCUMENT);
+		assertNotNull(signed);
+		assertTrue(signed.contains("-----BEGIN PGP SIGNED MESSAGE-----"));
+		assertTrue(signed.contains("-----BEGIN PGP SIGNATURE-----"));
+		assertTrue(signed.contains("-----END PGP SIGNATURE-----"));
+		assertTrue(signed.contains(plainText));
+	}
+
+	@Ignore("Requires configured username and password")
+	@Test
 	public void shouldSendUnsignedMail() {
 
 		String subject = "Unsigned email test";
@@ -66,6 +94,7 @@ public class SmtpMailerTest {
 		this.emailSender.sendUnsignedMail(RECIPIENT, subject, plainText);
 	}
 
+	@Ignore("Requires configured username and password")
 	@Test
 	public void shouldSendUnsignedMailWithUnsignedAttachment() {
 		String subject = "Unsigned email test with unsigned attachment";
@@ -78,6 +107,7 @@ public class SmtpMailerTest {
 		this.emailSender.sendUnsignedMailWithAttachment(RECIPIENT, subject, plainText, mailAttachment);
 	}
 
+	@Ignore("Requires configured username and password")
 	@Test
 	public void shouldSendUnsignedMailWithSignedAttachment() {
 
@@ -90,6 +120,7 @@ public class SmtpMailerTest {
 		this.emailSender.sendUnsignedMailWithAttachment(RECIPIENT, subject, plainText, mailAttachment);
 	}
 
+	@Ignore("Requires configured username and password")
 	@Test
 	public void shouldSendSignedMail() {
 
@@ -101,6 +132,7 @@ public class SmtpMailerTest {
 		this.emailSender.sendMailSignedIfAvailable(RECIPIENT, subject, plainText);
 	}
 
+	@Ignore("Requires configured username and password")
 	@Test
 	public void shouldSendEncryptedMail() {
 
@@ -112,6 +144,7 @@ public class SmtpMailerTest {
 		this.emailSender.sendEncryptedEmail(RECIPIENT, subject, mailText, secretText, encryptedTextFileName);
 	}
 
+	@Ignore("Requires configured username and password")
 	@Test
 	public void shouldSendEncryptedMailWithAttachment() {
 

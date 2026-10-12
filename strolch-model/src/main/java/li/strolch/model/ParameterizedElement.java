@@ -43,6 +43,9 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
  */
 public abstract class ParameterizedElement extends AbstractStrolchElement {
 
+	protected String id;
+	protected String name;
+	protected boolean readOnly;
 	protected GroupedParameterizedElement parent;
 	protected Map<String, Parameter<?>> parameterMap;
 	protected String type;
@@ -61,10 +64,42 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @param name the name
 	 * @param type the type
 	 */
-	public ParameterizedElement(String id, String name, String type) {
+	protected ParameterizedElement(String id, String name, String type) {
 		setId(id);
 		setName(name);
 		setType(type);
+	}
+
+	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
+	public void setId(String id) {
+		assertNotReadonly();
+		if (StringHelper.isEmpty(id)) {
+			String msg = "The id may never be empty for {0}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName());
+			throw new StrolchException(msg);
+		}
+		this.id = id;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public void setName(String name) {
+		assertNotReadonly();
+		if (StringHelper.isEmpty(name)) {
+			String msg = "The name may never be empty for {0} {1}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
+			throw new StrolchException(msg);
+		}
+		this.name = name;
 	}
 
 	@Override
@@ -1089,8 +1124,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	@Override
 	protected void fillClone(AbstractStrolchElement clone) {
-		super.fillClone(clone);
 		ParameterizedElement clonePe = (ParameterizedElement) clone;
+		clonePe.id = this.id;
+		clonePe.name = this.name;
 		clonePe.type = this.type;
 		if (this.parameterMap != null) {
 			for (Parameter<?> param : this.parameterMap.values()) {
@@ -1106,13 +1142,18 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public abstract int hashCode();
 
 	@Override
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	@Override
 	public void setReadOnly() {
 		if (this.parameterMap != null) {
 			for (Parameter<?> param : this.parameterMap.values()) {
 				param.setReadOnly();
 			}
 		}
-		super.setReadOnly();
+		this.readOnly = true;
 	}
 
 	@Override

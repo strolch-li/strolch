@@ -1,0 +1,166 @@
+{
+  "preferences": {
+    "ch.qos.logback:logback-classic": {
+      "action": "latest"
+    },
+    "com.github.spotbugs:spotbugs-maven-plugin": {
+      "action": "patch_only"
+    },
+    "com.google.code.gson:gson": {
+      "action": "latest"
+    },
+    "com.zaxxer:HikariCP": {
+      "action": "latest"
+    },
+    "jakarta.annotation:jakarta.annotation-api": {
+      "action": "patch_only"
+    },
+    "org.antlr:antlr4": {
+      "action": "latest"
+    },
+    "org.apache.maven.plugins:maven-assembly-plugin": {
+      "action": "latest"
+    },
+    "org.apache.maven.plugins:maven-compiler-plugin": {
+      "action": "latest"
+    },
+    "org.apache.maven.plugins:maven-dependency-plugin": {
+      "action": "latest"
+    },
+    "org.apache.maven.plugins:maven-deploy-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-jar-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-javadoc-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-resources-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-scm-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-site-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-source-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-surefire-plugin": {
+      "action": "patch_only"
+    },
+    "org.apache.maven.plugins:maven-war-plugin": {
+      "action": "patch_only"
+    },
+    "org.codehaus.mojo:buildnumber-maven-plugin": {
+      "action": "latest"
+    },
+    "org.codehaus.mojo:versions-maven-plugin": {
+      "action": "patch_only"
+    },
+    "org.eclipse.store:storage-embedded": {
+      "action": "latest"
+    },
+    "org.glassfish.jersey.containers:jersey-container-servlet": {
+      "action": "patch_only"
+    },
+    "org.hamcrest:hamcrest-core": {
+      "action": "patch_only"
+    },
+    "org.junit:junit-bom": {
+      "action": "patch_only"
+    },
+    "org.owasp:dependency-check-maven": {
+      "action": "latest"
+    },
+    "org.pgpainless:pgpainless-core": {
+      "action": "latest"
+    },
+    "org.sonatype.central:central-publishing-maven-plugin": {
+      "action": "latest"
+    },
+    "prop:antlr.version": {
+      "action": "latest"
+    },
+    "prop:buildnumber-maven-plugin.version": {
+      "action": "latest"
+    },
+    "prop:central-publishing-maven-plugin.version": {
+      "action": "latest"
+    },
+    "prop:dependency-check-maven-plugin.version": {
+      "action": "latest"
+    },
+    "prop:eclipse-storage.version": {
+      "action": "latest"
+    },
+    "prop:gppainless.version": {
+      "action": "latest"
+    },
+    "prop:gson.version": {
+      "action": "latest"
+    },
+    "prop:hamcrest.version": {
+      "action": "patch_only"
+    },
+    "prop:hikaricp.version": {
+      "action": "latest"
+    },
+    "prop:jakarta.annotation.version": {
+      "action": "patch_only"
+    },
+    "prop:jersey.version": {
+      "action": "patch_only"
+    },
+    "prop:junit5.version": {
+      "action": "patch_only"
+    },
+    "prop:logback.version": {
+      "action": "latest"
+    },
+    "prop:maven-assembly-plugin.version": {
+      "action": "latest"
+    },
+    "prop:maven-compiler-plugin.version": {
+      "action": "latest"
+    },
+    "prop:maven-dependency-plugin.version": {
+      "action": "latest"
+    },
+    "prop:maven-deploy-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-jar-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-javadoc-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-resources-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-scm-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-site-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-source-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-surefire-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:maven-war-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:spotbugs-maven-plugin.version": {
+      "action": "patch_only"
+    },
+    "prop:versions-maven-plugin.version": {
+      "action": "patch_only"
+    }
+  }
+}

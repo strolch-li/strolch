@@ -79,6 +79,9 @@ public class CertificateStubsSaxWriter {
 		certificates.sort(comparing(CertificateStub::getSessionId));
 		for (CertificateStub cert : certificates) {
 
+			if (cert.getAuthTokenCrypt().isInvalid())
+				continue;
+
 			// create the certificate element
 			xmlWriter.writeEmptyElement(CERTIFICATE);
 

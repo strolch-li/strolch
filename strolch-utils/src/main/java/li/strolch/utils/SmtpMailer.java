@@ -20,9 +20,9 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import li.strolch.utils.dbc.DBC;
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKey;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.api.MessageEncryptionMechanism;
+import org.bouncycastle.openpgp.api.OpenPGPCertificate;
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.bouncycastle.util.io.Streams;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.DocumentSignatureType;
@@ -33,7 +33,6 @@ import org.pgpainless.encryption_signing.EncryptionStream;
 import org.pgpainless.encryption_signing.ProducerOptions;
 import org.pgpainless.encryption_signing.SigningOptions;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
-import org.pgpainless.key.protection.UnlockSecretKey;
 import org.pgpainless.util.Passphrase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,9 +93,9 @@ public class SmtpMailer {
 	private Authenticator authenticator;
 	private InternetAddress[] overrideRecipients;
 
-	private PGPSecretKeyRing signingKeyRing;
+	private OpenPGPKey signingKey;
 	private char[] signingKeyPassword;
-	private List<PGPPublicKeyRing> recipientKeyRings;
+	private List<OpenPGPCertificate> recipientCertificates;
 
 	private static SmtpMailer instance;
 
@@ -209,33 +208,32 @@ public class SmtpMailer {
 	}
 
 	public void addRecipientPublicKeyFileName(String recipientPublicKeyFileName) {
-		if (recipientKeyRings == null)
-			this.recipientKeyRings = new ArrayList<>();
-		this.recipientKeyRings.add(getRecipientKeyRing(recipientPublicKeyFileName));
+		if (this.recipientCertificates == null)
+			this.recipientCertificates = new ArrayList<>();
+		this.recipientCertificates.add(getRecipientCertificate(recipientPublicKeyFileName));
 	}
 
 	public void setSigningKeyFileName(String signingKeyFileName, char[] signingKeyPassword) {
 		// validate we can unlock the key with the given password
-		PGPSecretKeyRing signingKeyRing = getSigningKeyRing(signingKeyFileName);
+		OpenPGPKey signingKey = getSigningKey(signingKeyFileName);
 		try {
-			PGPSecretKey secretKey = signingKeyRing.getSecretKey();
-			UnlockSecretKey.unlockSecretKey(secretKey,
-					SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(signingKeyPassword)));
+			signingKey.getPrimarySecretKey().unlock(signingKeyPassword);
 		} catch (PGPException e) {
 			throw new RuntimeException(e);
 		}
 
-		this.signingKeyRing = signingKeyRing;
+		this.signingKey = signingKey;
 		this.signingKeyPassword = signingKeyPassword;
 	}
 
 	private boolean canSign() {
-		return this.signingKeyRing != null;
+		return this.signingKey != null;
 	}
 
 	private void assertCanEncrypt() {
-		DBC.PRE.assertNotNull("Encrypted emails require a signing key!", this.signingKeyRing);
-		DBC.PRE.assertNotEmpty("Encrypted emails require at least one recipient key ring!", this.recipientKeyRings);
+		DBC.PRE.assertNotNull("Encrypted emails require a signing key!", this.signingKey);
+		DBC.PRE.assertNotEmpty("Encrypted emails require at least one recipient certificate!",
+				this.recipientCertificates);
 	}
 
 	/**
@@ -350,7 +348,7 @@ public class SmtpMailer {
 		}
 
 		if (canSign()) {
-			logger.info("Signing text with key {}", this.signingKeyRing.getPublicKey().getUserIDs().next());
+			logger.info("Signing text with key {}", this.signingKey.getPrimaryUserId().getUserId());
 			String signedMessage = sign(text, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
 			messageBodyPart.setText(signedMessage, UTF_8.name());
 		} else {
@@ -566,15 +564,17 @@ public class SmtpMailer {
 			if (!this.lock.tryLock(10, TimeUnit.SECONDS))
 				throw new IllegalStateException("Failed to acquired lock in 10s!");
 
-			SigningOptions signingOptions = new SigningOptions()
+			SigningOptions signingOptions = SigningOptions
+					.get(PGPainless.getInstance())
 					.addDetachedSignature(
 							SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(this.signingKeyPassword)),
-							this.signingKeyRing, signatureType)
+							this.signingKey, signatureType)
 					.overrideHashAlgorithm(HashAlgorithm.SHA256);
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
 			EncryptionStream encryptionStream = PGPainless
-					.encryptAndOrSign()
+					.getInstance()
+					.generateMessage()
 					.onOutputStream(signatureResult)
 					.withOptions(ProducerOptions.sign(signingOptions).setCleartextSigned().setVersion(""));
 
@@ -603,7 +603,8 @@ public class SmtpMailer {
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
 			EncryptionStream encryptionStream = PGPainless
-					.encryptAndOrSign()
+					.getInstance()
+					.generateMessage()
 					.onOutputStream(signatureResult)
 					.withOptions(ProducerOptions
 							.signAndEncrypt(getEncryptionOptions(), getSigningOptions())
@@ -626,42 +627,48 @@ public class SmtpMailer {
 	}
 
 	protected SigningOptions getSigningOptions() throws PGPException {
-		return new SigningOptions()
+		return SigningOptions
+				.get(PGPainless.getInstance())
 				.addInlineSignature(SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(this.signingKeyPassword)),
-						this.signingKeyRing, DocumentSignatureType.BINARY_DOCUMENT)
+						this.signingKey, DocumentSignatureType.BINARY_DOCUMENT)
 				.overrideHashAlgorithm(HashAlgorithm.SHA256);
 	}
 
 	protected EncryptionOptions getEncryptionOptions() {
-		return new EncryptionOptions()
-				.addRecipients(this.recipientKeyRings)
-				.overrideEncryptionAlgorithm(SymmetricKeyAlgorithm.AES_256);
+		EncryptionOptions encryptionOptions = EncryptionOptions
+				.get(PGPainless.getInstance())
+				.overrideEncryptionMechanism(
+						MessageEncryptionMechanism.integrityProtected(SymmetricKeyAlgorithm.AES_256.getAlgorithmId()));
+		for (OpenPGPCertificate recipient : this.recipientCertificates) {
+			encryptionOptions.addRecipient(recipient);
+		}
+		return encryptionOptions;
 	}
 
-	protected PGPSecretKeyRing getSigningKeyRing(String signingKeyFileName) {
-		PGPSecretKeyRing signingKeyRing;
-		try {
-			signingKeyRing = PGPainless.readKeyRing().secretKeyRing(new FileInputStream(signingKeyFileName));
+	protected OpenPGPKey getSigningKey(String signingKeyFileName) {
+		OpenPGPKey signingKey;
+		try (FileInputStream in = new FileInputStream(signingKeyFileName)) {
+			signingKey = PGPainless.getInstance().readKey().parseKey(in);
 		} catch (IOException e) {
 			throw new IllegalStateException("Failed to read signing key " + signingKeyFileName, e);
 		}
 
-		if (signingKeyRing == null)
+		if (signingKey == null)
 			throw new IllegalStateException("No secret key ring found for signing key file " + signingKeyFileName);
-		return signingKeyRing;
+		return signingKey;
 	}
 
-	protected PGPPublicKeyRing getRecipientKeyRing(String recipientPublicKeyFileName) {
-		PGPPublicKeyRing recipientKeyRing;
-		try {
-			recipientKeyRing = PGPainless.readKeyRing().publicKeyRing(new FileInputStream(recipientPublicKeyFileName));
+	protected OpenPGPCertificate getRecipientCertificate(String recipientPublicKeyFileName) {
+		OpenPGPCertificate recipientCertificate;
+		try (FileInputStream in = new FileInputStream(recipientPublicKeyFileName)) {
+			recipientCertificate = PGPainless.getInstance().readKey().parseCertificate(in);
 		} catch (IOException e) {
 			throw new IllegalStateException("Failed to read recipient public key " + recipientPublicKeyFileName, e);
 		}
 
-		if (recipientKeyRing == null)
+		if (recipientCertificate == null)
 			throw new IllegalStateException("No public key found for recipient key file " + recipientPublicKeyFileName);
-		return recipientKeyRing;
+		return recipientCertificate;
 	}
 
 	private static String getAttachmentsSummary(MailAttachment[] attachments) {
