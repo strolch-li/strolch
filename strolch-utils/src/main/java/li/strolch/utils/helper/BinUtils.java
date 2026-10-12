@@ -10,7 +10,7 @@ public class BinUtils {
 	}
 
 	public static boolean bitTest(byte b,int pos) {
-		if (pos>7 | pos<0) throw new InvalidParameterException("Invalid bit position");
+		if (pos>7 || pos<0) throw new InvalidParameterException("Invalid bit position");
 		return (b & (1 << (7 - pos))) != 0;
 	}
 
