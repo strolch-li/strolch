@@ -46,6 +46,10 @@ public class Crc {
 		}
 	}
 
+	private Crc() {
+		// utility class
+	}
+
 	/**
 	 * Implements a CRC-CCITT (XModem), using the initial value 0x0000 and the polynomial 0x1021
 	 *
@@ -100,11 +104,11 @@ public class Crc {
 	 */
 	public static short crcCcittBytes(byte[] bytes, int src, int length) {
 		int crc = 0x0000;
-		if (src<0)
+		if (src < 0)
 			throw new InvalidParameterException("src<0");
 		if (src + length > bytes.length)
 			throw new InvalidParameterException("src + length > bytes.length");
-		for (int i = src; i < (src+length); i++) {
+		for (int i = src; i < (src + length); i++) {
 			byte aData = bytes[i];
 			crc = ((crc << 8) & 0xFF00) ^ (crcTable[(crc >> 8) ^ (aData & 0xFF)] & 0xFFFF);
 		}

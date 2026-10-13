@@ -8,7 +8,7 @@ public final class HexUtils {
 	private static final int MAX_ARRAY_SIZE = Math.toIntExact((Integer.MAX_VALUE - 1L) * 8L / 25L); //687194766;
 
 	private HexUtils() {
-		throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+		// utility class
 	}
 
 	public static String bytesToHex(byte[] byteArray) {
@@ -31,7 +31,7 @@ public final class HexUtils {
 			pos++;
 			hexChars[pos] = ' ';
 			pos++;
-			if (i % 8==7) {
+			if (i % 8 == 7) {
 				hexChars[pos] = ' ';
 				pos++;
 			}
@@ -47,8 +47,7 @@ public final class HexUtils {
 		for (int i = 0; i < chars.length; i++) {
 			if (chars[i] == ' ') {
 				cpt++;
-			}
-			else {
+			} else {
 				charsnospace[i - cpt] = chars[i];
 			}
 		}
@@ -77,5 +76,4 @@ public final class HexUtils {
 
 		return data;
 	}
-
 }
