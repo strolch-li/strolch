@@ -65,6 +65,10 @@ public class LocatorServiceResult extends ServiceResult {
 		this.id = locator.get(2);
 	}
 
+	public Locator getLocator() {
+		return this.locator;
+	}
+
 	public JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.addProperty(Tags.Json.LOCATOR, this.locator.toString());
