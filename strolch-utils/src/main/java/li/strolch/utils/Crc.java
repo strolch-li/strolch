@@ -16,6 +16,8 @@
 
 package li.strolch.utils;
 
+import java.security.InvalidParameterException;
+
 import static li.strolch.utils.helper.ByteHelper.toByteArrayBigEndian;
 
 /**
@@ -98,7 +100,11 @@ public class Crc {
 	 */
 	public static short crcCcittBytes(byte[] bytes, int src, int length) {
 		int crc = 0x0000;
-		for (int i = src; i < length; i++) {
+		if (src<0)
+			throw new InvalidParameterException("src<0");
+		if (src + length > bytes.length)
+			throw new InvalidParameterException("src + length > bytes.length");
+		for (int i = src; i < (src+length); i++) {
 			byte aData = bytes[i];
 			crc = ((crc << 8) & 0xFF00) ^ (crcTable[(crc >> 8) ^ (aData & 0xFF)] & 0xFFFF);
 		}
