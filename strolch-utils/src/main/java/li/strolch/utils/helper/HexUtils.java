@@ -1,12 +1,15 @@
 package li.strolch.utils.helper;
 
 import java.security.InvalidParameterException;
-import java.util.Arrays;
 
-public class HexUtils {
+public final class HexUtils {
 
 	private static final char[] hexArray = "0123456789abcdef".toCharArray();
 	private static final int MAX_ARRAY_SIZE = Math.toIntExact((Integer.MAX_VALUE - 1L) * 8L / 25L); //687194766;
+
+	private HexUtils() {
+		throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+	}
 
 	public static String bytesToHex(byte[] byteArray) {
 		if (byteArray.length > MAX_ARRAY_SIZE)
@@ -33,35 +36,6 @@ public class HexUtils {
 				pos++;
 			}
 		}
-		return new String(hexChars).trim();
-	}
-
-	public static String bytesToHex2(byte[] byteArray) {
-		if (byteArray.length > MAX_ARRAY_SIZE)
-			throw new InvalidParameterException("Size of byte array too large for hex conversion: " + byteArray.length);
-
-		int spaces = byteArray.length / 8;
-		char[] hexChars = new char[byteArray.length * 3 + spaces];
-		int pos = 0;
-		int high;
-		int low;
-		int v;
-		for (int i = 0; i < byteArray.length; i++) {
-			v = byteArray[i] & 0xFF;
-			high = v >>> 4;
-			low = v & 0x0F;
-			hexChars[pos] = hexArray[high];
-			pos++;
-			hexChars[pos] = hexArray[low];
-			pos++;
-			hexChars[pos] = ' ';
-			pos++;
-			if (i % 8==7) {
-				hexChars[pos] = ' ';
-				pos++;
-			}
-		}
-//		return Arrays.toString(hexChars);
 		return new String(hexChars).trim();
 	}
 

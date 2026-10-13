@@ -2,7 +2,11 @@ package li.strolch.utils.helper;
 
 import java.security.InvalidParameterException;
 
-public class BinUtils {
+public final class BinUtils {
+
+	private BinUtils() {
+		throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+	}
 
 	public enum ENDIANESS{
 		BIG_ENDIAN,	//MSB is stored at Lower Address
@@ -11,7 +15,7 @@ public class BinUtils {
 
 	public static boolean bitTest(byte b,int pos) {
 		if (pos>7 || pos<0) throw new InvalidParameterException("Invalid bit position");
-		return (b & (1 << (7 - pos))) != 0;
+		return ((b & 0xFF) & (1 << (7 - pos))) != 0;
 	}
 
 	public static byte[] binToBytes(String prettyBin) {
@@ -64,7 +68,7 @@ public class BinUtils {
 	}
 
 	public static String bytesToBin(byte[] byteArray,ENDIANESS endianess) {
-//		int spaces = byteArray.length;
+
 		char[] chars = new char[9*byteArray.length];
 		for (int j = 0; j < byteArray.length; j++) {
 			byte b ;
@@ -74,7 +78,7 @@ public class BinUtils {
 				b=byteArray[byteArray.length-1-j];
 
 			for (int i = 0; i < 8; i++) {
-				chars[j*9+i] = (b & (1 << (7 - i))) == 0 ? '0' : '1';
+				chars[j*9+i] = ((b & 0xFF) & (1 << (7 - i))) == 0 ? '0' : '1';
 			}
 			chars[j*9+8] = ' ';
 		}
@@ -84,7 +88,7 @@ public class BinUtils {
 	public static String byteToBin(byte b) {
 		char[] chars = new char[8];
 		for (int i = 0; i <8; i++) {
-			chars[i] = (b & (1 << (7-i))) == 0 ? '0' : '1';
+			chars[i] = ((b & 0xFF) & (1 << (7-i))) == 0 ? '0' : '1';
 		}
 		return String.valueOf(chars);
 	}
