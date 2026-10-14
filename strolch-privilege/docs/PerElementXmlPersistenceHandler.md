@@ -75,19 +75,16 @@ privilege/
 The `PerElementXmlPersistenceHandler` is configured in `StrolchConfiguration.xml` or `PrivilegeConfig.xml` under the `PersistenceHandler` component:
 
 ```xml
-<Component>
-    <name>PersistenceHandler</name>
-    <api>li.strolch.privilege.handler.PersistenceHandler</api>
-    <impl>li.strolch.privilege.handler.PerElementXmlPersistenceHandler</impl>
-    <Properties>
-        <basePath>config/privilege</basePath>
-        <modelDir>model</modelDir>
-        <stateDir>state</stateDir>
-        <caseInsensitiveUsername>true</caseInsensitiveUsername>
-        <autoMigrateMonolithic>true</autoMigrateMonolithic>
-        <verbose>false</verbose>
-    </Properties>
-</Component>
+<PersistenceHandler class="li.strolch.privilege.handler.PerElementXmlPersistenceHandler">
+    <Parameters>
+        <Parameter name="basePath" value="config/privilege"/>
+        <Parameter name="modelDir" value="model"/>
+        <Parameter name="stateDir" value="state"/>
+        <Parameter name="caseInsensitiveUsername" value="true"/>
+        <Parameter name="autoMigrateMonolithic" value="true"/>
+        <Parameter name="verbose" value="false"/>
+    </Parameters>
+</PersistenceHandler>
 ```
 
 ### Parameter Reference
