@@ -119,7 +119,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			// set sessions data path
 			Map<String, String> persistenceParameterMap = containerModel.getPersistenceHandlerParameterMap();
 			if (parseBoolean(parameterMap.get(PARAM_PERSIST_SESSIONS))) {
-				File dataPath = runtimeConfig.getTempPath();
+				File dataPath = runtimeConfig.getConfigPath();
 				String sessionsPath = new File(dataPath, "sessions.xml").getAbsolutePath();
 				persistenceParameterMap.put(PARAM_SESSIONS_FILE, sessionsPath);
 			}
