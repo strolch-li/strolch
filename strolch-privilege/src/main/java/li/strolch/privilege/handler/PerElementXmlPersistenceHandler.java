@@ -19,11 +19,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Usage;
-import li.strolch.privilege.model.internal.PasswordCrypt;
-import li.strolch.privilege.model.internal.PersonalAccessToken;
-import li.strolch.privilege.model.internal.Role;
-import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.model.internal.UserHistory;
+import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.xml.*;
 import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.dbc.DBC;
@@ -47,6 +43,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.text.MessageFormat.format;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE_ZONED_DATE;
 
@@ -586,11 +583,13 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public boolean reload() {
+		long start = System.currentTimeMillis();
 		ensureDirectories();
 
 		if (this.autoMigrateMonolithic && isModelEmpty())
 			migrateMonolithicFiles();
 
+		long tmp = System.currentTimeMillis();
 		// ROLES
 		Map<String, Role> loadedRoles = new HashMap<>();
 		for (File file : listXmlFiles(this.modelRolesDir)) {
@@ -668,6 +667,9 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 			}
 		}
 
+		long end = System.currentTimeMillis();
+		logger.info("Read files in {}", formatMillisecondsDuration(end - tmp));
+
 		this.roles.clear();
 		this.roles.putAll(loadedRoles);
 
@@ -716,6 +718,8 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 			}
 		}
 
+		end = System.currentTimeMillis();
+		logger.info("Reloaded privilege model in {}", formatMillisecondsDuration(end - start));
 		return true;
 	}
 
@@ -745,6 +749,8 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	private void migrateMonolithicFiles() {
+		long start = System.currentTimeMillis();
+
 		File usersXml = new File(this.basePath, this.parameterMap.getOrDefault(PARAM_USERS_FILE, PARAM_USERS_FILE_DEF));
 		File rolesXml = new File(this.basePath, this.parameterMap.getOrDefault(PARAM_ROLES_FILE, PARAM_ROLES_FILE_DEF));
 		File groupsXml = new File(this.basePath,
@@ -819,6 +825,9 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 				Files.deleteIfExists(usersXml.toPath());
 			if (this.persistSessions && sessionsXml.exists())
 				Files.deleteIfExists(sessionsXml.toPath());
+
+			long end = System.currentTimeMillis();
+			logger.info("Migrated monolithic privilege model in {}", formatMillisecondsDuration(end - start));
 
 		} catch (Exception e) {
 			throw new PrivilegeException("Failed to auto-migrate monolithic configuration", e);
@@ -1051,7 +1060,8 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 		ZonedDateTime lastAccess = ISO8601.parseToZdt(lastAccessS);
 		boolean keepAlive = Boolean.parseBoolean(keepAliveS);
 		authTokenS = authTokenS.trim();
-		PasswordCrypt authTokenCrypt = authTokenS.startsWith("$") ? PasswordCrypt.parse(authTokenS) : PasswordCrypt.parse(authTokenS, null);
+		PasswordCrypt authTokenCrypt = authTokenS.startsWith("$") ? PasswordCrypt.parse(authTokenS) :
+				PasswordCrypt.parse(authTokenS, null);
 
 		return new CertificateStub(usage, sessionId, username, authTokenCrypt, source, locale, loginTime, lastAccess,
 				keepAlive);
