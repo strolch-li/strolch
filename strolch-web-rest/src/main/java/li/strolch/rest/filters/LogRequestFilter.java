@@ -71,6 +71,8 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 				if (contentTypeEnumeration.hasMoreElements())
 					contentType.append(", ");
 			}
+			if (contentType.isEmpty())
+				contentType.append("(undefined)");
 
 			Enumeration<String> contentEncodingEnumeration = request.getHeaders("content-encoding");
 			StringBuilder contentEncoding = new StringBuilder();
@@ -79,6 +81,8 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 				if (contentEncodingEnumeration.hasMoreElements())
 					contentEncoding.append(", ");
 			}
+			if (contentEncoding.isEmpty())
+				contentEncoding.append("(undefined)");
 
 			if (!responseContext.getHeaders().containsKey(STROLCH_EXCEPTION_I18N))
 				logger.error("Request failed {} {}: {} {} Content-type: {}, Content-encoding: {}",
