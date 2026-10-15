@@ -287,11 +287,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void invalidate(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must be given!", certificate);
-
-		Certificate removedCert = this.certificateMap.remove(certificate.getSessionId());
-		if (removedCert == null)
-			logger.error("No session was registered with ID {}", certificate.getSessionId());
-
+		this.certificateMap.remove(certificate.getSessionId());
 		this.privilegeHandler.invalidate(certificate);
 	}
 
