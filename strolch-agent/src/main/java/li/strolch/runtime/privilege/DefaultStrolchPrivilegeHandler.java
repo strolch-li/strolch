@@ -107,13 +107,19 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		RuntimeConfiguration runtimeConfig = configuration.getRuntimeConfiguration();
 		File configPath = runtimeConfig.getConfigPath();
 
+		PrivilegeContainerModel containerModel = new PrivilegeContainerModel(configPath);
+		PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
+
+		// parse configuration file
 		try (InputStream inputStream = Files.newInputStream(privilegeXmlFile.toPath())) {
-
-			// parse configuration file
-			PrivilegeContainerModel containerModel = new PrivilegeContainerModel(configPath);
-			PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
 			XmlHelper.parseDocument(inputStream, xmlHandler);
+		} catch (Exception e) {
+			String msg = "Failed to load Privilege configuration from {0}";
+			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
+			throw new PrivilegeException(msg, e);
+		}
 
+		try {
 			Map<String, String> parameterMap = containerModel.getParameterMap();
 
 			// set sessions data path
@@ -124,17 +130,13 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 				persistenceParameterMap.put(PARAM_SESSIONS_FILE, sessionsPath);
 			}
 
-			if (getConfiguration().isVerbose()) {
+			if (getConfiguration().isVerbose())
 				parameterMap.put(PARAM_VERBOSE, "true");
-			}
 
 			return new PrivilegeInitializer(getConfiguration().isVerbose(),
 					getScheduledExecutor(getName())).initializeFromXml(containerModel);
-
 		} catch (Exception e) {
-			String msg = "Failed to load Privilege configuration from {0}";
-			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
-			throw new PrivilegeException(msg, e);
+			throw new PrivilegeException("Failed to initialize Privilege handler", e);
 		}
 	}
 
