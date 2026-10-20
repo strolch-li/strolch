@@ -22,6 +22,7 @@ import li.strolch.model.Order;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
+import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public abstract class StrolchPolicy {
 	 * @param tx the transaction for this policy
 	 */
 	public StrolchPolicy(StrolchTransaction tx) {
+		DBC.PRE.assertNotNull("tx", tx);
 		this.agent = tx.getAgent();
 		this.container = tx.getContainer();
 		this.tx = tx;
