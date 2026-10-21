@@ -37,6 +37,7 @@ import li.strolch.utils.iso8601.ISO8601;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -58,6 +59,7 @@ public class OperationsLog extends StrolchComponent {
 	public static final String PARAM_SEND_MAILS_MIN_SEVERITY = "sendMailsMinSeverity";
 	public static final String PARAM_SEND_MAILS_RECIPIENTS = "sendMailsRecipients";
 	private LinkedBlockingQueue<LogTask> queue;
+	private AtomicInteger pendingTasks;
 
 	private Map<String, Set<LogMessage>> logMessagesByRealmAndId;
 	private Map<String, Map<Locator, Set<LogMessage>>> logMessagesByLocator;
@@ -85,18 +87,19 @@ public class OperationsLog extends StrolchComponent {
 		this.sendMailsMinSeverity = LogSeverity.valueOf(
 				configuration.getString(PARAM_SEND_MAILS_MIN_SEVERITY, LogSeverity.Exception.name()));
 		if (this.sendMails) {
-			String mailRecipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
+			String recipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
 			try {
-				InternetAddress.parse(mailRecipients);
+				InternetAddress.parse(recipients);
 			} catch (AddressException e) {
-				throw new IllegalArgumentException("Failed to parse email recipients " + mailRecipients, e);
+				throw new IllegalArgumentException("Failed to parse email recipients " + recipients, e);
 			}
-			this.mailRecipients = mailRecipients;
+			this.mailRecipients = recipients;
 		}
 
 		this.maxMessages = configuration.getInt(PARAM_MAX_MESSAGES, 10000);
 
 		this.queue = new LinkedBlockingQueue<>();
+		this.pendingTasks = new AtomicInteger();
 		this.logMessagesByRealmAndId = new ConcurrentHashMap<>();
 		this.logMessagesByLocator = new ConcurrentHashMap<>();
 
@@ -112,7 +115,7 @@ public class OperationsLog extends StrolchComponent {
 		for (String realmName : realmNames) {
 			StrolchRealm realm = getContainer().getRealm(realmName);
 			if (!realm.getMode().isTransient())
-				this.queue.add(() -> loadMessages(realmName));
+				enqueue(() -> loadMessages(realmName));
 		}
 
 		this.run = true;
@@ -207,13 +210,13 @@ public class OperationsLog extends StrolchComponent {
 				// get collections to which to add
 				Set<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
 						OperationsLog::newHashSet);
-				Map<Locator, Set<LogMessage>> logMessagesByLocator = this.logMessagesByLocator.computeIfAbsent(
-						realmName, this::newBoundedLocatorMap);
+				Map<Locator, Set<LogMessage>> messagesByLocator = this.logMessagesByLocator.computeIfAbsent(realmName,
+						this::newBoundedLocatorMap);
 
 				// add the messages
 				messages.forEach(logMessage -> {
 					logMessages.add(logMessage);
-					Set<LogMessage> tmp = logMessagesByLocator.computeIfAbsent(logMessage.getLocator(),
+					Set<LogMessage> tmp = messagesByLocator.computeIfAbsent(logMessage.getLocator(),
 							OperationsLog::newHashSet);
 					tmp.add(logMessage);
 				});
@@ -263,7 +266,7 @@ public class OperationsLog extends StrolchComponent {
 		}
 
 		// wait for all tasks to complete
-		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture[0])).handle((_, t) -> t).join();
+		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture<?>[0])).handle((_, t) -> t).join();
 		if (failureEx != null)
 			throw new IllegalStateException("Failed to load LogMessages in pages", failureEx);
 
@@ -293,11 +296,11 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public boolean isQueueEmpty() {
-		return this.queue.isEmpty();
+		return this.pendingTasks.get() == 0;
 	}
 
 	public boolean isQueueNotEmpty() {
-		return !this.queue.isEmpty();
+		return this.pendingTasks.get() > 0;
 	}
 
 	public String getMailRecipients() {
@@ -309,24 +312,23 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public void addMessage(LogMessage logMessage, boolean suppressMailNotification) {
-		if (this.queue != null)
-			this.queue.add(() -> _addMessage(logMessage, suppressMailNotification));
+		enqueue(() -> _addMessage(logMessage, suppressMailNotification));
 	}
 
 	public void removeMessage(LogMessage message) {
-		this.queue.add(() -> _removeMessage(message));
+		enqueue(() -> _removeMessage(message));
 	}
 
 	public void removeMessages(Collection<LogMessage> logMessages) {
-		this.queue.add(() -> _removeMessages(logMessages));
+		enqueue(() -> _removeMessages(logMessages));
 	}
 
 	public void updateState(String realmName, Locator locator, LogMessageState state) {
-		this.queue.add(() -> _updateState(realmName, locator, state));
+		enqueue(() -> _updateState(realmName, locator, state));
 	}
 
 	public void updateState(String realmName, String id, LogMessageState state) {
-		this.queue.add(() -> _updateState(realmName, id, state));
+		enqueue(() -> _updateState(realmName, id, state));
 	}
 
 	private void _addMessage(LogMessage logMessage, boolean suppressMailNotification) {
@@ -501,11 +503,24 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public void clearMessages(String realm, Locator locator) {
-		this.queue.add(() -> {
+		enqueue(() -> {
 			Map<Locator, Set<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 			if (logMessages != null)
 				logMessages.remove(locator);
 		});
+	}
+
+	private void enqueue(LogTask task) {
+		if (this.queue != null) {
+			this.pendingTasks.incrementAndGet();
+			this.queue.add(() -> {
+				try {
+					task.run();
+				} finally {
+					this.pendingTasks.decrementAndGet();
+				}
+			});
+		}
 	}
 
 	public Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
@@ -585,13 +600,11 @@ public class OperationsLog extends StrolchComponent {
 		String hash = logMessage.buildRelevantHash();
 		long now = System.currentTimeMillis();
 		Long sentTime = this.sentMessageHashes.get(hash);
-		if (sentTime != null) {
-			if (now - sentTime < TimeUnit.MINUTES.toMillis(30)) {
-				logger.warn(
-						"LogMessage {} {} has already been sent less than 30min ago as hash is already known. Ignoring.",
-						logMessage.getSeverity(), logMessage.getLocator());
-				return;
-			}
+		if (sentTime != null && now - sentTime < TimeUnit.MINUTES.toMillis(30)) {
+			logger.warn(
+					"LogMessage {} {} has already been sent less than 30min ago as hash is already known. Ignoring.",
+					logMessage.getSeverity(), logMessage.getLocator());
+			return;
 		}
 		this.sentMessageHashes.put(hash, now);
 

@@ -134,7 +134,7 @@ public class LogMessagesTestRunner {
 							.stream()
 							.map(LogMessage::getId)
 							.sorted()
-							.collect(toList());
+							.toList();
 					assertEquals(expectedSize, actualIds.size());
 					List<String> expectedIds = ids.subList(ids.size() - expectedSize, ids.size());
 					assertEquals(expectedIds, actualIds);
@@ -177,7 +177,9 @@ public class LogMessagesTestRunner {
 
 			// now try and remove a single element
 			this.operationsLog.removeMessage(logMessage1);
-			Thread.sleep(50L);
+			while (this.operationsLog.isQueueNotEmpty())
+				//noinspection BusyWait
+				Thread.sleep(100L);
 			assertFalse(this.operationsLog.getMessagesFor(this.realmName, logMessage1.getLocator()).isPresent());
 
 			// now remove bulk
@@ -209,7 +211,8 @@ public class LogMessagesTestRunner {
 				}
 			}
 
-		} catch (InterruptedException e) {
+		} catch (InterruptedException _) {
+			Thread.currentThread().interrupt();
 			throw new IllegalStateException("Interrupted!");
 		}
 	}
