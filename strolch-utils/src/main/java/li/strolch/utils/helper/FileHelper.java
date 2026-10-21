@@ -16,10 +16,12 @@
 package li.strolch.utils.helper;
 
 import li.strolch.utils.DataUnit;
+import li.strolch.utils.ThrowingConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
@@ -29,6 +31,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.emptySet;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.normalizeLength;
@@ -45,6 +49,20 @@ public class FileHelper {
 
 	private static final DateTimeFormatter separatedDtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 	private static final DateTimeFormatter nonSeparatedDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	private static volatile boolean atomicMoveSupported = true;
+
+	private FileHelper() {
+		// utility class
+	}
+
+	public static boolean isAtomicMoveSupported() {
+		return atomicMoveSupported;
+	}
+
+	public static void setAtomicMoveSupported(boolean atomicMoveSupported) {
+		FileHelper.atomicMoveSupported = atomicMoveSupported;
+	}
 
 	/**
 	 * <p>Generates a path to the given temporary path to write a file separated in sub folders by day using current
@@ -343,6 +361,32 @@ public class FileHelper {
 		}
 
 		return false;
+	}
+
+	public static void writeAtomically(File targetFile, ThrowingConsumer<File> writer) throws Exception {
+		File parent = targetFile.getParentFile();
+		if (!parent.exists() && !parent.mkdirs())
+			throw new IOException("Failed to create directory " + parent.getAbsolutePath());
+
+		File tmpFile = new File(parent, targetFile.getName() + ".tmp");
+		try {
+			writer.accept(tmpFile);
+			if (atomicMoveSupported) {
+				try {
+					Files.move(tmpFile.toPath(), targetFile.toPath(), ATOMIC_MOVE, REPLACE_EXISTING);
+				} catch (AtomicMoveNotSupportedException _) {
+					atomicMoveSupported = false;
+					logger.warn("Atomic move not supported on this platform, falling back to non-atomic move");
+					Files.move(tmpFile.toPath(), targetFile.toPath(), REPLACE_EXISTING);
+				}
+			} else {
+				Files.move(tmpFile.toPath(), targetFile.toPath(), REPLACE_EXISTING);
+			}
+		} catch (Exception e) {
+			if (tmpFile.exists() && !tmpFile.delete())
+				logger.error("Failed to delete temp file: {}", tmpFile.getAbsolutePath());
+			throw e;
+		}
 	}
 
 	/**
