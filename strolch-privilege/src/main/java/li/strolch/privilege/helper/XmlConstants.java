@@ -38,6 +38,7 @@ public class XmlConstants {
 	public static final String ROLES = "Roles";
 	public static final String TOKENS = "Tokens";
 	public static final String TOKEN = "Token";
+	public static final String SESSIONS = "Sessions";
 	public static final String ROLE = "Role";
 	public static final String USERS = "Users";
 	public static final String GROUPS = "Groups";
@@ -96,7 +97,30 @@ public class XmlConstants {
 	public static final String PARAM_TOKENS_FILE_DEF = "PrivilegeTokens.xml";
 	public static final String PARAM_ROLES_FILE = "rolesXmlFile";
 	public static final String PARAM_ROLES_FILE_DEF = "PrivilegeRoles.xml";
+	public static final String PARAM_SESSIONS_FILE = "sessionsXmlFile";
+	public static final String PARAM_SESSIONS_FILE_DEF = "PrivilegeSessions.xml";
+	public static final String PARAM_PERSIST_SESSIONS = "persistSessions";
+	public static final String PARAM_PERSIST_SESSIONS_DEF = "false";
 	public static final String PARAM_BASE_PATH = "basePath";
 	public static final String PARAM_CONFIG_FILE = "configFile";
 	public static final String PARAM_VERBOSE = "verbose";
+	public static final String PARAM_MODEL_DIR = "modelDir";
+	public static final String PARAM_MODEL_DIR_DEF = "model";
+	public static final String PARAM_STATE_DIR = "stateDir";
+	public static final String PARAM_STATE_DIR_DEF = "state";
+	public static final String PARAM_AUTO_MIGRATE_MONOLITHIC = "autoMigrateMonolithic";
+
+	public static final String PROP_FIRST_LOGIN = "firstLogin";
+	public static final String PROP_LAST_LOGIN = "lastLogin";
+	public static final String PROP_LAST_PASSWORD_CHANGE = "lastPasswordChange";
+	public static final String PROP_LAST_USED = "lastUsed";
+	public static final String PROP_SESSION_ID = "sessionId";
+	public static final String PROP_USERNAME = "username";
+	public static final String PROP_USAGE = "usage";
+	public static final String PROP_AUTH_TOKEN = "authToken";
+	public static final String PROP_SOURCE = "source";
+	public static final String PROP_LOCALE = "locale";
+	public static final String PROP_LOGIN_TIME = "loginTime";
+	public static final String PROP_LAST_ACCESS = "lastAccess";
+	public static final String PROP_KEEP_ALIVE = "keepAlive";
 }

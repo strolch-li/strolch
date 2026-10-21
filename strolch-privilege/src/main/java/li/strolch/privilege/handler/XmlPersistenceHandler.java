@@ -17,11 +17,13 @@ package li.strolch.privilege.handler;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.xml.*;
+import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +44,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.text.MessageFormat.format;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.FileHelper.writeAtomically;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -59,11 +63,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private final Map<String, Group> groups;
 	private final Map<String, Role> roles;
 	private final Map<String, PersonalAccessToken> tokens;
+	private final Map<String, CertificateStub> sessions;
 
 	private boolean usersDirty;
 	private boolean groupsDirty;
 	private boolean rolesDirty;
 	private boolean tokensDirty;
+	private boolean sessionsDirty;
 
 	private Map<String, String> parameterMap;
 	private boolean verbose;
@@ -72,8 +78,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private File groupsPath;
 	private File rolesPath;
 	private File tokensPath;
+	private File sessionsPath;
 
 	private boolean caseInsensitiveUsername;
+	private boolean persistSessions;
 
 	public XmlPersistenceHandler() {
 		this.roles = new ConcurrentHashMap<>();
@@ -81,6 +89,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.usersByUsername = new ConcurrentHashMap<>();
 		this.usersById = new ConcurrentHashMap<>();
 		this.tokens = new ConcurrentHashMap<>();
+		this.sessions = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -153,16 +162,22 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public Group removeGroup(String groupName) {
-		Group group = this.groups.remove(groupName);
-		this.groupsDirty = group != null;
-		return group;
+		synchronized (this.groups) {
+			Group group = this.groups.remove(groupName);
+			if (group != null)
+				this.groupsDirty = true;
+			return group;
+		}
 	}
 
 	@Override
 	public Role removeRole(String roleName) {
-		Role role = this.roles.remove(roleName);
-		this.rolesDirty = role != null;
-		return role;
+		synchronized (this.roles) {
+			Role role = this.roles.remove(roleName);
+			if (role != null)
+				this.rolesDirty = true;
+			return role;
+		}
 	}
 
 	@Override
@@ -198,37 +213,58 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
+	public synchronized boolean updateUserState(User user) {
+		DBC.PRE.assertNotNull("user may not be null", user);
+		DBC.PRE.assertNotEmpty(() -> "userId must not be empty for user " + user.username(), user.userId());
+		String username = evaluateUsername(user.getUsername());
+		if (!this.usersByUsername.containsKey(username) || !this.usersById.containsKey(user.getUserId()))
+			return false;
+		this.usersByUsername.put(username, user);
+		this.usersById.put(user.getUserId(), user);
+		this.usersDirty = true;
+		return true;
+	}
+
+	@Override
 	public void addGroup(Group group) {
-		if (this.groups.containsKey(group.name()))
-			throw new IllegalStateException(format("The group {0} already exists!", group.name()));
-		this.groups.put(group.name(), group);
-		this.groupsDirty = true;
+		synchronized (this.groups) {
+			if (this.groups.containsKey(group.name()))
+				throw new IllegalStateException(format("The group {0} already exists!", group.name()));
+			this.groups.put(group.name(), group);
+			this.groupsDirty = true;
+		}
 	}
 
 	@Override
 	public void replaceGroup(Group group) {
-		if (!this.groups.containsKey(group.name()))
-			throw new IllegalStateException(
-					format("The group {0} can not be replaced as it does not exist!", group.name()));
-		this.groups.put(group.name(), group);
-		this.groupsDirty = true;
+		synchronized (this.groups) {
+			if (!this.groups.containsKey(group.name()))
+				throw new IllegalStateException(
+						format("The group {0} can not be replaced as it does not exist!", group.name()));
+			this.groups.put(group.name(), group);
+			this.groupsDirty = true;
+		}
 	}
 
 	@Override
 	public void addRole(Role role) {
-		if (this.roles.containsKey(role.getName()))
-			throw new IllegalStateException(format("The role {0} already exists!", role.getName()));
-		this.roles.put(role.getName(), role);
-		this.rolesDirty = true;
+		synchronized (this.roles) {
+			if (this.roles.containsKey(role.getName()))
+				throw new IllegalStateException(format("The role {0} already exists!", role.getName()));
+			this.roles.put(role.getName(), role);
+			this.rolesDirty = true;
+		}
 	}
 
 	@Override
 	public void replaceRole(Role role) {
-		if (!this.roles.containsKey(role.getName()))
-			throw new IllegalStateException(
-					format("The role {0} can not be replaced as it does not exist!", role.getName()));
-		this.roles.put(role.getName(), role);
-		this.rolesDirty = true;
+		synchronized (this.roles) {
+			if (!this.roles.containsKey(role.getName()))
+				throw new IllegalStateException(
+						format("The role {0} can not be replaced as it does not exist!", role.getName()));
+			this.roles.put(role.getName(), role);
+			this.rolesDirty = true;
+		}
 	}
 
 	@Override
@@ -238,23 +274,80 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addAccessToken(PersonalAccessToken accessToken) {
-		if (this.tokens.containsKey(accessToken.tokenId()))
-			throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
-		this.tokens.put(accessToken.tokenId(), accessToken);
-		this.tokensDirty = true;
+		synchronized (this.tokens) {
+			if (this.tokens.containsKey(accessToken.tokenId()))
+				throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
+			this.tokens.put(accessToken.tokenId(), accessToken);
+			this.tokensDirty = true;
+		}
 	}
 
 	@Override
 	public PersonalAccessToken removeAccessToken(String tokenId) {
-		PersonalAccessToken token = this.tokens.remove(tokenId);
-		this.tokensDirty = token != null;
-		return token;
+		synchronized (this.tokens) {
+			PersonalAccessToken token = this.tokens.remove(tokenId);
+			if (token != null)
+				this.tokensDirty = true;
+			return token;
+		}
+	}
+
+	@Override
+	public boolean updateAccessTokenLastUsed(String tokenId, ZonedDateTime lastUsed) {
+		synchronized (this.tokens) {
+			PersonalAccessToken updated = this.tokens.computeIfPresent(tokenId,
+					(id, token) -> token.withLastUsed(lastUsed));
+			if (updated != null) {
+				this.tokensDirty = true;
+				return true;
+			}
+			return false;
+		}
 	}
 
 	@Override
 	public List<PersonalAccessToken> getAccessTokensForUser(String username) {
 		synchronized (this.tokens) {
 			return this.tokens.values().stream().filter(t -> t.username().equals(username)).toList();
+		}
+	}
+
+	@Override
+	public List<CertificateStub> getAllSessions() {
+		if (!this.persistSessions)
+			return List.of();
+		synchronized (this.sessions) {
+			return new LinkedList<>(this.sessions.values());
+		}
+	}
+
+	@Override
+	public void addSession(Certificate certificate) {
+		if (!this.persistSessions)
+			return;
+		synchronized (this.sessions) {
+			this.sessions.put(certificate.getSessionId(), new CertificateStub(certificate));
+			this.sessionsDirty = true;
+		}
+	}
+
+	@Override
+	public void updateSession(Certificate certificate) {
+		if (!this.persistSessions)
+			return;
+		synchronized (this.sessions) {
+			this.sessions.put(certificate.getSessionId(), new CertificateStub(certificate));
+			this.sessionsDirty = true;
+		}
+	}
+
+	@Override
+	public void removeSession(String sessionId) {
+		if (!this.persistSessions)
+			return;
+		synchronized (this.sessions) {
+			if (this.sessions.remove(sessionId) != null)
+				this.sessionsDirty = true;
 		}
 	}
 
@@ -266,6 +359,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * <li>{@link XmlConstants#PARAM_GROUPS_FILE}</li>
 	 * <li>{@link XmlConstants#PARAM_ROLES_FILE}</li>
 	 * <li>{@link XmlConstants#PARAM_TOKENS_FILE}</li>
+	 * <li>{@link XmlConstants#PARAM_SESSIONS_FILE}</li>
 	 * </ul>
 	 */
 	@Override
@@ -286,15 +380,19 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File groupsPath = getFile(basePath, PARAM_GROUPS_FILE, PARAM_GROUPS_FILE_DEF, false);
 		File rolesPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_ROLES_FILE_DEF, true);
 		File tokensPath = getFile(basePath, PARAM_TOKENS_FILE, PARAM_TOKENS_FILE_DEF, false);
+		File sessionsPath = getFile(basePath, PARAM_SESSIONS_FILE, PARAM_SESSIONS_FILE_DEF, false);
 
 		// save path to model
 		this.usersPath = usersPath;
 		this.groupsPath = groupsPath;
 		this.rolesPath = rolesPath;
 		this.tokensPath = tokensPath;
+		this.sessionsPath = sessionsPath;
 
 		this.caseInsensitiveUsername = parseBoolean(
 				this.parameterMap.getOrDefault(PARAM_CASE_INSENSITIVE_USERNAME, "true"));
+		this.persistSessions = parseBoolean(
+				this.parameterMap.getOrDefault(PARAM_PERSIST_SESSIONS, PARAM_PERSIST_SESSIONS_DEF));
 
 		reload();
 	}
@@ -310,8 +408,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 		}
 
-		String path = basePath + "/" + fileName;
-		File file = new File(path);
+		File file;
+		if (new File(fileName).isAbsolute()) {
+			file = new File(fileName);
+		} else {
+			String path = basePath + "/" + fileName;
+			file = new File(path);
+		}
 		if (required && !file.exists()) {
 			String msg = "[{0}] Defined parameter {1} is invalid as file does not exist at path {2}";
 			msg = format(msg, PersistenceHandler.class.getName(), param, file.getAbsolutePath());
@@ -380,13 +483,31 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			this.tokens.putAll(tokensXmlHandler.getTokens());
 		}
 
+		// SESSIONS
+		Map<String, CertificateStub> sessions = new ConcurrentHashMap<>();
+		if (this.persistSessions && this.sessionsPath != null && this.sessionsPath.exists()) {
+			try {
+				CertificateStubsSaxReader reader = new CertificateStubsSaxReader(this.sessionsPath);
+				reader.read().forEach(s -> sessions.put(s.getSessionId(), s));
+			} catch (Exception e) {
+				logger.error("Could not read sessions from file {}", this.sessionsPath, e);
+				if (!this.sessionsPath.delete())
+					throw new IllegalStateException("Could not delete sessions file " + this.sessionsPath);
+			}
+		}
+		synchronized (this.sessions) {
+			this.sessions.clear();
+			this.sessions.putAll(sessions);
+		}
+
 		this.usersDirty = false;
 		this.groupsDirty = false;
 		this.rolesDirty = false;
 		this.tokensDirty = false;
+		this.sessionsDirty = false;
 
-		logger.info("Read {} Users, {} Groups, {} Roles, {} Tokens", this.usersByUsername.size(), this.groups.size(),
-				this.roles.size(), this.tokens.size());
+		logger.info("Read {} Users, {} Groups, {} Roles, {} Tokens, {} Sessions", this.usersByUsername.size(),
+				this.groups.size(), this.roles.size(), this.tokens.size(), this.sessions.size());
 
 		// validate referenced elements exist
 		for (User user : this.usersByUsername.values()) {
@@ -428,42 +549,120 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * Writes the model to the XML files. Where the files are written to was defined in the {@link #initialize(Map)}
 	 */
 	@Override
-	public boolean persist() throws XMLStreamException, IOException {
+	public synchronized boolean persist() throws XMLStreamException, IOException {
 		long start = System.nanoTime();
-		boolean saved = false;
 
-		// write users file
-		if (this.usersDirty) {
-			new PrivilegeUsersSaxWriter(getAllUsers(), this.usersPath).write();
-			this.usersDirty = false;
-			saved = true;
-		}
-
-		// write groups file
-		if (this.groupsDirty) {
-			new PrivilegeGroupsSaxWriter(getAllGroups(), this.groupsPath).write();
-			this.groupsDirty = false;
-			saved = true;
-		}
-
-		// write roles file
-		if (this.rolesDirty) {
-			new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath).write();
-			this.rolesDirty = false;
-			saved = true;
-		}
-
-		// write tokens file
-		if (this.tokensDirty) {
-			new PrivilegeTokensSaxWriter(getAllAccessTokens(), this.tokensPath).write();
-			this.tokensDirty = false;
-			saved = true;
-		}
+		boolean saved;
+		saved = writeUsersFile();
+		saved = writeGroupsFile() || saved;
+		saved = writeRolesFile() || saved;
+		saved = writeTokensFile() || saved;
+		saved = writeSessionsFile() || saved;
 
 		long tookNanos = System.nanoTime() - start;
 		if (TimeUnit.NANOSECONDS.toMillis(tookNanos) > 100)
 			logger.warn("Persist took {}", formatNanoDuration(tookNanos));
 		return saved;
+	}
+
+	private boolean writeSessionsFile() {
+		List<CertificateStub> sessions;
+		synchronized (this.sessions) {
+			if (!this.persistSessions || !this.sessionsDirty)
+				return false;
+			sessions = new LinkedList<>(this.sessions.values());
+			this.sessionsDirty = false;
+		}
+
+		try {
+			writeAtomically(this.sessionsPath, tmpFile -> new CertificateStubsSaxWriter(sessions, tmpFile).write());
+			return true;
+		} catch (Exception e) {
+			synchronized (this.sessions) {
+				this.sessionsDirty = true;
+			}
+			throw new PrivilegeException("Failed to write sessions file", e);
+		}
+	}
+
+	private boolean writeTokensFile() {
+		List<PersonalAccessToken> tokens;
+		synchronized (this.tokens) {
+			if (!this.tokensDirty)
+				return false;
+			tokens = new LinkedList<>(this.tokens.values());
+			this.tokensDirty = false;
+		}
+
+		try {
+			writeAtomically(this.tokensPath, tmpFile -> new PrivilegeTokensSaxWriter(tokens, tmpFile).write());
+			return true;
+		} catch (Exception e) {
+			synchronized (this.tokens) {
+				this.tokensDirty = true;
+			}
+			throw new PrivilegeException("Failed to write tokens file", e);
+		}
+	}
+
+	private boolean writeRolesFile() {
+		List<Role> roles;
+		synchronized (this.roles) {
+			if (!this.rolesDirty)
+				return false;
+			roles = new LinkedList<>(this.roles.values());
+			this.rolesDirty = false;
+		}
+
+		try {
+			writeAtomically(this.rolesPath, tmpFile -> new PrivilegeRolesSaxWriter(roles, tmpFile).write());
+			return true;
+		} catch (Exception e) {
+			synchronized (this.roles) {
+				this.rolesDirty = true;
+			}
+			throw new PrivilegeException("Failed to write roles file", e);
+		}
+	}
+
+	private boolean writeGroupsFile() {
+		List<Group> groups;
+		synchronized (this.groups) {
+			if (!this.groupsDirty)
+				return false;
+			groups = new LinkedList<>(this.groups.values());
+			this.groupsDirty = false;
+		}
+
+		try {
+			writeAtomically(this.groupsPath, tmpFile -> new PrivilegeGroupsSaxWriter(groups, tmpFile).write());
+			return true;
+		} catch (Exception e) {
+			synchronized (this.groups) {
+				this.groupsDirty = true;
+			}
+			throw new PrivilegeException("Failed to write groups file", e);
+		}
+	}
+
+	private boolean writeUsersFile() {
+		List<User> users;
+		synchronized (this) {
+			if (!this.usersDirty)
+				return false;
+			users = getAllUsers();
+			this.usersDirty = false;
+		}
+
+		try {
+			writeAtomically(this.usersPath, tmpFile -> new PrivilegeUsersSaxWriter(users, tmpFile).write());
+			return true;
+		} catch (Exception e) {
+			synchronized (this) {
+				this.usersDirty = true;
+			}
+			throw new PrivilegeException("Failed to write users file", e);
+		}
 	}
 
 	protected String evaluateUsername(String username) {

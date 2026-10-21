@@ -17,13 +17,11 @@ package li.strolch.privilege.xml;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.iso8601.ISO8601;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,27 +35,52 @@ import static li.strolch.privilege.helper.XmlHelper.openXmlStreamWriterDocument;
  */
 public class CertificateStubsSaxWriter {
 
-	private final List<Certificate> certificates;
+	private final List<CertificateStub> certificates;
 	private final OutputStream outputStream;
+	private final File file;
 
-	public CertificateStubsSaxWriter(List<Certificate> certificates, OutputStream outputStream) {
+	public CertificateStubsSaxWriter(List<CertificateStub> certificates, OutputStream outputStream) {
 		this.certificates = certificates;
 		this.outputStream = outputStream;
+		this.file = null;
+	}
+
+	public CertificateStubsSaxWriter(List<CertificateStub> certificates, File file) {
+		this.certificates = certificates;
+		this.outputStream = null;
+		this.file = file;
+	}
+
+	public static CertificateStubsSaxWriter ofCertificates(List<Certificate> certificates, OutputStream outputStream) {
+		return new CertificateStubsSaxWriter(certificates.stream().map(CertificateStub::new).toList(), outputStream);
+	}
+
+	public static CertificateStubsSaxWriter ofCertificates(List<Certificate> certificates, File file) {
+		return new CertificateStubsSaxWriter(certificates.stream().map(CertificateStub::new).toList(), file);
 	}
 
 	public void write() throws IOException, XMLStreamException {
+		if (this.file != null) {
+			try (OutputStream out = new FileOutputStream(this.file)) {
+				writeToStream(out);
+			}
+		} else {
+			writeToStream(this.outputStream);
+		}
+	}
 
-		Writer ioWriter = new OutputStreamWriter(this.outputStream, StandardCharsets.UTF_8);
+	private void writeToStream(OutputStream outputStream) throws XMLStreamException {
+		Writer ioWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
 
 		IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
 		xmlWriter.writeStartElement(ROOT_CERTIFICATES);
 
-		List<Certificate> certificates = new ArrayList<>(this.certificates);
-		certificates.sort(comparing(Certificate::getSessionId));
-		for (Certificate cert : certificates) {
+		List<CertificateStub> certificates = new ArrayList<>(this.certificates);
+		certificates.sort(comparing(CertificateStub::getSessionId));
+		for (CertificateStub cert : certificates) {
 
 			// create the certificate element
-			xmlWriter.writeStartElement(CERTIFICATE);
+			xmlWriter.writeEmptyElement(CERTIFICATE);
 
 			// sessionId;
 			xmlWriter.writeAttribute(ATTR_SESSION_ID, cert.getSessionId());
@@ -88,6 +111,7 @@ public class CertificateStubsSaxWriter {
 		}
 
 		// and now end
+		xmlWriter.writeEndElement();
 		xmlWriter.writeEndDocument();
 		xmlWriter.flush();
 	}

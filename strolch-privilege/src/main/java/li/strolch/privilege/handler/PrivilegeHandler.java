@@ -732,9 +732,9 @@ public interface PrivilegeHandler {
 	boolean isPasswordResetAllowed();
 
 	/**
-	 * Returns true if persisting on user data changed enabled
+	 * Returns true if automatic persistence of privilege-model changes is enabled
 	 *
-	 * @return true persisting on user data changed enabled
+	 * @return true if automatic persistence is enabled
 	 */
 	boolean isPersistOnUserDataChanged();
 
@@ -828,8 +828,8 @@ public interface PrivilegeHandler {
 	boolean reload(Certificate certificate, String source);
 
 	/**
-	 * Persists any changes to the privilege data model. Changes are thus not persisted immediately, but must be
-	 * actively performed
+	 * Explicitly persists pending changes to the privilege data model. Successful mutations may also be persisted
+	 * automatically when automatic persistence is enabled.
 	 *
 	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
 	 *

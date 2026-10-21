@@ -139,22 +139,10 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public PasswordCrypt hashPassword(char[] password, byte[] salt, String algorithm, int iterations, int keyLength) {
 
 		try {
-			long start = System.currentTimeMillis();
 			SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm);
 			PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
 			SecretKey key = skf.generateSecret(spec);
-
-			long end = System.currentTimeMillis();
-			long duration = end - start;
-			if (duration < 1000)
-				logger.info("Hashing password took {}. This is too short. Consider increasing iterations.",
-						formatMillisecondsDuration(duration));
-			else if (duration > 5000)
-				logger.info("Hashing password took {}. This is too long. Consider decreasing iterations.",
-						formatMillisecondsDuration(duration));
-
 			return new PasswordCrypt(key.getEncoded(), salt, algorithm, iterations, keyLength);
-
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new IllegalStateException(e);
 		}

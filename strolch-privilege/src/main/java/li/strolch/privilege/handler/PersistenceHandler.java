@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.Restrictable;
@@ -22,9 +23,11 @@ import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
+import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -159,6 +162,16 @@ public interface PersistenceHandler {
 	void replaceUser(User user);
 
 	/**
+	 * Updates the dynamic state (e.g. {@link li.strolch.privilege.model.internal.UserHistory}) of an existing
+	 * {@link User}.
+	 *
+	 * @param user the {@link User} containing updated state
+	 *
+	 * @return true if the user was found and updated, false otherwise
+	 */
+	boolean updateUserState(User user);
+
+	/**
 	 * Adds a {@link Role} object to the underlying database
 	 *
 	 * @param role the {@link Role} object to add
@@ -210,6 +223,16 @@ public interface PersistenceHandler {
 	PersonalAccessToken removeAccessToken(String tokenId);
 
 	/**
+	 * Updates the {@code lastUsed} timestamp of an existing {@link PersonalAccessToken}.
+	 *
+	 * @param tokenId  the id of the {@link PersonalAccessToken} to update
+	 * @param lastUsed the new {@code lastUsed} timestamp
+	 *
+	 * @return true if the token was found and updated, false otherwise
+	 */
+	boolean updateAccessTokenLastUsed(String tokenId, ZonedDateTime lastUsed);
+
+	/**
 	 * Retrieves a list of access tokens associated with a specified user.
 	 *
 	 * @param username the name of the user whose access tokens are to be retrieved
@@ -217,6 +240,43 @@ public interface PersistenceHandler {
 	 * @return a list of access tokens associated with the specified user
 	 */
 	List<PersonalAccessToken> getAccessTokensForUser(String username);
+
+	/**
+	 * Returns all persisted session stubs from the underlying storage.
+	 *
+	 * @return a list of all persisted session stubs
+	 */
+	List<CertificateStub> getAllSessions();
+
+	/**
+	 * Adds a newly created session to storage.
+	 *
+	 * @param certificate the session certificate to persist
+	 */
+	void addSession(Certificate certificate);
+
+	/**
+	 * Updates an existing session's runtime state (e.g. lastAccess).
+	 *
+	 * @param certificate the session certificate to update
+	 */
+	void updateSession(Certificate certificate);
+
+	/**
+	 * Removes a persisted session by session ID.
+	 *
+	 * @param sessionId the session ID to remove
+	 */
+	void removeSession(String sessionId);
+
+	/**
+	 * Removes a persisted session.
+	 *
+	 * @param certificate the session certificate to remove
+	 */
+	default void removeSession(Certificate certificate) {
+		removeSession(certificate.getSessionId());
+	}
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved

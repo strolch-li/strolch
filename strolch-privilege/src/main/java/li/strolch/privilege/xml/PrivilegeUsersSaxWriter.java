@@ -136,7 +136,7 @@ public class PrivilegeUsersSaxWriter {
 			return;
 
 		String passwordString = passwordCrypt.buildPasswordString();
-		if (passwordString != null) {
+		if (!passwordString.isEmpty()) {
 			xmlStreamWriter.writeAttribute(ATTR_PASSWORD, passwordString);
 		} else {
 			if (passwordCrypt.password() != null)

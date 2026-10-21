@@ -25,6 +25,8 @@ import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static li.strolch.privilege.helper.XmlConstants.*;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -202,6 +204,9 @@ public class PrivilegeInitializer {
 		String persistenceHandlerClassName = this.containerModel.getPersistenceHandlerClassName();
 		PersistenceHandler persistenceHandler = instantiateClass(persistenceHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getPersistenceHandlerParameterMap();
+		if (this.containerModel.getParameterMap().containsKey(PARAM_PERSIST_SESSIONS))
+			parameterMap.putIfAbsent(PARAM_PERSIST_SESSIONS,
+					this.containerModel.getParameterMap().get(PARAM_PERSIST_SESSIONS));
 		parameterMap.put(PARAM_BASE_PATH, this.containerModel.getBasePath().getAbsolutePath());
 		if (this.verbose)
 			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));

@@ -174,15 +174,14 @@ public class PrivilegeContextBuilder {
 	protected void copyGroupProperties(User user, Set<Group> groups) {
 		for (Group group : groups) {
 			Map<String, String> groupProperties = group.getProperties();
-			for (String key : groupProperties.keySet()) {
+			for (Map.Entry<String, String> entry : groupProperties.entrySet()) {
+				String key = entry.getKey();
 
 				// we have special handling for certain duplicate group properties
-				if (this.properties.containsKey(key)) {
-					if (handleDuplicateGroupProperty(key, group))
-						continue;
-				}
+				if (this.properties.containsKey(key) && handleDuplicateGroupProperty(key, group))
+					continue;
 
-				String value = groupProperties.get(key);
+				String value = entry.getValue();
 				String replaced = this.properties.put(key, value);
 				if (replaced != null && !replaced.equals(value)) {
 					logger.error("Duplicate property {} for user {} from group {} replaced: {} with: {}", key,
