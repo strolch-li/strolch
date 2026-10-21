@@ -122,7 +122,7 @@ public class FileHelper {
 		LocalDate localDate = dateTime.toLocalDate();
 
 		boolean separateDateSegments = options.contains(SEPARATE_DATE_SEGMENTS);
-		String date = separateDateSegments ? localDate.format(separatedDtf) : localDate.format(nonSeparatedDtf);
+		String date = localDate.format(separateDateSegments ? separatedDtf : nonSeparatedDtf);
 
 		String pathS;
 		if (options.contains(WITH_HOURS)) {
@@ -179,8 +179,8 @@ public class FileHelper {
 
 			return sb.toString();
 
-		} catch (IOException e) {
-			throw new RuntimeException("Could not read strean " + stream);
+		} catch (IOException _) {
+			throw new RuntimeException("Could not read stream " + stream);
 		}
 	}
 
@@ -459,7 +459,7 @@ public class FileHelper {
 			} while (numRead != -1);
 
 			return complete.digest();
-		} catch (Exception e) {
+		} catch (Exception _) {
 			throw new RuntimeException("Something went wrong while hashing file: " + file.getAbsolutePath());
 		}
 	}
