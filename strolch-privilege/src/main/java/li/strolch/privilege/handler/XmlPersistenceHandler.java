@@ -44,6 +44,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.text.MessageFormat.format;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.FileHelper.writeAtomically;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -564,7 +565,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return saved;
 	}
 
-	private boolean writeSessionsFile() throws IOException, XMLStreamException {
+	private boolean writeSessionsFile() {
 		if (!this.persistSessions || !this.sessionsDirty)
 			return false;
 
@@ -575,15 +576,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		try {
-			new CertificateStubsSaxWriter(sessions, this.sessionsPath).write();
+			writeAtomically(this.sessionsPath, tmpFile -> new CertificateStubsSaxWriter(sessions, tmpFile).write());
 			return true;
 		} catch (Exception e) {
 			this.sessionsDirty = true;
-			throw e;
+			throw new PrivilegeException("Failed to write sessions file", e);
 		}
 	}
 
-	private boolean writeTokensFile() throws IOException, XMLStreamException {
+	private boolean writeTokensFile() {
 		if (!this.tokensDirty)
 			return false;
 
@@ -594,15 +595,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		try {
-			new PrivilegeTokensSaxWriter(tokens, this.tokensPath).write();
+			writeAtomically(this.tokensPath, tmpFile -> new PrivilegeTokensSaxWriter(tokens, tmpFile).write());
 			return true;
 		} catch (Exception e) {
 			this.tokensDirty = true;
-			throw e;
+			throw new PrivilegeException("Failed to write tokens file", e);
 		}
 	}
 
-	private boolean writeRolesFile() throws IOException, XMLStreamException {
+	private boolean writeRolesFile() {
 		if (!this.rolesDirty)
 			return false;
 
@@ -613,15 +614,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		try {
-			new PrivilegeRolesSaxWriter(roles, this.rolesPath).write();
+			writeAtomically(this.rolesPath, tmpFile -> new PrivilegeRolesSaxWriter(roles, tmpFile).write());
 			return true;
 		} catch (Exception e) {
 			this.rolesDirty = true;
-			throw e;
+			throw new PrivilegeException("Failed to write roles file", e);
 		}
 	}
 
-	private boolean writeGroupsFile() throws IOException, XMLStreamException {
+	private boolean writeGroupsFile() {
 		if (!this.groupsDirty)
 			return false;
 
@@ -632,15 +633,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		try {
-			new PrivilegeGroupsSaxWriter(groups, this.groupsPath).write();
+			writeAtomically(this.groupsPath, tmpFile -> new PrivilegeGroupsSaxWriter(groups, tmpFile).write());
 			return true;
 		} catch (Exception e) {
 			this.groupsDirty = true;
-			throw e;
+			throw new PrivilegeException("Failed to write groups file", e);
 		}
 	}
 
-	private boolean writeUsersFile() throws IOException, XMLStreamException {
+	private boolean writeUsersFile() {
 		if (!this.usersDirty)
 			return false;
 
@@ -651,11 +652,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		try {
-			new PrivilegeUsersSaxWriter(users, this.usersPath).write();
+			writeAtomically(this.usersPath, tmpFile -> new PrivilegeUsersSaxWriter(users, tmpFile).write());
 			return true;
 		} catch (Exception e) {
 			this.usersDirty = true;
-			throw e;
+			throw new PrivilegeException("Failed to write users file", e);
 		}
 	}
 

@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +41,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.text.MessageFormat.format;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.FileHelper.writeAtomically;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE_ZONED_DATE;
@@ -831,32 +830,6 @@ public class PerElementXmlPersistenceHandler implements PersistenceHandler {
 
 		} catch (Exception e) {
 			throw new PrivilegeException("Failed to auto-migrate monolithic configuration", e);
-		}
-	}
-
-	@FunctionalInterface
-	private interface ThrowingConsumer<T> {
-		void accept(T t) throws Exception;
-	}
-
-	private void writeAtomically(File targetFile, ThrowingConsumer<File> writer) throws Exception {
-		File parent = targetFile.getParentFile();
-		if (!parent.exists() && !parent.mkdirs())
-			throw new IOException("Failed to create directory " + parent.getAbsolutePath());
-
-		File tmpFile = new File(parent, targetFile.getName() + ".tmp");
-		try {
-			writer.accept(tmpFile);
-			try {
-				Files.move(tmpFile.toPath(), targetFile.toPath(), StandardCopyOption.ATOMIC_MOVE,
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (AtomicMoveNotSupportedException _) {
-				Files.move(tmpFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			}
-		} catch (Exception e) {
-			if (tmpFile.exists() && !tmpFile.delete())
-				throw new PrivilegeException("Failed to delete token file: " + tmpFile);
-			throw e;
 		}
 	}
 
