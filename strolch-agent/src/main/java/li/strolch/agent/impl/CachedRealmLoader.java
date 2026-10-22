@@ -66,18 +66,31 @@ public class CachedRealmLoader {
 		logger.info("Loading Model from Database for realm {}...", realm);
 
 		if (this.persistenceHandler.supportsPaging()) {
-			loadElementsPagingAsync("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
-					this.nrOfResources);
-			loadElementsPagingAsync("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
-					this.nrOfOrders);
-			loadElementsPagingAsync("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
-					this.nrOfActivities);
+			CompletableFuture<Void> resources = CompletableFuture.runAsync(() ->
+					loadElementsPagingAsync("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
+							this.nrOfResources));
+			CompletableFuture<Void> orders = CompletableFuture.runAsync(() ->
+					loadElementsPagingAsync("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
+							this.nrOfOrders));
+			CompletableFuture<Void> activities = CompletableFuture.runAsync(() ->
+					loadElementsPagingAsync("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
+							this.nrOfActivities));
+			Throwable failureEx = allOf(resources, orders, activities).handle((_, t) -> t).join();
+			if (failureEx != null)
+				throw new IllegalStateException("Failed to load realm " + realm, failureEx);
 		} else {
-			loadElements("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
-					this.nrOfResources);
-			loadElements("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap, this.nrOfOrders);
-			loadElements("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
-					this.nrOfActivities);
+			CompletableFuture<Void> resources = CompletableFuture.runAsync(() ->
+					loadElements("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
+							this.nrOfResources));
+			CompletableFuture<Void> orders = CompletableFuture.runAsync(() ->
+					loadElements("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
+							this.nrOfOrders));
+			CompletableFuture<Void> activities = CompletableFuture.runAsync(() ->
+					loadElements("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
+							this.nrOfActivities));
+			Throwable failureEx = allOf(resources, orders, activities).handle((_, t) -> t).join();
+			if (failureEx != null)
+				throw new IllegalStateException("Failed to load realm " + realm, failureEx);
 		}
 
 		long duration = System.nanoTime() - start;
