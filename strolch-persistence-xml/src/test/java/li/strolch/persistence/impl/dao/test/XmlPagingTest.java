@@ -195,12 +195,10 @@ public class XmlPagingTest {
 		ResourceBundle bundle = ResourceBundle.getBundle("li-strolch-testbase");
 
 		List<LogMessage> messages = new ArrayList<>();
-		ZonedDateTime now = ZonedDateTime.now();
 		for (int i = 0; i < 5; i++) {
-			LogMessage logMessage = new LogMessage("msg_" + i, now.plusSeconds(i), StrolchConstants.DEFAULT_REALM,
+			LogMessage logMessage = new LogMessage(StrolchConstants.DEFAULT_REALM,
 					SYSTEM_USER_AGENT, Locator.valueOf(AGENT, "li.strolch.testbase", "XmlPagingTest"),
-					LogSeverity.Info, LogMessageState.Information, bundle.getBaseBundleName(), "test-message",
-					java.util.Collections.emptyMap(), "test-message-" + i, null);
+					LogSeverity.Info, LogMessageState.Information, bundle, "test-message").value("index", String.valueOf(i));
 			messages.add(logMessage);
 		}
 
