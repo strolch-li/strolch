@@ -20,7 +20,10 @@ import li.strolch.model.Tags;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 
@@ -88,7 +91,9 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 			long startNanos = System.nanoTime();
 			this.statistics.startTime = LocalDateTime.now();
 
-			getSaxParser().parse(this.modelFile, this);
+			try (InputStream in = new BufferedInputStream(new FileInputStream(this.modelFile))) {
+				getSaxParser().parse(in, this);
+			}
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;
