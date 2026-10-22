@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -38,7 +39,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 	private final Map<String, Map<String, T>> elementMap;
 
 	public TransientElementMap() {
-		this.elementMap = new HashMap<>();
+		this.elementMap = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -157,22 +158,21 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 	 *
 	 * @param elements the elements to insert
 	 */
-	synchronized void insertAll(List<T> elements) {
+	void insertAll(List<T> elements) {
 		elements.forEach(this::internalInsert);
 	}
 
 	@Override
 	protected void internalInsert(T element) {
-		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
+		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), _ -> new ConcurrentHashMap<>());
 
 		// assert no object already exists with this id
-		if (byType.containsKey(element.getId())) {
+		T previous = byType.putIfAbsent(element.getId(), element);
+		if (previous != null) {
 			String msg = "An element already exists with the id {0} and type {1}";
 			msg = MessageFormat.format(msg, element.getId(), element.getType());
 			throw new StrolchPersistenceException(msg);
 		}
-
-		byType.put(element.getId(), element);
 
 		// now make read only
 		element.setReadOnly();
