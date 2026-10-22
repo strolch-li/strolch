@@ -94,7 +94,7 @@ public class I18nMessage {
 
 	public String getBundle() {
 		if (this.bundle == null)
-			return "";
+			return this.bundleName == null ? "" : this.bundleName;
 		return this.bundle.getBaseBundleName();
 	}
 
