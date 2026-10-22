@@ -198,9 +198,16 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 				if (this.verbose)
 					logger.info("{} objects updated in this tx.", updated.size());
 
-				for (Object object : updated) {
-					@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
-					this.fileDao.performUpdate(ctx);
+				if (updated.size() > 1) {
+					updated.parallelStream().forEach(object -> {
+						@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+						this.fileDao.performUpdate(ctx);
+					});
+				} else {
+					for (Object object : updated) {
+						@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+						this.fileDao.performUpdate(ctx);
+					}
 				}
 			}
 
@@ -212,9 +219,16 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 				if (this.verbose)
 					logger.info("{} objects added in this tx.", added.size());
 
-				for (Object object : added) {
-					@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
-					this.fileDao.performCreate(ctx);
+				if (added.size() > 1) {
+					added.parallelStream().forEach(object -> {
+						@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+						this.fileDao.performCreate(ctx);
+					});
+				} else {
+					for (Object object : added) {
+						@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+						this.fileDao.performCreate(ctx);
+					}
 				}
 			}
 
@@ -311,7 +325,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	}
 
 	@Override
-	public void lock(LockableObject lockableObject) {
+	public synchronized void lock(LockableObject lockableObject) {
 		lockableObject.lock();
 		this.lockedObjects.add(lockableObject);
 	}

@@ -137,6 +137,68 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		testBulk(IoMode.DOM);
 	}
 
+	@Test
+	public void testPagingSax() {
+		setup(IoMode.SAX);
+		testPaging();
+	}
+
+	@Test
+	public void testPagingDom() {
+		setup(IoMode.DOM);
+		testPaging();
+	}
+
+	private void testPaging() {
+		List<Book> books = new ArrayList<>(10);
+		for (int i = 0; i < 10; i++) {
+			String title = "Paging Test Book. " + i;
+			String author = "Nick Hornby";
+			String press = "Penguin Books";
+			double price = 21.30;
+
+			Book book = createBook(i, title, author, press, price);
+			books.add(book);
+		}
+
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			ObjectDao objectDao = tx.getObjectDao();
+			objectDao.addAll(books);
+		}
+
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
+			ObjectDao objectDao = tx.getObjectDao();
+
+			List<Book> page1 = objectDao.queryAll(typeRef, file -> true, 3, 0);
+			assertEquals(3, page1.size());
+			assertEquals(Long.valueOf(0L), page1.get(0).getId());
+			assertEquals(Long.valueOf(1L), page1.get(1).getId());
+			assertEquals(Long.valueOf(2L), page1.get(2).getId());
+
+			List<Book> page2 = objectDao.queryAll(typeRef, file -> true, 3, 3);
+			assertEquals(3, page2.size());
+			assertEquals(Long.valueOf(3L), page2.get(0).getId());
+			assertEquals(Long.valueOf(4L), page2.get(1).getId());
+			assertEquals(Long.valueOf(5L), page2.get(2).getId());
+
+			List<Book> pageLast = objectDao.queryAll(typeRef, file -> true, 3, 9);
+			assertEquals(1, pageLast.size());
+			assertEquals(Long.valueOf(9L), pageLast.get(0).getId());
+
+			List<Book> pageEmpty = objectDao.queryAll(typeRef, file -> true, 3, 10);
+			assertEquals(0, pageEmpty.size());
+
+			List<Book> reversePage1 = objectDao.queryAll(typeRef, true, file -> true, 3, 0);
+			assertEquals(3, reversePage1.size());
+			assertEquals(Long.valueOf(9L), reversePage1.get(0).getId());
+			assertEquals(Long.valueOf(8L), reversePage1.get(1).getId());
+			assertEquals(Long.valueOf(7L), reversePage1.get(2).getId());
+
+			objectDao.removeAll(books);
+		}
+	}
+
 	private void testBulk(IoMode ioMode) {
 
 		// create a list of books

@@ -169,7 +169,7 @@ public class FileDao {
 	private void createMissingParents(File path, ObjectRef objectRef) {
 		ObjectRef parentRef = objectRef.getParent(this.tx);
 		File parentFile = parentRef.getPath(this.pathBuilder);
-		if (!parentFile.exists() && !parentFile.mkdirs()) {
+		if (!parentFile.exists() && !parentFile.mkdirs() && !parentFile.exists()) {
 			String msg = "Could not create parent path for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);

@@ -22,9 +22,11 @@ import li.strolch.xmlpers.objref.TypeRef;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static li.strolch.xmlpers.util.AssertionUtil.*;
 
@@ -228,6 +230,15 @@ public class ObjectDao {
 	}
 
 	public <T> List<T> queryAll(ObjectRef parentRef, boolean reverse, Predicate<File> predicate, int maxSize) {
+		return queryAll(parentRef, reverse, predicate, (long) maxSize, 0L);
+	}
+
+	public <T> List<T> queryAll(ObjectRef parentRef, Predicate<File> predicate, long limit, long offset) {
+		return queryAll(parentRef, false, predicate, limit, offset);
+	}
+
+	public <T> List<T> queryAll(ObjectRef parentRef, boolean reverse, Predicate<File> predicate, long limit,
+			long offset) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
@@ -236,22 +247,64 @@ public class ObjectDao {
 		MetadataDao metadataDao = this.tx.getMetadataDao();
 		Set<String> keySet = metadataDao.queryKeySet(parentRef, reverse, predicate);
 
-		int i = 0;
-		List<T> result = new ArrayList<>();
-		for (String id : keySet) {
+		if (keySet.isEmpty() || limit <= 0)
+			return Collections.emptyList();
 
+		List<String> selectedKeys = keySet.stream().skip(offset).limit(limit).toList();
+		if (selectedKeys.isEmpty())
+			return Collections.emptyList();
+
+		List<PersistenceContext<T>> contexts = new ArrayList<>(selectedKeys.size());
+		for (String id : selectedKeys) {
 			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
 			PersistenceContext<T> childCtx = childRef.createPersistenceContext(this.tx);
 			this.tx.lock(childCtx.getObjectRef());
-			this.fileDao.performRead(childCtx);
-			assertObjectRead(childCtx);
-			result.add(childCtx.getObject());
-
-			if (maxSize != Integer.MAX_VALUE && i >= maxSize)
-				break;
+			contexts.add(childCtx);
 		}
 
-		return result;
+		if (contexts.size() > 1) {
+			return contexts.parallelStream().map(childCtx -> {
+				this.fileDao.performRead(childCtx);
+				assertObjectRead(childCtx);
+				return childCtx.getObject();
+			}).collect(Collectors.toCollection(ArrayList::new));
+		} else {
+			PersistenceContext<T> childCtx = contexts.get(0);
+			this.fileDao.performRead(childCtx);
+			assertObjectRead(childCtx);
+			List<T> list = new ArrayList<>(1);
+			list.add(childCtx.getObject());
+			return list;
+		}
+	}
+
+	public <T> List<T> queryAll(List<ObjectRef> childRefs) {
+		assertNotClosed();
+		if (childRefs.isEmpty())
+			return Collections.emptyList();
+
+		List<PersistenceContext<T>> contexts = new ArrayList<>(childRefs.size());
+		for (ObjectRef childRef : childRefs) {
+			assertIsIdRef(childRef);
+			PersistenceContext<T> childCtx = childRef.createPersistenceContext(this.tx);
+			this.tx.lock(childCtx.getObjectRef());
+			contexts.add(childCtx);
+		}
+
+		if (contexts.size() > 1) {
+			return contexts.parallelStream().map(childCtx -> {
+				this.fileDao.performRead(childCtx);
+				assertObjectRead(childCtx);
+				return childCtx.getObject();
+			}).collect(Collectors.toCollection(ArrayList::new));
+		} else {
+			PersistenceContext<T> childCtx = contexts.get(0);
+			this.fileDao.performRead(childCtx);
+			assertObjectRead(childCtx);
+			List<T> list = new ArrayList<>(1);
+			list.add(childCtx.getObject());
+			return list;
+		}
 	}
 
 	private Set<String> queryKeySet(ObjectRef parentRef, boolean reverse, Predicate<File> predicate) {

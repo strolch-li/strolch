@@ -35,10 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 
@@ -53,6 +50,8 @@ public class FileIo {
 	private static final Logger logger = LoggerFactory.getLogger(FileIo.class);
 	public static final String TMP_PREFIX = ".tmp_";
 
+	private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
+
 	private final File path;
 	private final File tmpPath;
 
@@ -66,11 +65,11 @@ public class FileIo {
 		XMLStreamWriter xmlWriter;
 		try {
 			try (FileOutputStream fos = new FileOutputStream(this.tmpPath);
-				 OutputStreamWriter ioWriter = new OutputStreamWriter(fos, DEFAULT_ENCODING);
+				 BufferedOutputStream bos = new BufferedOutputStream(fos);
+				 OutputStreamWriter ioWriter = new OutputStreamWriter(bos, DEFAULT_ENCODING);
 				 FileChannel fileChannel = fos.getChannel()) {
 
-				XMLOutputFactory factory = XMLOutputFactory.newInstance();
-				xmlWriter = factory.createXMLStreamWriter(ioWriter);
+				xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(ioWriter);
 				xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
 
 				// start document
@@ -84,6 +83,8 @@ public class FileIo {
 				// and now end
 				xmlWriter.writeEndDocument();
 				xmlWriter.flush();
+				ioWriter.flush();
+				bos.flush();
 
 				// Ensure data is written to disk using FileChannel
 				fileChannel.force(true);
@@ -114,7 +115,9 @@ public class FileIo {
 
 			SaxParser<T> saxParser = ctx.getParserFactor().getSaxParser();
 			DefaultHandler defaultHandler = saxParser.getDefaultHandler();
-			getSaxParser().parse(this.path, defaultHandler);
+			try (InputStream in = new BufferedInputStream(new FileInputStream(this.path))) {
+				getSaxParser().parse(in, defaultHandler);
+			}
 
 			if (logger.isDebugEnabled()) {
 				logger.info("SAX parsed file {}", this.path.getAbsolutePath());
@@ -162,12 +165,15 @@ public class FileIo {
 
 			// Transform to file
 			try (FileOutputStream fos = new FileOutputStream(this.tmpPath);
-				 OutputStreamWriter ioWriter = new OutputStreamWriter(fos, encoding);
+				 BufferedOutputStream bos = new BufferedOutputStream(fos);
+				 OutputStreamWriter ioWriter = new OutputStreamWriter(bos, encoding);
 				 FileChannel fileChannel = fos.getChannel()) {
 
 				StreamResult result = new StreamResult(ioWriter);
 				Source xmlSource = new DOMSource(document);
 				transformer.transform(xmlSource, result);
+				ioWriter.flush();
+				bos.flush();
 
 				// Ensure data is written to disk using FileChannel
 				fileChannel.force(true);
@@ -210,7 +216,10 @@ public class FileIo {
 		try {
 
 			DocumentBuilder docBuilder = DomUtil.createDocumentBuilder();
-			Document document = docBuilder.parse(this.path);
+			Document document;
+			try (InputStream in = new BufferedInputStream(new FileInputStream(this.path))) {
+				document = docBuilder.parse(in);
+			}
 			DomParser<T> domParser = ctx.getParserFactor().getDomParser();
 			domParser.fromDom(document);
 
