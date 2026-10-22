@@ -72,7 +72,6 @@ public class XmlHelper {
 
 	private static SAXParserFactory saxParserFactory;
 	private static DocumentBuilderFactory documentBuilderFactory;
-	private static DocumentBuilder documentBuilder;
 	private static TransformerFactory transformerFactory;
 
 	public synchronized static SAXParserFactory getSaxParserFactory()
@@ -85,11 +84,10 @@ public class XmlHelper {
 		return saxParserFactory;
 	}
 
-	public synchronized static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-		if (documentBuilder != null)
-			return documentBuilder;
-		documentBuilder = getDocumentBuilderFactory().newDocumentBuilder();
-		return documentBuilder;
+	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		return factory.newDocumentBuilder();
 	}
 
 	public synchronized static DocumentBuilderFactory getDocumentBuilderFactory() throws ParserConfigurationException {
