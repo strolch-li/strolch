@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -42,6 +44,7 @@ public class CachedRealmLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedRealmLoader.class);
 	public static final long MIN_PAGE_SIZE = 200;
+	public static final long MAX_PAGE_SIZE = 1000;
 
 	private final CachedRealm realm;
 	private final PersistenceHandler persistenceHandler;
@@ -65,32 +68,34 @@ public class CachedRealmLoader {
 		long start = System.nanoTime();
 		logger.info("Loading Model from Database for realm {}...", realm);
 
-		if (this.persistenceHandler.supportsPaging()) {
-			CompletableFuture<Void> resources = CompletableFuture.runAsync(() ->
-					loadElementsPagingAsync("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
-							this.nrOfResources));
-			CompletableFuture<Void> orders = CompletableFuture.runAsync(() ->
-					loadElementsPagingAsync("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
-							this.nrOfOrders));
-			CompletableFuture<Void> activities = CompletableFuture.runAsync(() ->
-					loadElementsPagingAsync("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
-							this.nrOfActivities));
-			Throwable failureEx = allOf(resources, orders, activities).handle((_, t) -> t).join();
-			if (failureEx != null)
-				throw new IllegalStateException("Failed to load realm " + realm, failureEx);
-		} else {
-			CompletableFuture<Void> resources = CompletableFuture.runAsync(() ->
-					loadElements("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
-							this.nrOfResources));
-			CompletableFuture<Void> orders = CompletableFuture.runAsync(() ->
-					loadElements("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
-							this.nrOfOrders));
-			CompletableFuture<Void> activities = CompletableFuture.runAsync(() ->
-					loadElements("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
-							this.nrOfActivities));
-			Throwable failureEx = allOf(resources, orders, activities).handle((_, t) -> t).join();
-			if (failureEx != null)
-				throw new IllegalStateException("Failed to load realm " + realm, failureEx);
+		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+			if (this.persistenceHandler.supportsPaging()) {
+				CompletableFuture<Void> resources = CompletableFuture.runAsync(() ->
+						loadElementsPagingAsync(executor, "Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
+								this.nrOfResources), executor);
+				CompletableFuture<Void> orders = CompletableFuture.runAsync(() ->
+						loadElementsPagingAsync(executor, "Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
+								this.nrOfOrders), executor);
+				CompletableFuture<Void> activities = CompletableFuture.runAsync(() ->
+						loadElementsPagingAsync(executor, "Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
+								this.nrOfActivities), executor);
+				Throwable failureEx = allOf(resources, orders, activities).handle((_, t) -> t).join();
+				if (failureEx != null)
+					throw new IllegalStateException("Failed to load realm " + realm, failureEx);
+			} else {
+				CompletableFuture<Void> resources = CompletableFuture.runAsync(() ->
+						loadElements(executor, "Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
+								this.nrOfResources), executor);
+				CompletableFuture<Void> orders = CompletableFuture.runAsync(() ->
+						loadElements(executor, "Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
+								this.nrOfOrders), executor);
+				CompletableFuture<Void> activities = CompletableFuture.runAsync(() ->
+						loadElements(executor, "Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
+								this.nrOfActivities), executor);
+				Throwable failureEx = allOf(resources, orders, activities).handle((_, t) -> t).join();
+				if (failureEx != null)
+					throw new IllegalStateException("Failed to load realm " + realm, failureEx);
+			}
 		}
 
 		long duration = System.nanoTime() - start;
@@ -101,37 +106,51 @@ public class CachedRealmLoader {
 		logger.info("Loaded {} Activities", this.nrOfActivities);
 	}
 
-	private <T extends StrolchRootElement> void loadElements(String context,
+	private <T extends StrolchRootElement> void loadElements(ExecutorService executor, String context,
 			Function<StrolchTransaction, StrolchDao<T>> daoSupplier, Supplier<CachedElementMap<T>> elementMapSupplier,
 			AtomicLong counter) {
 
 		long start = System.nanoTime();
-		long nrOfElements;
 		CachedElementMap<T> elementMap = elementMapSupplier.get();
 
-		try (StrolchTransaction tx = this.realm.openTx(getCert(), "strolch_boot_" + context, false)) {
+		Set<String> types;
+		long nrOfElements;
+		try (StrolchTransaction tx = this.realm.openTx(getCert(), "strolch_boot_" + context, true).silentThreshold(10, SECONDS)) {
 			StrolchDao<T> dao = daoSupplier.apply(tx);
 			nrOfElements = dao.querySize();
-			logger.info("Loading {} {} synchronously from DB...", nrOfElements, context);
-
-			Set<String> types = dao.queryTypes();
-			for (String type : types) {
-				long sizeOfType = dao.querySize(type);
-				logger.info("Loading {} {} of type {} from DB...", sizeOfType, context, type);
-
-				List<T> elements = dao.queryAll(type);
-				elementMap.insertAll(elements);
-				counter.addAndGet(elements.size());
-			}
-
-			tx.commitOnClose();
+			types = dao.queryTypes();
 		}
 
+		logger.info("Loading {} {} of {} types from DB in parallel...", nrOfElements, context, types.size());
+
+		List<CompletableFuture<Long>> tasks = new ArrayList<>();
+		for (String type : types) {
+			tasks.add(supplyAsync(() -> {
+				try (StrolchTransaction tx = this.realm
+						.openTx(getCert(), "strolch_boot", true)
+						.silentThreshold(10, SECONDS)
+						.suppressUpdates()) {
+					StrolchDao<T> dao = daoSupplier.apply(tx);
+					List<T> elements = dao.queryAll(type);
+					elementMap.insertAll(elements);
+					return (long) elements.size();
+				}
+			}, executor));
+		}
+
+		Throwable failureEx = allOf(tasks.toArray(CompletableFuture[]::new)).handle((_, t) -> t).join();
+		if (failureEx != null)
+			throw new IllegalStateException("Failed to load " + context, failureEx);
+
+		long loadedCount = tasks.stream().mapToLong(CompletableFuture::join).sum();
+		counter.addAndGet(loadedCount);
+
+		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
 		String durationS = formatNanoDuration(System.nanoTime() - start);
-		logger.info("Loading of {} {} synchronously took {}.", nrOfElements, context, durationS);
+		logger.info("Loading of {} {} asynchronously took {}.", counter, context, durationS);
 	}
 
-	private <T extends StrolchRootElement> void loadElementsPagingAsync(String context,
+	private <T extends StrolchRootElement> void loadElementsPagingAsync(ExecutorService executor, String context,
 			Function<StrolchTransaction, StrolchDao<T>> daoSupplier, Supplier<CachedElementMap<T>> elementMapSupplier,
 			AtomicLong counter) {
 
@@ -156,43 +175,55 @@ public class CachedRealmLoader {
 		}
 
 		if (!smallMaps.isEmpty()) {
-			logger.info("Loading {} small {} maps from DB...", smallMaps.size(), context);
+			logger.info("Loading {} small {} maps from DB in parallel...", smallMaps.size(), context);
 			long startI = System.nanoTime();
+			List<CompletableFuture<Long>> smallTasks = new ArrayList<>();
 			for (String type : smallMaps.keySet()) {
-				counter.addAndGet(loadPage(elementMap, daoSupplier, type, MAX_VALUE, 0));
+				smallTasks.add(supplyAsync(() -> loadPage(elementMap, daoSupplier, type, MAX_VALUE, 0), executor));
 			}
+			Throwable failureEx = allOf(smallTasks.toArray(CompletableFuture[]::new)).handle((_, t) -> t).join();
+			if (failureEx != null)
+				throw new IllegalStateException("Failed to load small " + context + " maps", failureEx);
+			long smallCount = smallTasks.stream().mapToLong(CompletableFuture::join).sum();
+			counter.addAndGet(smallCount);
 			String duration = formatNanoDuration(System.nanoTime() - startI);
-			logger.info("Loading {} small {} maps took {}", counter, context, duration);
+			logger.info("Loading {} elements across {} small {} maps took {}", smallCount, smallMaps.size(), context, duration);
 		}
 
-		logger.info("Loading {} large {} maps from DB in parallel...", sizeByTypes.size(), context);
-		long startI = System.nanoTime();
-		List<CompletableFuture<Long>> tasks = new ArrayList<>();
-		sizeByTypes.keySet().stream().sorted(Comparator.comparing(sizeByTypes::get)).forEach(type -> {
-			long size = sizeByTypes.get(type);
-			long pageSize = Math.max(MIN_PAGE_SIZE, size / availableProcessors);
-			logger.info("Loading {} {} of type {} in {} pages of {} from DB async in parallel...", size, context, type,
-					availableProcessors, pageSize);
-			long position = 0;
-			while (position < size) {
-				long offset = position;
-				tasks.add(supplyAsync(() -> loadPage(elementMap, daoSupplier, type, pageSize, offset)));
-				position += pageSize;
-			}
-		});
+		if (!sizeByTypes.isEmpty()) {
+			logger.info("Loading {} large {} maps from DB in parallel...", sizeByTypes.size(), context);
+			long startI = System.nanoTime();
+			List<CompletableFuture<Long>> tasks = new ArrayList<>();
+			sizeByTypes.keySet().stream().sorted(Comparator.comparing(sizeByTypes::get)).forEach(type -> {
+				long size = sizeByTypes.get(type);
+				long pageSize = Math.clamp(size / (availableProcessors * 2L), MIN_PAGE_SIZE, MAX_PAGE_SIZE);
+				long nrOfPages = (size + pageSize - 1) / pageSize;
+				logger.info("Loading {} {} of type {} in {} pages of {} from DB async in parallel...", size, context,
+						type, nrOfPages, pageSize);
+				long position = 0;
+				while (position < size) {
+					long offset = position;
+					tasks.add(supplyAsync(() -> loadPage(elementMap, daoSupplier, type, pageSize, offset), executor));
+					position += pageSize;
+				}
+			});
 
-		// wait for all tasks to complete
-		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture[0])).handle((_, t) -> t).join();
-		if (failureEx != null)
-			throw new IllegalStateException("Failed to load " + context, failureEx);
-		String duration = formatNanoDuration(System.nanoTime() - startI);
-		logger.info("Loading {} large {} maps took {}", counter, context, duration);
+			// wait for all tasks to complete
+			Throwable failureEx = allOf(tasks.toArray(CompletableFuture[]::new)).handle((_, t) -> t).join();
+			if (failureEx != null)
+				throw new IllegalStateException("Failed to load " + context, failureEx);
 
-		// count all elements inserted into map
-		tasks.stream().map(CompletableFuture::join).forEach(counter::addAndGet);
+			// count all elements inserted into map
+			long largeCount = tasks.stream().mapToLong(CompletableFuture::join).sum();
+			counter.addAndGet(largeCount);
+
+			String duration = formatNanoDuration(System.nanoTime() - startI);
+			logger.info("Loading {} elements across {} large {} maps took {}", largeCount, sizeByTypes.size(), context,
+					duration);
+		}
 
 		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
-		duration = formatNanoDuration(System.nanoTime() - start);
+		String duration = formatNanoDuration(System.nanoTime() - start);
 		logger.info("Loading of {} {} asynchronously took {}.", counter, context, duration);
 	}
 
