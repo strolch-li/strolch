@@ -65,7 +65,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 
 	@Override
 	public boolean supportsPaging() {
-		return false;
+		return true;
 	}
 
 	@Override

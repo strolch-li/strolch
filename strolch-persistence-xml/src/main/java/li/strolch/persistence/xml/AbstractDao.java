@@ -20,12 +20,12 @@ import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.xmlpers.api.PersistenceTransaction;
+import li.strolch.xmlpers.objref.ObjectRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
@@ -38,7 +38,7 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 
 	@Override
 	public boolean supportsPaging() {
-		return false;
+		return true;
 	}
 
 	protected abstract String getClassType();
@@ -49,18 +49,21 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 
 	@Override
 	public long querySize() {
-		long size = 0;
 		Set<String> types = queryTypes();
-		for (String type : types) {
-			SubTypeRef subTypeRef = getTypeRef(type);
-			size += this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
+		if (types.isEmpty())
+			return 0L;
+		if (types.size() == 1) {
+			SubTypeRef subTypeRef = getTypeRef(types.iterator().next());
+			return this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
 		}
-		return size;
+		return types.parallelStream().mapToLong(type -> {
+			SubTypeRef subTypeRef = getTypeRef(type);
+			return this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
+		}).sum();
 	}
 
 	@Override
 	public long querySize(String... types) {
-
 		if (types.length == 0)
 			return querySize();
 
@@ -69,13 +72,10 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 			return this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
 		}
 
-		long size = 0;
-		for (String type : types) {
+		return Arrays.stream(types).parallel().mapToLong(type -> {
 			SubTypeRef subTypeRef = getTypeRef(type);
-			size += this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
-		}
-
-		return size;
+			return this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
+		}).sum();
 	}
 
 	@Override
@@ -96,14 +96,17 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 
 	@Override
 	public List<T> queryAll() {
-		List<T> objects = new ArrayList<>();
 		Set<String> types = queryTypes();
-		for (String type : types) {
-			List<T> objectsByType = this.tx.getObjectDao().queryAll(getTypeRef(type), file -> true);
-			objects.addAll(objectsByType);
+		if (types.isEmpty())
+			return new ArrayList<>();
+		if (types.size() == 1) {
+			String type = types.iterator().next();
+			return new ArrayList<>(this.tx.getObjectDao().queryAll(getTypeRef(type), file -> true));
 		}
 
-		return objects;
+		return types.parallelStream()
+				.flatMap(type -> this.tx.getObjectDao().<T>queryAll(getTypeRef(type), file -> true).stream())
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	@Override
@@ -112,15 +115,13 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 			return queryAll();
 
 		if (types.length == 1) {
-			return this.tx.getObjectDao().queryAll(getTypeRef(types[0]), file -> true);
+			return new ArrayList<>(this.tx.getObjectDao().queryAll(getTypeRef(types[0]), file -> true));
 		}
 
-		List<T> objects = new ArrayList<>();
-		for (String type : types) {
-			objects.addAll(this.tx.getObjectDao().queryAll(getTypeRef(type), file -> true));
-		}
-
-		return objects;
+		return Arrays.stream(types)
+				.parallel()
+				.flatMap(type -> this.tx.getObjectDao().<T>queryAll(getTypeRef(type), file -> true).stream())
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	@Override
@@ -167,12 +168,54 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 
 	@Override
 	public List<T> queryAll(long limit, long offset) throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
+		if (limit <= 0)
+			return Collections.emptyList();
+
+		Set<String> types = queryTypes();
+		if (types.isEmpty())
+			return Collections.emptyList();
+
+		if (types.size() == 1) {
+			String type = types.iterator().next();
+			return this.tx.getObjectDao().queryAll(getTypeRef(type), false, file -> true, limit, offset);
+		}
+
+		List<ObjectRef> childRefs = new ArrayList<>();
+		for (String type : types) {
+			SubTypeRef subTypeRef = getTypeRef(type);
+			Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef, file -> true);
+			for (String id : keySet) {
+				childRefs.add(subTypeRef.getChildIdRef(this.tx, id));
+			}
+		}
+
+		List<ObjectRef> selectedRefs = childRefs.stream().skip(offset).limit(limit).toList();
+		return this.tx.getObjectDao().queryAll(selectedRefs);
 	}
 
 	@Override
 	public List<T> queryAll(long limit, long offset, String... types) throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
+		if (types.length == 0)
+			return queryAll(limit, offset);
+
+		if (limit <= 0)
+			return Collections.emptyList();
+
+		if (types.length == 1) {
+			return this.tx.getObjectDao().queryAll(getTypeRef(types[0]), false, file -> true, limit, offset);
+		}
+
+		List<ObjectRef> childRefs = new ArrayList<>();
+		for (String type : types) {
+			SubTypeRef subTypeRef = getTypeRef(type);
+			Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef, file -> true);
+			for (String id : keySet) {
+				childRefs.add(subTypeRef.getChildIdRef(this.tx, id));
+			}
+		}
+
+		List<ObjectRef> selectedRefs = childRefs.stream().skip(offset).limit(limit).toList();
+		return this.tx.getObjectDao().queryAll(selectedRefs);
 	}
 
 	@Override

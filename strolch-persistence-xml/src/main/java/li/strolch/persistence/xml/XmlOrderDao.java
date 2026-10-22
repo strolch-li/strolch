@@ -21,13 +21,13 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
+import li.strolch.xmlpers.api.FileIo;
+import li.strolch.xmlpers.objref.ObjectRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
+import li.strolch.xmlpers.util.FilenameUtility;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
@@ -102,32 +102,73 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange) throws StrolchPersistenceException {
-		List<Order> objects = new ArrayList<>();
-		Set<String> types = queryTypes();
-		for (String type : types) {
-			List<Order> objectsByType = this.tx
-					.getObjectDao()
-					.queryAll(getTypeRef(type), getDateRangePredicate(dateRange));
-			objects.addAll(objectsByType);
-		}
+		return queryAll(dateRange, Integer.MAX_VALUE, 0, true);
+	}
 
-		return objects;
+	@Override
+	public List<Order> queryAll(DateRange dateRange, String... types) throws StrolchPersistenceException {
+		return queryAll(dateRange, Integer.MAX_VALUE, 0, true, types);
 	}
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc)
 			throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
-	}
-
-	@Override
-	public List<Order> queryAll(DateRange dateRange, String... types) throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
+		Set<String> types = queryTypes();
+		if (types.isEmpty())
+			return Collections.emptyList();
+		return queryAll(dateRange, limit, offset, asc, types.toArray(new String[0]));
 	}
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
+		if (types.length == 0)
+			return queryAll(dateRange, limit, offset, asc);
+
+		if (limit <= 0)
+			return Collections.emptyList();
+
+		record OrderRefAndDate(ObjectRef objectRef, long date) {}
+
+		Predicate<File> dateRangePredicate = getDateRangePredicate(dateRange);
+		List<OrderRefAndDate> orderRefs = new ArrayList<>();
+
+		for (String type : types) {
+			SubTypeRef subTypeRef = getTypeRef(type);
+			File queryPath = subTypeRef.getPath(this.tx.getManager().getPathBuilder());
+			if (!queryPath.exists() || !queryPath.isDirectory())
+				continue;
+
+			File[] files = queryPath.listFiles();
+			if (files == null)
+				continue;
+
+			for (File file : files) {
+				if (file.isFile() && !file.getName().startsWith(FileIo.TMP_PREFIX) && dateRangePredicate.test(file)) {
+					String id = FilenameUtility.getId(file.getName());
+					ObjectRef childRef = subTypeRef.getChildIdRef(this.tx, id);
+					orderRefs.add(new OrderRefAndDate(childRef, file.lastModified()));
+				}
+			}
+		}
+
+		if (orderRefs.isEmpty())
+			return Collections.emptyList();
+
+		Comparator<OrderRefAndDate> comparator;
+		if (asc) {
+			comparator = Comparator.comparingLong(OrderRefAndDate::date).thenComparing(o -> o.objectRef().getName());
+		} else {
+			comparator = Comparator.comparingLong(OrderRefAndDate::date).reversed().thenComparing(o -> o.objectRef().getName());
+		}
+		orderRefs.sort(comparator);
+
+		List<ObjectRef> selectedRefs = orderRefs.stream()
+				.skip(offset)
+				.limit(limit)
+				.map(OrderRefAndDate::objectRef)
+				.toList();
+
+		return this.tx.getObjectDao().queryAll(selectedRefs);
 	}
 }

@@ -109,11 +109,20 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public void saveAll(List<Audit> audits) {
-		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx
-					.getObjectDao()
-					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
-			this.tx.getFileDao().performCreate(ctx);
+		if (audits.size() > 1) {
+			audits.parallelStream().forEach(audit -> {
+				PersistenceContext<Audit> ctx = this.tx
+						.getObjectDao()
+						.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
+				this.tx.getFileDao().performCreate(ctx);
+			});
+		} else {
+			for (Audit audit : audits) {
+				PersistenceContext<Audit> ctx = this.tx
+						.getObjectDao()
+						.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
+				this.tx.getFileDao().performCreate(ctx);
+			}
 		}
 	}
 }
