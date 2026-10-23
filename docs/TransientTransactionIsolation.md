@@ -6,6 +6,12 @@ those changes, and rollback discards them. Resources, Orders and Activities shar
 so a transaction keeps a consistent view across direct lookups and searches while another commits.
 Transactions starting after a successful commit see the new model.
 
+## Performance qualification
+
+The implementation is not ready for merge based solely on its correctness regressions. See
+[measured performance and merge assessment](TransientTransactionPerformance.md) and the
+[reproducible benchmark guide](../strolch-jmh-benchmark/TRANSIENT-ISOLATION.md).
+
 ## Conflicts and locking
 
 A model-writing transaction validates that its starting realm revision is still current, both before

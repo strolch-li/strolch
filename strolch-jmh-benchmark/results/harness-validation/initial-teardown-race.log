@@ -1,0 +1,298 @@
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.openjdk.jmh.util.Utils (file:/home/eitch/.m2/repository/org/openjdk/jmh/jmh-core/1.37/jmh-core-1.37.jar)
+WARNING: Please consider reporting this to the maintainers of class org.openjdk.jmh.util.Utils
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+# JMH version: 1.37
+# VM version: JDK 25.0.4, OpenJDK 64-Bit Server VM, 25.0.4+7-LTS
+# VM invoker: /home/eitch/.sdkman/candidates/java/25.0.4-tem/bin/java
+# VM options: -Xms2g -Xmx2g -XX:+UseG1GC -XX:ActiveProcessorCount=8 -Dlogback.configurationFile=isolation-logback.xml
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 2 iterations, 1 s each
+# Measurement: 3 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 8 threads, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: li.strolch.test.benchmark.TransientTransactionBenchmark.updateIndependent
+# Parameters: (dataset = customer, rootKind = Resource, roots = 290203, targetType = Person, types = 32, workTokens = 0)
+
+# Run progress: 0.00% complete, ETA 00:00:10
+# Fork: 1 of 2
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.openjdk.jmh.util.Utils (file:/home/eitch/.m2/repository/org/openjdk/jmh/jmh-core/1.37/jmh-core-1.37.jar)
+WARNING: Please consider reporting this to the maintainers of class org.openjdk.jmh.util.Utils
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+# Warmup Iteration   1: MODEL_IMPLEMENTATION=file:/tmp/strolch-benchmark-develop/strolch-agent/target/classes/
+329244.600 ops/s
+# Warmup Iteration   2: 348517.998 ops/s
+Iteration   1: 389483.516 ops/s
+                 commits:            391861.490 ops/s
+                 conflicts:          ≈ 0 ops/s
+                 gc.alloc.rate:      4096.932 MB/sec
+                 gc.alloc.rate.norm: 10989.089 B/op
+                 gc.count:           3.000 counts
+                 gc.time:            631.000 ms
+                 lockTimeouts:       ≈ 0 ops/s
+                 reads:              ≈ 0 ops/s
+
+Iteration   2: 354869.552 ops/s
+                 commits:            357174.262 ops/s
+                 conflicts:          ≈ 0 ops/s
+                 gc.alloc.rate:      3732.643 MB/sec
+                 gc.alloc.rate.norm: 10989.170 B/op
+                 gc.count:           3.000 counts
+                 gc.time:            658.000 ms
+                 lockTimeouts:       ≈ 0 ops/s
+                 reads:              ≈ 0 ops/s
+
+Iteration   3: 290715.882 ops/s
+                 commits:            290759.877 ops/s
+                 conflicts:          ≈ 0 ops/s
+                 gc.alloc.rate:      1503.882 MB/sec
+                 gc.alloc.rate.norm: 10989.080 B/op
+                 gc.count:           3.000 counts
+                 gc.time:            680.000 ms
+                 lockTimeouts:       ≈ 0 ops/s
+                 reads:              ≈ 0 ops/s
+
+
+# Run progress: 50.00% complete, ETA 00:00:07
+# Fork: 2 of 2
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.openjdk.jmh.util.Utils (file:/home/eitch/.m2/repository/org/openjdk/jmh/jmh-core/1.37/jmh-core-1.37.jar)
+WARNING: Please consider reporting this to the maintainers of class org.openjdk.jmh.util.Utils
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+# Warmup Iteration   1: MODEL_IMPLEMENTATION=file:/tmp/strolch-benchmark-develop/strolch-agent/target/classes/
+221095.453 ops/s
+# Warmup Iteration   2: 384062.370 ops/s
+Iteration   1: 327022.127 ops/s
+                 commits:            327908.447 ops/s
+                 conflicts:          ≈ 0 ops/s
+                 gc.alloc.rate:      3417.959 MB/sec
+                 gc.alloc.rate.norm: 10971.479 B/op
+                 gc.count:           3.000 counts
+                 gc.time:            549.000 ms
+                 lockTimeouts:       ≈ 0 ops/s
+                 reads:              ≈ 0 ops/s
+
+Iteration   2: 341060.333 ops/s
+                 commits:            341471.254 ops/s
+                 conflicts:          ≈ 0 ops/s
+                 gc.alloc.rate:      3571.909 MB/sec
+                 gc.alloc.rate.norm: 10978.486 B/op
+                 gc.count:           4.000 counts
+                 gc.time:            615.000 ms
+                 lockTimeouts:       ≈ 0 ops/s
+                 reads:              ≈ 0 ops/s
+
+Iteration   3: <failure>
+
+li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+	at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+	at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+	at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+	at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+	at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+	at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+	at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+	at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+	at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+	at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+	at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+	at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+	at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+	at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+	at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+	at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+	at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+	at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+
+
+Benchmark had encountered error, and fail on error was requested
+ERROR: org.openjdk.jmh.runner.RunnerException: Benchmark caught the exception
+	at org.openjdk.jmh.runner.Runner.runBenchmarks(Runner.java:572)
+	at org.openjdk.jmh.runner.Runner.internalRun(Runner.java:309)
+	at org.openjdk.jmh.runner.Runner.run(Runner.java:208)
+	at org.openjdk.jmh.Main.main(Main.java:71)
+Caused by: org.openjdk.jmh.runner.BenchmarkException: Benchmark error during the run
+	at org.openjdk.jmh.runner.BenchmarkHandler.runIteration(BenchmarkHandler.java:440)
+	at org.openjdk.jmh.runner.BaseRunner.runBenchmark(BaseRunner.java:283)
+	at org.openjdk.jmh.runner.BaseRunner.runBenchmark(BaseRunner.java:233)
+	at org.openjdk.jmh.runner.BaseRunner.doSingle(BaseRunner.java:138)
+	at org.openjdk.jmh.runner.BaseRunner.runBenchmarksForked(BaseRunner.java:75)
+	at org.openjdk.jmh.runner.ForkedRunner.run(ForkedRunner.java:72)
+	at org.openjdk.jmh.runner.ForkedMain.main(ForkedMain.java:86)
+	Suppressed: li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+		at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+		at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+		at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+		at java.base/java.lang.Thread.run(Thread.java:1474)
+	Suppressed: li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+		at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+		at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+		at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+		at java.base/java.lang.Thread.run(Thread.java:1474)
+	Suppressed: li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+		at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+		at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+		at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+		at java.base/java.lang.Thread.run(Thread.java:1474)
+	Suppressed: li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+		at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+		at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+		at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+		at java.base/java.lang.Thread.run(Thread.java:1474)
+	Suppressed: li.strolch.utils.dbc.DBC$DbcException: Realm is not in state started!: STARTED != INITIALIZED
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:57)
+		at li.strolch.utils.dbc.DBC.assertEquals(DBC.java:42)
+		at li.strolch.agent.impl.TransientRealm.openTx(TransientRealm.java:57)
+		at li.strolch.agent.api.StrolchRealm.openTx(StrolchRealm.java:115)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.open(TransientTransactionBenchmark.java:207)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark.read(TransientTransactionBenchmark.java:221)
+		at li.strolch.test.benchmark.TransientTransactionBenchmark$Worker.verifyCommittedState(TransientTransactionBenchmark.java:191)
+		at li.strolch.test.benchmark.jmh_generated.TransientTransactionBenchmark_updateIndependent_jmhTest.updateIndependent_Throughput(TransientTransactionBenchmark_updateIndependent_jmhTest.java:107)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:527)
+		at org.openjdk.jmh.runner.BenchmarkHandler$BenchmarkTask.call(BenchmarkHandler.java:504)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+		at java.base/java.lang.Thread.run(Thread.java:1474)

@@ -326,6 +326,8 @@ Explore detailed documentation across all Strolch domains:
 Transient realms keep flushed model changes private and publish a consistent snapshot at commit.
 Concurrent stale writers fail explicitly and may require an application-controlled retry. See
 [transaction semantics, costs and regression tests](docs/TransientTransactionIsolation.md).
+**The current isolation implementation failed its [performance qualification](docs/TransientTransactionPerformance.md)
+and is not ready for production.**
 
 ## Community & License
 
