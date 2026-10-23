@@ -1,0 +1,9 @@
+<configuration>
+	<appender name="BENCHMARK" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder><pattern>%msg%n</pattern></encoder>
+	</appender>
+	<logger name="li.strolch.test.benchmark.TransientTransactionBenchmark" level="INFO" additivity="false">
+		<appender-ref ref="BENCHMARK"/>
+	</logger>
+	<root level="OFF"/>
+</configuration>
