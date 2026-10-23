@@ -321,6 +321,12 @@ Explore detailed documentation across all Strolch domains:
 
 ---
 
+## Transaction correctness diagnostics
+
+The opt-in [ACID and strict-serializability baseline](docs/ACID-BASELINE.md) tests transaction visibility,
+locking and selected concurrent histories before clustering changes. See the guide for execution commands,
+PostgreSQL setup and the limits of the initial coverage.
+
 ## Community & License
 
 - **Website**: [https://strolch.li](https://strolch.li)
