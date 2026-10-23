@@ -414,6 +414,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		Locator locator = element.getLocator();
 		removeFromCache(locator);
+		refreshLockedElement(locator);
 
 		StrolchRootElement freshCopy = switch (locator.get(0)) {
 			case RESOURCE -> getResourceBy(locator.get(1), locator.get(2), true);
@@ -489,7 +490,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ResourceMap getResourceMap() {
 		if (this.resourceMap == null) {
-			this.resourceMap = new AuditingResourceMap(this.realm.getResourceMap(), isReadOnly(),
+			this.resourceMap = new AuditingResourceMap(resourceMapForTransaction(), isReadOnly(),
 					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.resourceMap;
@@ -498,7 +499,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public OrderMap getOrderMap() {
 		if (this.orderMap == null) {
-			this.orderMap = new AuditingOrderMap(this.realm.getOrderMap(), isReadOnly(),
+			this.orderMap = new AuditingOrderMap(orderMapForTransaction(), isReadOnly(),
 					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.orderMap;
@@ -507,10 +508,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ActivityMap getActivityMap() {
 		if (this.activityMap == null) {
-			this.activityMap = new AuditingActivityMap(this.realm.getActivityMap(), isReadOnly(),
+			this.activityMap = new AuditingActivityMap(activityMapForTransaction(), isReadOnly(),
 					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.activityMap;
+	}
+
+	protected ResourceMap resourceMapForTransaction() {
+		return this.realm.getResourceMap();
+	}
+
+	protected OrderMap orderMapForTransaction() {
+		return this.realm.getOrderMap();
+	}
+
+	protected ActivityMap activityMapForTransaction() {
+		return this.realm.getActivityMap();
+	}
+
+	protected void refreshLockedElement(Locator locator) {
+		// Persistent realms retain their existing lookup behavior.
 	}
 
 	@Override
@@ -1764,12 +1781,21 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 	}
 
+	protected void validateBeforeCommit() {
+		// Persistence implementations may validate their concurrency dependencies here.
+	}
+
+	protected void validateBeforeReadOnlyClose() {
+		// Persistence implementations may validate refreshed reads here.
+	}
+
 	@Override
 	public void autoCloseableCommit() {
 		long start = System.nanoTime();
 
 		try {
 			this.txResult.setState(TransactionState.COMMITTING);
+			validateBeforeCommit();
 
 			addModelChangeCommands();
 			doCommands();
@@ -1841,6 +1867,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		long start = System.nanoTime();
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
+			validateBeforeReadOnlyClose();
 
 			if (this.closeStrategy != TransactionCloseStrategy.READ_ONLY) {
 				if (!this.commands.isEmpty()) {

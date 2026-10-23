@@ -17,6 +17,9 @@ package li.strolch.agent.impl;
 
 import li.strolch.agent.api.*;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.StrolchTransactionConflictException;
+import li.strolch.model.Locator;
+
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
@@ -29,15 +32,17 @@ import java.text.MessageFormat;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
 import static li.strolch.persistence.api.TransactionThreadLocal.setTx;
+import static li.strolch.model.Tags.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class TransientRealm extends InternalStrolchRealm {
 
-	private ResourceMap resourceMap;
-	private OrderMap orderMap;
-	private ActivityMap activityMap;
+	private TransientResourceMap resourceMap;
+	private TransientOrderMap orderMap;
+	private TransientActivityMap activityMap;
+	private long revision;
 	private AuditTrail auditTrail;
 
 	private File modelFile;
@@ -53,27 +58,82 @@ public class TransientRealm extends InternalStrolchRealm {
 	}
 
 	@Override
-	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+	public synchronized StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
 		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		//noinspection resource
-		return setTx(new TransientTransaction(this.container, this, certificate, action,
+		return setTx(new SnapshotTransientTransaction(this.container, this, certificate, action,
 				readOnly).suppressAuditsForAudits());
 	}
 
 	@Override
-	public ResourceMap getResourceMap() {
+	public synchronized ResourceMap getResourceMap() {
 		return this.resourceMap;
 	}
 
 	@Override
-	public OrderMap getOrderMap() {
+	public synchronized OrderMap getOrderMap() {
 		return this.orderMap;
 	}
 
 	@Override
-	public ActivityMap getActivityMap() {
+	public synchronized ActivityMap getActivityMap() {
 		return this.activityMap;
+	}
+
+	record Snapshot(long revision, TransientResourceMap resources, TransientOrderMap orders,
+			TransientActivityMap activities) {
+		boolean modified() {
+			return resources.isModified() || orders.isModified() || activities.isModified();
+		}
+	}
+
+	synchronized Snapshot snapshot() {
+		TransientResourceMap resources = new TransientResourceMap();
+		TransientOrderMap orders = new TransientOrderMap();
+		TransientActivityMap activities = new TransientActivityMap();
+		this.resourceMap.snapshotInto(resources);
+		this.orderMap.snapshotInto(orders);
+		this.activityMap.snapshotInto(activities);
+		return new Snapshot(this.revision, resources, orders, activities);
+	}
+
+	synchronized boolean isCurrent(Snapshot snapshot) {
+		return snapshot.revision() == this.revision;
+	}
+
+	void validate(Snapshot snapshot) {
+		if (!isCurrent(snapshot))
+			throw new StrolchTransactionConflictException(
+					"Transient realm changed since this transaction's snapshot; retry the complete transaction");
+	}
+
+	synchronized void refresh(Snapshot snapshot, Locator locator) {
+		String type = locator.get(1);
+		String id = locator.get(2);
+		switch (locator.get(0)) {
+			case RESOURCE -> snapshot.resources().refresh(type, id, this.resourceMap._getBy(type, id));
+			case ORDER -> snapshot.orders().refresh(type, id, this.orderMap._getBy(type, id));
+			case ACTIVITY -> snapshot.activities().refresh(type, id, this.activityMap._getBy(type, id));
+			default -> throw new IllegalArgumentException("Not a root locator: " + locator);
+		}
+	}
+
+	synchronized void publish(Snapshot snapshot) {
+		if (!snapshot.modified())
+			return;
+		validate(snapshot);
+		// Keep the transaction's maps separate, including from undo after a post-commit error.
+		TransientResourceMap resources = new TransientResourceMap();
+		TransientOrderMap orders = new TransientOrderMap();
+		TransientActivityMap activities = new TransientActivityMap();
+		snapshot.resources().snapshotInto(resources);
+		snapshot.orders().snapshotInto(orders);
+		snapshot.activities().snapshotInto(activities);
+		this.resourceMap = resources;
+		this.orderMap = orders;
+		this.activityMap = activities;
+		this.revision++;
 	}
 
 	@Override

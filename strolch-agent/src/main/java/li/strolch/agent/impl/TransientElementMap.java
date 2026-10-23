@@ -37,6 +37,44 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 	protected static final Logger logger = LoggerFactory.getLogger(TransientElementMap.class);
 
 	private final Map<String, Map<String, T>> elementMap;
+	private boolean copyOnWrite;
+	private final Set<String> writableTypes = new HashSet<>();
+	private boolean modified;
+
+	/** Shares immutable roots and type maps; copies a type map only when it is first changed. */
+	synchronized void snapshotInto(TransientElementMap<T> target) {
+		this.copyOnWrite = true;
+		this.writableTypes.clear();
+		target.copyOnWrite = true;
+		target.elementMap.putAll(this.elementMap);
+	}
+
+	boolean isModified() {
+		return this.modified;
+	}
+
+	private Map<String, T> writableType(String type) {
+		this.modified = true;
+		if (this.copyOnWrite && this.writableTypes.add(type)) {
+			Map<String, T> current = this.elementMap.get(type);
+			if (current != null)
+				this.elementMap.put(type, new ConcurrentHashMap<>(current));
+		}
+		return this.elementMap.get(type);
+	}
+
+	/** Refresh one locked root without altering any previously returned immutable copy. */
+	synchronized void refresh(String type, String id, T current) {
+		boolean wasModified = this.modified;
+		Map<String, T> byType = writableType(type);
+		if (current == null) {
+			if (byType != null)
+				byType.remove(id);
+		} else {
+			this.elementMap.computeIfAbsent(type, _ -> new ConcurrentHashMap<>()).put(id, current);
+		}
+		this.modified = wasModified;
+	}
 
 	public TransientElementMap() {
 		this.elementMap = new ConcurrentHashMap<>();
@@ -163,7 +201,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 	}
 
 	@Override
-	protected void internalInsert(T element) {
+	protected synchronized void internalInsert(T element) {
+		writableType(element.getType());
 		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), _ -> new ConcurrentHashMap<>());
 
 		// assert no object already exists with this id
@@ -185,8 +224,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 		internalInsert(element);
 	}
 
-	protected void internalUpdate(T element) {
-		Map<String, T> byType = this.elementMap.get(element.getType());
+	protected synchronized void internalUpdate(T element) {
+		Map<String, T> byType = writableType(element.getType());
 		if (byType == null) {
 			String msg
 					= "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!";
@@ -210,7 +249,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 
 	@Override
 	public synchronized void remove(StrolchTransaction tx, T element) {
-		Map<String, T> byType = this.elementMap.get(element.getType());
+		Map<String, T> byType = writableType(element.getType());
 		if (byType != null) {
 			byType.remove(element.getId());
 
@@ -222,26 +261,17 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 
 	@Override
 	public synchronized void removeAll(StrolchTransaction tx, List<T> elements) {
-		for (T element : elements) {
-			Map<String, T> byType = this.elementMap.get(element.getType());
-			if (byType != null) {
-				byType.remove(element.getId());
-
-				if (byType.isEmpty()) {
-					this.elementMap.remove(element.getType());
-				}
-			}
-		}
+		elements.forEach(element -> remove(tx, element));
 	}
 
 	@Override
 	public synchronized long removeAll(StrolchTransaction tx) {
+		this.modified = true;
 		long removed = 0;
 		Set<String> keySet = new HashSet<>(this.elementMap.keySet());
 		for (String type : keySet) {
 			Map<String, T> byType = this.elementMap.remove(type);
 			removed += byType.size();
-			byType.clear();
 		}
 
 		return removed;
@@ -249,11 +279,11 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 
 	@Override
 	public synchronized long removeAllBy(StrolchTransaction tx, String type) {
+		this.modified = true;
 		long removed = 0;
 		Map<String, T> byType = this.elementMap.remove(type);
 		if (byType != null) {
 			removed = byType.size();
-			byType.clear();
 		}
 
 		return removed;
