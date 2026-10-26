@@ -27,6 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -65,12 +71,15 @@ public class CachedRealmLoader {
 
 		try {
 			if (this.persistenceHandler.supportsPaging()) {
-				loadElementsPaging("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
-						this.nrOfResources);
-				loadElementsPaging("Orders", this.persistenceHandler::getOrderDao, this.realm::getOrderMap,
-						this.nrOfOrders);
-				loadElementsPaging("Activities", this.persistenceHandler::getActivityDao, this.realm::getActivityMap,
-						this.nrOfActivities);
+				int parallelism = Math.max(1, Runtime.getRuntime().availableProcessors());
+				try (ExecutorService executor = Executors.newFixedThreadPool(parallelism)) {
+					loadElementsPaging(executor, parallelism, "Resources", this.persistenceHandler::getResourceDao,
+							this.realm::getResourceMap, this.nrOfResources);
+					loadElementsPaging(executor, parallelism, "Orders", this.persistenceHandler::getOrderDao,
+							this.realm::getOrderMap, this.nrOfOrders);
+					loadElementsPaging(executor, parallelism, "Activities", this.persistenceHandler::getActivityDao,
+							this.realm::getActivityMap, this.nrOfActivities);
+				}
 			} else {
 				loadElements("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
 						this.nrOfResources);
@@ -128,7 +137,7 @@ public class CachedRealmLoader {
 		}
 	}
 
-	private <T extends StrolchRootElement> void loadElementsPaging(String context,
+	private <T extends StrolchRootElement> void loadElementsPaging(ExecutorService executor, int parallelism, String context,
 			Function<StrolchTransaction, StrolchDao<T>> daoSupplier, Supplier<CachedElementMap<T>> elementMapSupplier,
 			AtomicLong counter) {
 
@@ -138,7 +147,6 @@ public class CachedRealmLoader {
 		logger.info("Queried {} types from DB took {}", sizeByTypes.size(),
 				formatNanoDuration(System.nanoTime() - start));
 
-		int availableProcessors = Runtime.getRuntime().availableProcessors();
 		long nrOfElements = sizeByTypes.values().stream().mapToLong(Long::longValue).sum();
 		logger.info("Loading {} {} using paging from DB...", nrOfElements, context);
 
@@ -146,40 +154,62 @@ public class CachedRealmLoader {
 		Set<String> types = new HashSet<>(sizeByTypes.keySet());
 		for (String type : types) {
 			long size = sizeByTypes.get(type);
-			if (size < MIN_PAGE_SIZE * availableProcessors) {
+			if (size < MIN_PAGE_SIZE * parallelism) {
 				smallMaps.put(type, size);
 				sizeByTypes.remove(type);
 			}
 		}
 
 		if (!smallMaps.isEmpty()) {
-			logger.info("Loading {} small {} maps from DB sequentially...", smallMaps.size(), context);
+			logger.info("Loading {} small {} maps from DB in parallel...", smallMaps.size(), context);
 			long startI = System.nanoTime();
-			long smallCount = 0;
-			for (String type : smallMaps.keySet()) {
-				smallCount += loadPage(elementMap, daoSupplier, type, MAX_VALUE, 0);
-			}
+			Iterator<Callable<Long>> smallTasks = smallMaps.keySet().stream()
+					.<Callable<Long>>map(type -> () -> loadPage(elementMap, daoSupplier, type, MAX_VALUE, 0)).iterator();
+			long smallCount = loadTasks(executor, parallelism, smallTasks);
 			counter.addAndGet(smallCount);
 			String duration = formatNanoDuration(System.nanoTime() - startI);
 			logger.info("Loading {} elements across {} small {} maps took {}", smallCount, smallMaps.size(), context, duration);
 		}
 
 		if (!sizeByTypes.isEmpty()) {
-			logger.info("Loading {} large {} maps from DB sequentially...", sizeByTypes.size(), context);
+			logger.info("Loading {} large {} maps from DB in parallel...", sizeByTypes.size(), context);
 			long startI = System.nanoTime();
-			long largeCount = 0;
-			for (String type : sizeByTypes.keySet().stream().sorted(Comparator.comparing(sizeByTypes::get)).toList()) {
-				long size = sizeByTypes.get(type);
-				long pageSize = Math.clamp(size / (availableProcessors * 2L), MIN_PAGE_SIZE, MAX_PAGE_SIZE);
-				long nrOfPages = (size + pageSize - 1) / pageSize;
-				logger.info("Loading {} {} of type {} in {} pages of {} from DB sequentially...", size, context,
-						type, nrOfPages, pageSize);
-				long position = 0;
-				while (position < size) {
-					largeCount += loadPage(elementMap, daoSupplier, type, pageSize, position);
-					position += pageSize;
+			Iterator<String> typeIterator = sizeByTypes.keySet().stream()
+					.sorted(Comparator.comparing(sizeByTypes::get)).iterator();
+			Iterator<Callable<Long>> pageTasks = new Iterator<>() {
+				private String type;
+				private long size;
+				private long pageSize;
+				private long offset;
+
+				@Override
+				public boolean hasNext() {
+					while (this.type == null || this.offset >= this.size) {
+						if (!typeIterator.hasNext())
+							return false;
+						this.type = typeIterator.next();
+						this.size = sizeByTypes.get(this.type);
+						this.pageSize = Math.clamp(this.size / (parallelism * 2L), MIN_PAGE_SIZE, MAX_PAGE_SIZE);
+						this.offset = 0;
+						long nrOfPages = (this.size + this.pageSize - 1) / this.pageSize;
+						logger.info("Loading {} {} of type {} in {} pages of {} from DB in parallel...", this.size,
+								context, this.type, nrOfPages, this.pageSize);
+					}
+					return true;
 				}
-			}
+
+				@Override
+				public Callable<Long> next() {
+					if (!hasNext())
+						throw new NoSuchElementException();
+					String taskType = this.type;
+					long taskOffset = this.offset;
+					long taskPageSize = this.pageSize;
+					this.offset += this.pageSize;
+					return () -> loadPage(elementMap, daoSupplier, taskType, taskPageSize, taskOffset);
+				}
+			};
+			long largeCount = loadTasks(executor, parallelism, pageTasks);
 			counter.addAndGet(largeCount);
 
 			String duration = formatNanoDuration(System.nanoTime() - startI);
@@ -189,7 +219,34 @@ public class CachedRealmLoader {
 
 		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
 		String duration = formatNanoDuration(System.nanoTime() - start);
-		logger.info("Loading of {} {} sequentially took {}.", counter, context, duration);
+		logger.info("Loading of {} {} in parallel took {}.", counter, context, duration);
+	}
+
+	private long loadTasks(ExecutorService executor, int parallelism, Iterator<Callable<Long>> tasks) {
+		CompletionService<Long> completionService = new ExecutorCompletionService<>(executor);
+		int inFlight = 0;
+		long loadedCount = 0;
+		try {
+			while (tasks.hasNext() || inFlight > 0) {
+				while (tasks.hasNext() && inFlight < parallelism) {
+					completionService.submit(tasks.next());
+					inFlight++;
+				}
+				if (inFlight > 0) {
+					loadedCount += completionService.take().get();
+					inFlight--;
+				}
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Interrupted while loading cached elements", e);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof RuntimeException runtimeException)
+				throw runtimeException;
+			throw new IllegalStateException("Failed to load cached elements", cause);
+		}
+		return loadedCount;
 	}
 
 	private <T extends StrolchRootElement> long loadPage(CachedElementMap<T> elementMap,
