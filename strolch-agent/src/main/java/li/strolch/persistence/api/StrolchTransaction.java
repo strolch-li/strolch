@@ -424,7 +424,9 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Performs all registered commands
+	 * Performs all registered commands. In transient and cached realms, model changes remain transaction-local:
+	 * no model DAO writes, persistence commit, or shared root publication occurs here. Explicit historical reads
+	 * and custom command side effects retain their own behavior.
 	 * </p>
 	 *
 	 * <p>

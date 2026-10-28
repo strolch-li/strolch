@@ -28,6 +28,7 @@ public enum TransactionState {
 	CLOSED, //
 	COMMITTED, // 
 	ROLLED_BACK,
+	UNKNOWN, // Persistence commit may have succeeded; never infer rollback from a lost response.
 	FAILED;
 
 	/**
