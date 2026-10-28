@@ -16,15 +16,27 @@
 
 package li.strolch.utils;
 
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.DocumentSignatureType;
+import org.pgpainless.algorithm.OpenPGPKeyVersion;
+import org.pgpainless.key.protection.SecretKeyRingProtector;
+import org.pgpainless.util.Passphrase;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Optional;
 import java.util.Properties;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class SmtpMailerTest {
 
@@ -40,6 +52,12 @@ public class SmtpMailerTest {
 
 	@Before
 	public void setUpBefore() {
+		this.emailSender = createMailer();
+		this.emailSender.addRecipientPublicKeyFileName(RECIPIENT_PUBLIC_KEY_FILE_NAME);
+		this.emailSender.setSigningKeyFileName(SIGNING_KEY_FILE_NAME, SIGNING_KEY_PASSWORD);
+	}
+
+	private static SmtpMailer createMailer() {
 		int port = 587;
 		String username = System.getenv("email.username");
 		String password = System.getenv("email.password");
@@ -57,9 +75,7 @@ public class SmtpMailerTest {
 		props.setProperty(SmtpMailer.PARAM_HOST, SMTP_HOST);
 		props.setProperty(SmtpMailer.PARAM_PORT, String.valueOf(port));
 
-		this.emailSender = new SmtpMailer(props);
-		this.emailSender.addRecipientPublicKeyFileName(RECIPIENT_PUBLIC_KEY_FILE_NAME);
-		this.emailSender.setSigningKeyFileName(SIGNING_KEY_FILE_NAME, SIGNING_KEY_PASSWORD);
+		return new SmtpMailer(props);
 	}
 
 	@Test
@@ -82,6 +98,66 @@ public class SmtpMailerTest {
 		assertTrue(signed.contains("-----BEGIN PGP SIGNATURE-----"));
 		assertTrue(signed.contains("-----END PGP SIGNATURE-----"));
 		assertTrue(signed.contains(plainText));
+	}
+
+	@Test
+	public void shouldReturnExpirationOfExampleKey() {
+		assertNotNull(this.emailSender.getSigningKeyFingerprint());
+		Instant expiration = this.emailSender.getSigningKeyExpiration().orElseThrow();
+		assertTrue(expiration.isAfter(Instant.now().plus(Duration.ofDays(90))));
+	}
+
+	@Test
+	public void shouldReturnNoExpirationWithoutSigningKey() {
+		assertEquals(Optional.empty(), createMailer().getSigningKeyExpiration());
+	}
+
+	@Test
+	public void shouldReturnExpirationOfExpiringKey() throws Exception {
+		Instant expiration = Instant.now().plus(Duration.ofDays(30));
+		File keyFile = createKeyFile(Instant.now().minus(Duration.ofDays(365)), Instant.now(), expiration);
+
+		this.emailSender.setSigningKeyFileName(keyFile.getAbsolutePath(), "test".toCharArray());
+
+		Instant signingKeyExpiration = this.emailSender.getSigningKeyExpiration().orElseThrow();
+		// expiration dates are stored in seconds
+		assertTrue(Duration.between(expiration, signingKeyExpiration).abs().getSeconds() <= 1);
+	}
+
+	@Test
+	public void shouldFailToSetExpiredSigningKey() throws Exception {
+		Instant created = Instant.now().minus(Duration.ofDays(365));
+		Instant evaluated = Instant.now().minus(Duration.ofDays(200));
+		File keyFile = createKeyFile(created, evaluated, Instant.now().minus(Duration.ofDays(100)));
+
+		SmtpMailer mailer = createMailer();
+		IllegalStateException e = assertThrows(IllegalStateException.class,
+				() -> mailer.setSigningKeyFileName(keyFile.getAbsolutePath(), "test".toCharArray()));
+		assertTrue(e.getMessage(), e.getMessage().contains("has expired"));
+		assertNull(mailer.getSigningKeyFingerprint());
+	}
+
+	private static File createKeyFile(Instant created, Instant evaluationTime, Instant expiration) throws Exception {
+		OpenPGPKey key = PGPainless
+				.getInstance()
+				.generateKey(OpenPGPKeyVersion.v4, Date.from(created))
+				.modernKeyRing("Test <test@example.com>", Passphrase.fromPassword("test"));
+		key = PGPainless
+				.getInstance()
+				.modify(key, Date.from(evaluationTime))
+				.setExpirationDate(Date.from(expiration),
+						SecretKeyRingProtector.unlockAnyKeyWith(Passphrase.fromPassword("test")))
+				.done();
+
+		File file = writeKey(key);
+		file.deleteOnExit();
+		return file;
+	}
+
+	private static File writeKey(OpenPGPKey key) throws IOException {
+		Path path = Files.createTempFile("signing-key", ".asc");
+		Files.writeString(path, key.toAsciiArmoredString());
+		return path.toFile();
 	}
 
 	@Ignore("Requires configured username and password")

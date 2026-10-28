@@ -32,6 +32,7 @@ import org.pgpainless.encryption_signing.EncryptionOptions;
 import org.pgpainless.encryption_signing.EncryptionStream;
 import org.pgpainless.encryption_signing.ProducerOptions;
 import org.pgpainless.encryption_signing.SigningOptions;
+import org.pgpainless.key.info.KeyRingInfo;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
 import org.pgpainless.util.Passphrase;
 import org.slf4j.Logger;
@@ -41,8 +42,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -222,8 +226,78 @@ public class SmtpMailer {
 			throw new RuntimeException(e);
 		}
 
+		validateSigningKey(signingKey, signingKeyFileName);
+
 		this.signingKey = signingKey;
 		this.signingKeyPassword = signingKeyPassword;
+	}
+
+	/**
+	 * PGPainless 2.x only accepts keys which currently have a validly bound (sub-)key with the signing key flag. If
+	 * this is not the case, signing would fail later on, so we refuse to use the key at all.
+	 *
+	 * @throws IllegalStateException if the key has no currently valid subkey with signing capability, e.g. because it
+	 *                               has expired
+	 */
+	private void validateSigningKey(OpenPGPKey signingKey, String signingKeyFileName) {
+		KeyRingInfo info = PGPainless.getInstance().inspect(signingKey);
+		if (!info.getSigningSubkeys().isEmpty())
+			return;
+
+		Date primaryKeyExpiration = info.getPrimaryKeyExpirationDate();
+		boolean expired = primaryKeyExpiration != null && primaryKeyExpiration.before(new Date());
+		throw new IllegalStateException(
+				"Signing key %s (fingerprint %s) has no currently valid subkey with signing capability! %s Primary key expiration: %s, validly bound: %s. Use a renewed export of the key.".formatted(
+						signingKeyFileName, signingKey.getFingerprint(),
+						expired ? "The key has expired." : "The key is not expired, check the signing key flag.",
+						primaryKeyExpiration == null ? "never" : primaryKeyExpiration.toInstant(),
+						info.isKeyValidlyBound(info.getKeyIdentifier())));
+	}
+
+	/**
+	 * Returns the fingerprint of the signing key, or null if no signing key is set
+	 *
+	 * @return the fingerprint of the signing key, or null if no signing key is set
+	 */
+	public String getSigningKeyFingerprint() {
+		return this.signingKey == null ? null : this.signingKey.getFingerprint().toString();
+	}
+
+	/**
+	 * Returns the point in time at which the signing key can no longer be used for signing, i.e. the latest expiration
+	 * of all currently valid signing subkeys.
+	 *
+	 * @return the expiration of the signing key, or empty if no signing key is set, the key has no valid signing subkey
+	 * 		or if the key never expires
+	 */
+	public Optional<Instant> getSigningKeyExpiration() {
+		if (this.signingKey == null)
+			return Optional.empty();
+
+		KeyRingInfo info = PGPainless.getInstance().inspect(this.signingKey);
+		Date primaryExpiration = info.getPrimaryKeyExpirationDate();
+		Instant latest = null;
+		for (OpenPGPCertificate.OpenPGPComponentKey subkey : info.getSigningSubkeys()) {
+
+			// a subkey is only usable as long as the primary key is, so the earlier expiration wins
+			Date subkeyExpiration = info.getSubkeyExpirationDate(subkey.getKeyIdentifier());
+			Date expiration;
+			if (subkeyExpiration == null)
+				expiration = primaryExpiration;
+			else if (primaryExpiration == null || subkeyExpiration.before(primaryExpiration))
+				expiration = subkeyExpiration;
+			else
+				expiration = primaryExpiration;
+
+			// a signing subkey which never expires
+			if (expiration == null)
+				return Optional.empty();
+
+			if (latest == null || expiration.toInstant().isAfter(latest))
+				latest = expiration.toInstant();
+		}
+
+		return Optional.ofNullable(latest);
 	}
 
 	private boolean canSign() {
@@ -587,7 +661,8 @@ public class SmtpMailer {
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to sign plain text!", e);
 		} finally {
-			this.lock.unlock();
+			if (this.lock.isHeldByCurrentThread())
+				this.lock.unlock();
 		}
 	}
 

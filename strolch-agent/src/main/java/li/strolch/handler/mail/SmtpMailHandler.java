@@ -28,9 +28,15 @@ import org.pgpainless.algorithm.DocumentSignatureType;
 
 import java.io.File;
 import java.text.Normalizer;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
@@ -51,10 +57,17 @@ public class SmtpMailHandler extends MailHandler {
 	public static final String ENCRYPTED_MAIL_TEXT
 			= "This is an encrypted mail. Please decrypt the attached file for details.";
 
+	/**
+	 * The number of months before the expiration of the signing key, from which on a warning is logged to the
+	 * {@link OperationsLog}
+	 */
+	public static final int SIGNING_KEY_EXPIRY_WARNING_MONTHS = 3;
+
 	private String realm;
 	private String host;
 	private boolean encryptionEnabled;
 	private boolean signingEnabled;
+	private ScheduledFuture<?> signingKeyCheckTask;
 
 	public SmtpMailHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -109,6 +122,75 @@ public class SmtpMailHandler extends MailHandler {
 		}
 
 		super.initialize(configuration);
+	}
+
+	@Override
+	public void start() throws Exception {
+		if (this.signingEnabled) {
+			// the OperationsLog might not yet be available, so check after a short delay and then daily
+			this.signingKeyCheckTask = getScheduledExecutor("Mail").scheduleWithFixedDelay(
+					this::validateSigningKeyExpiration, 1, TimeUnit.DAYS.toMinutes(1), TimeUnit.MINUTES);
+		}
+
+		super.start();
+	}
+
+	@Override
+	public void stop() throws Exception {
+		if (this.signingKeyCheckTask != null) {
+			this.signingKeyCheckTask.cancel(false);
+			this.signingKeyCheckTask = null;
+		}
+
+		super.stop();
+	}
+
+	/**
+	 * Validates that the signing key is not about to expire, i.e. within the next
+	 * {@link #SIGNING_KEY_EXPIRY_WARNING_MONTHS} months. If it is, then a {@link LogMessage} is added to the
+	 * {@link OperationsLog}, which in turn can notify by email, so that the key can be renewed in time. If the key has
+	 * already expired, then an error message is added.
+	 */
+	public void validateSigningKeyExpiration() {
+		if (!this.signingEnabled)
+			return;
+
+		try {
+			SmtpMailer mailer = getSmtpMailer();
+			Optional<Instant> expirationO = mailer.getSigningKeyExpiration();
+			if (expirationO.isEmpty())
+				return;
+
+			Instant expiration = expirationO.get();
+			ZonedDateTime now = ZonedDateTime.now();
+			if (expiration.isAfter(now.plusMonths(SIGNING_KEY_EXPIRY_WARNING_MONTHS).toInstant()))
+				return;
+
+			boolean expired = !expiration.isAfter(now.toInstant());
+			String expirationDate = expiration.atZone(ZoneId.systemDefault()).toLocalDate().toString();
+			String fingerprint = mailer.getSigningKeyFingerprint();
+			if (expired)
+				logger.error("The signing key {} has expired on {}! Signing of emails will fail!", fingerprint,
+						expirationDate);
+			else
+				logger.warn("The signing key {} will expire on {}, please renew it!", fingerprint, expirationDate);
+
+			if (hasComponent(OperationsLog.class))
+				addSigningKeyExpiryLogMessage(expired, fingerprint, expirationDate);
+		} catch (Throwable e) {
+			// never throw, as this would cancel the scheduled task
+			logger.error("Failed to validate expiration of signing key", e);
+		}
+	}
+
+	private void addSigningKeyExpiryLogMessage(boolean expired, String fingerprint, String expirationDate) {
+		LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
+				LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+				expired ? "mail.signingKeyExpired" : "mail.signingKeyExpiring")
+				.value("host", this.host)
+				.value("fingerprint", fingerprint)
+				.value("expiration", expirationDate);
+		getComponent(OperationsLog.class).addMessage(message, true);
 	}
 
 	protected SmtpMailer initializeSmtpMailer(ComponentConfiguration configuration) {
