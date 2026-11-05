@@ -37,8 +37,7 @@ import java.util.*;
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Stream.concat;
-import static li.strolch.privilege.base.PrivilegeConstants.LOCATION;
-import static li.strolch.privilege.base.PrivilegeConstants.PRIMARY_LOCATION;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForGroups;
 
 public class PrivilegeContextBuilder {
@@ -206,7 +205,7 @@ public class PrivilegeContextBuilder {
 
 	protected boolean handleDuplicateGroupProperty(String key, Group group) {
 		return switch (key) {
-			case LOCATION -> mergePropertyCommaSeparated(key, group);
+			case LOCATION, ORGANISATION -> mergePropertyCommaSeparated(key, group);
 			case PRIMARY_LOCATION -> removeProperty(key);
 			default -> false;
 		};
