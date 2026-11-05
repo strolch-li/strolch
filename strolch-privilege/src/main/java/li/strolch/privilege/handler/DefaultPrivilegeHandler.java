@@ -137,7 +137,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected ScheduledExecutorService executorService;
 	protected Future<?> persistSessionsTask;
 	protected Future<?> prunePersonalAccessTokenCacheTask;
-	private boolean verbose;
+	protected boolean verbose;
 
 	@Override
 	public SingleSignOnHandler getSsoHandler() {
