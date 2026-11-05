@@ -36,6 +36,7 @@ import java.util.*;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForGroups;
@@ -45,8 +46,10 @@ public class PrivilegeContextBuilder {
 
 	protected final Map<String, Class<PrivilegePolicy>> policyMap;
 	protected final DefaultPrivilegeHandler privilegeHandler;
+	protected final EncryptionHandler encryptionHandler;
 	protected final PrivilegeConflictResolution conflictResolution;
 	protected final PersistenceHandler persistenceHandler;
+	protected final boolean allowSessionRefresh;
 
 	protected Set<String> groups;
 	protected Set<String> rolesWithGroupRoles;
@@ -54,6 +57,8 @@ public class PrivilegeContextBuilder {
 
 	public PrivilegeContextBuilder(DefaultPrivilegeHandler privilegeHandler) {
 		this.privilegeHandler = privilegeHandler;
+		this.allowSessionRefresh = this.privilegeHandler.allowSessionRefresh;
+		this.encryptionHandler = this.privilegeHandler.getEncryptionHandler();
 		this.persistenceHandler = privilegeHandler.persistenceHandler;
 		this.policyMap = privilegeHandler.policyMap;
 		this.conflictResolution = privilegeHandler.privilegeConflictResolution;
@@ -61,10 +66,10 @@ public class PrivilegeContextBuilder {
 
 	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, String source, ZonedDateTime loginTime,
 			boolean keepAlive) {
-		String tokenValue = this.privilegeHandler.getEncryptionHandler().nextToken();
+		String tokenValue = this.encryptionHandler.nextToken();
 		String sessionId = UUID.randomUUID().toString();
-		PasswordCrypt authTokenCrypt = this.privilegeHandler.getEncryptionHandler()
-				.hashPassword(tokenValue.toCharArray(), this.privilegeHandler.getEncryptionHandler().nextSalt());
+		PasswordCrypt authTokenCrypt = this.encryptionHandler.hashPassword(tokenValue.toCharArray(),
+				this.encryptionHandler.nextSalt());
 		String authToken = sessionId + ":" + tokenValue;
 		return buildPrivilegeContext(usage, user, authTokenCrypt, authToken, sessionId, source, loginTime, keepAlive);
 	}
@@ -87,24 +92,26 @@ public class PrivilegeContextBuilder {
 			addPolicyForPrivilege(policies, privilege, privilegeName);
 		}
 
-		String tokenValue = this.privilegeHandler.getEncryptionHandler().nextToken();
+		String tokenValue = this.encryptionHandler.nextToken();
 		String sessionId = UUID.randomUUID().toString();
-		PasswordCrypt authTokenCrypt = this.privilegeHandler.getEncryptionHandler()
-				.hashPassword(tokenValue.toCharArray(), this.privilegeHandler.getEncryptionHandler().nextSalt());
+		PasswordCrypt authTokenCrypt = this.encryptionHandler.hashPassword(tokenValue.toCharArray(),
+				this.encryptionHandler.nextSalt());
 		String authToken = sessionId + ":" + tokenValue;
 
-		Certificate certificate = new Certificate(Usage.API, sessionId, user.getUserId(), user.getUsername(),
-				user.getFirstname(), user.getLastname(), user.getUserState(), authTokenCrypt, authToken, source, loginTime, false,
-				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
+		return createContext(Usage.API, user, authTokenCrypt, authToken, sessionId, source, loginTime, false,
+				privileges, policies);
+	}
 
-		return new PrivilegeContext(certificate, privileges, policies);
+	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, PasswordCrypt authTokenCrypt,
+			String sessionId, String source, ZonedDateTime loginTime, boolean keepAlive) {
+		return buildPrivilegeContext(usage, user, authTokenCrypt, null, sessionId, source, loginTime, keepAlive);
 	}
 
 	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, PasswordCrypt authTokenCrypt,
 			String authToken, String sessionId, String source, ZonedDateTime loginTime, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
-		keepAlive = keepAlive && this.privilegeHandler.allowSessionRefresh;
+		keepAlive = keepAlive && allowSessionRefresh;
 
 		prepare(user);
 
@@ -114,16 +121,22 @@ public class PrivilegeContextBuilder {
 		// cache the privileges and policies for this user by role
 		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, policies);
 
+		return createContext(usage, user, authTokenCrypt, authToken, sessionId, source, loginTime, keepAlive,
+				privileges, policies);
+	}
+
+	private PrivilegeContext createContext(Usage usage, User user, PasswordCrypt authTokenCrypt, String authToken,
+			String sessionId, String source, ZonedDateTime loginTime, boolean keepAlive,
+			Map<String, Privilege> privileges, Map<String, PrivilegePolicy> policies) {
+
 		Certificate certificate = new Certificate(usage, sessionId, user.getUserId(), user.getUsername(),
 				user.getFirstname(), user.getLastname(), user.getUserState(), authTokenCrypt, authToken, source,
 				loginTime, keepAlive, user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
 
+		if (this.privilegeHandler.verbose)
+			logger.info("Created PrivilegeContext for user {} with groups {} with roles {} with properties {}",
+					user.getUsername(), this.groups, this.rolesWithGroupRoles, this.properties);
 		return new PrivilegeContext(certificate, privileges, policies);
-	}
-
-	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, PasswordCrypt authTokenCrypt,
-			String sessionId, String source, ZonedDateTime loginTime, boolean keepAlive) {
-		return buildPrivilegeContext(usage, user, authTokenCrypt, null, sessionId, source, loginTime, keepAlive);
 	}
 
 	public UserPrivileges buildUserPrivilege(User user) {
@@ -185,15 +198,14 @@ public class PrivilegeContextBuilder {
 	protected void copyGroupProperties(User user, Set<Group> groups) {
 		for (Group group : groups) {
 			Map<String, String> groupProperties = group.getProperties();
-			for (String key : groupProperties.keySet()) {
+			for (Map.Entry<String, String> entry : groupProperties.entrySet()) {
+				String key = entry.getKey();
 
 				// we have special handling for certain duplicate group properties
-				if (this.properties.containsKey(key)) {
-					if (handleDuplicateGroupProperty(key, group))
-						continue;
-				}
+				if (this.properties.containsKey(key) && handleDuplicateGroupProperty(key, group))
+					continue;
 
-				String value = groupProperties.get(key);
+				String value = entry.getValue();
 				String replaced = this.properties.put(key, value);
 				if (replaced != null && !replaced.equals(value)) {
 					logger.error("Duplicate property {} for user {} from group {} replaced: {} with: {}", key,
@@ -220,7 +232,8 @@ public class PrivilegeContextBuilder {
 		String currentValue = this.properties.get(key);
 		String groupValue = group.getProperty(key);
 
-		if (!currentValue.contains(groupValue))
+		Set<String> values = Arrays.stream(currentValue.split(",")).map(String::trim).collect(toSet());
+		if (!values.contains(groupValue))
 			this.properties.put(key, currentValue + "," + groupValue);
 
 		return true;
