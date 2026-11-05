@@ -35,6 +35,7 @@ import java.util.*;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForGroups;
@@ -208,7 +209,8 @@ public class PrivilegeContextBuilder {
 		String currentValue = this.properties.get(key);
 		String groupValue = group.getProperty(key);
 
-		if (!currentValue.contains(groupValue))
+		Set<String> values = Arrays.stream(currentValue.split(",")).map(String::trim).collect(toSet());
+		if (!values.contains(groupValue))
 			this.properties.put(key, currentValue + "," + groupValue);
 
 		return true;
