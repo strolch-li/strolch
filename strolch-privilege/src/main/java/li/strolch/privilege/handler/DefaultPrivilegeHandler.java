@@ -704,12 +704,23 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User internalUser = this.persistenceHandler.getUser(user.getUsername());
 		if (internalUser == null) {
 
-			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
-			if (user.getUserId() == null)
-				user = user.withUserId(UUID.randomUUID().toString());
+			if (user.getUserId() != null)
+				internalUser = this.persistenceHandler.getUserById(user.getUserId());
 
-			history = history.withFirstLogin(ZonedDateTime.now());
-			this.persistenceHandler.addUser(user.withHistory(history));
+			if (internalUser == null) {
+				// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
+				if (user.getUserId() == null)
+					user = user.withUserId(UUID.randomUUID().toString());
+
+				history = history.withFirstLogin(ZonedDateTime.now());
+				this.persistenceHandler.addUser(user.withHistory(history));
+			} else {
+				user = copyCustomProperties(user, internalUser);
+
+				history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
+				this.persistenceHandler.removeUserById(user.getUserId());
+				this.persistenceHandler.addUser(user.withHistory(history));
+			}
 		} else {
 
 			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
@@ -721,13 +732,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user.withHistory(history));
 		}
-		persistModelAsync();
 
 		// initialize a new privilege context
 		Certificate certificate = buildPrivilegeContext(Usage.ANY, user, source, ZonedDateTime.now(),
 				keepAlive).getCertificate();
 
-		persistSessionsAsync();
+		if (this.persistSessions && !certificate.getUserState().isSystem()) {
+			persistSessionsAsync();
+		}
 
 		// log
 		logger.info("User {} authenticated with single sign on: {}", user.getUsername(), certificate);
