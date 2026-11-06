@@ -23,7 +23,6 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION_PERSIST;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 /**
@@ -49,14 +48,6 @@ public class ClearUserPasswordService extends AbstractService<PrivilegeUserIdArg
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 			UserRep userRep = privilegeHandler.setUserPasswordById(getCertificate(), arg.userId, null);
-
-			// only persist if not setting own password
-			if (!getCertificate().getUserId().equals(arg.userId) && getPrivilegeContext()
-					.getPrivilegeNames()
-					.contains(PRIVILEGE_ACTION_PERSIST)) {
-				if (privilegeHandler.isPersistOnUserDataChanged())
-					privilegeHandler.persist(getCertificate());
-			}
 
 			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, userRep.getUsername()));
 			tx.commitOnClose();

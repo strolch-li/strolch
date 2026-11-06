@@ -70,8 +70,6 @@ public class PrivilegeAddUserCommand extends Command {
 	public void doCommand() {
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
 		this.userOut = privilegeHandler.addUser(this.cert, this.userIn, null);
-		if (privilegeHandler.isPersistOnUserDataChanged())
-			privilegeHandler.persist(this.cert);
 		writeAudit();
 	}
 

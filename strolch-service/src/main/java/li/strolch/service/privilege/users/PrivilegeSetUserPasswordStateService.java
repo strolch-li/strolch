@@ -58,8 +58,6 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 			UserRep userRep = privilegeHandler.requirePasswordChangeById(getCertificate(), userId);
-			if (privilegeHandler.isPersistOnUserDataChanged())
-				privilegeHandler.persist(getCertificate());
 
 			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, userRep.getUsername()));
 			tx.commitOnClose();

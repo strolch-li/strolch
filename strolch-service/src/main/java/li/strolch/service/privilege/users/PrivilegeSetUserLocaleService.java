@@ -49,8 +49,6 @@ public class PrivilegeSetUserLocaleService
 		UserRep user;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_LOCALE)) {
 			user = privilegeHandler.setUserLocaleById(getCertificate(), arg.userId, arg.locale);
-			if (privilegeHandler.isPersistOnUserDataChanged())
-				privilegeHandler.persist(getCertificate());
 
 			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, user.getUsername()));
 			tx.commitOnClose();

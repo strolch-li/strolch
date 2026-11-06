@@ -48,8 +48,6 @@ public class PrivilegeUpdateUserService extends AbstractService<PrivilegeUserArg
 		UserRep user;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_MODIFY_USER)) {
 			user = privilegeHandler.updateUser(getCertificate(), arg.user, null);
-			if (privilegeHandler.isPersistOnUserDataChanged())
-				privilegeHandler.persist(getCertificate());
 
 			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, user.getUsername()));
 			tx.commitOnClose();

@@ -51,8 +51,6 @@ public class PrivilegeRemoveUserCommand extends Command {
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep userRep = privilegeHandler.removeUserById(tx().getCertificate(), this.userId);
-		if (privilegeHandler.isPersistOnUserDataChanged())
-			privilegeHandler.persist(tx().getCertificate());
 
 		getComponent(StrolchSessionHandler.class).refreshSessions();
 

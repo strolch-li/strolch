@@ -42,8 +42,6 @@ public class PrivilegeAddUserAndSetPasswordCommand extends PrivilegeAddUserComma
 	public void doCommand() {
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
 		this.userOut = privilegeHandler.addUser(this.cert, this.userIn, this.password);
-		if (privilegeHandler.isPersistOnUserDataChanged())
-			privilegeHandler.persist(this.cert);
 		writeAudit();
 	}
 }
