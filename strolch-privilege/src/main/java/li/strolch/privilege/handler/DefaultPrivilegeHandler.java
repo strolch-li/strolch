@@ -652,6 +652,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				// for remote, the user won't exist, if it is the user's first login
 				this.persistenceHandler.addUser(user.withHistory(history));
 			}
+			persistModelIfAutoPersistEnabled();
 
 			// return the certificate
 			return certificate;
@@ -705,12 +706,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 				history = history.withFirstLogin(ZonedDateTime.now());
 				this.persistenceHandler.addUser(user.withHistory(history));
+				persistModelIfAutoPersistEnabled();
 			} else {
 				user = copyCustomProperties(user, internalUser);
 
 				history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
 				this.persistenceHandler.removeUserById(user.getUserId());
+				persistModelIfAutoPersistEnabled();
 				this.persistenceHandler.addUser(user.withHistory(history));
+				persistModelIfAutoPersistEnabled();
 			}
 		} else {
 
@@ -722,6 +726,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user.withHistory(history));
+			persistModelIfAutoPersistEnabled();
 		}
 
 		// initialize a new privilege context
@@ -953,6 +958,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(user);
+			persistModelIfAutoPersistEnabled();
 
 			logger.info("Updated password for {}", user.getUsername());
 		}
@@ -1194,6 +1200,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void validatePassword(Locale locale, char[] password) throws PasswordStrengthException {
 		if (!this.passwordStrengthHandler.validateStrength(password))
 			throw new PasswordStrengthException(this.passwordStrengthHandler.getDescription(locale));
+	}
+
+	void persistModelIfAutoPersistEnabled() {
+		if (!this.autoPersistOnUserChangesData)
+			return;
+
+		try {
+			this.persistenceHandler.persist();
+		} catch (XMLStreamException | IOException e) {
+			throw new PrivilegeException("Failed to persist model after user data changed", e);
+		}
 	}
 
 	@Override
