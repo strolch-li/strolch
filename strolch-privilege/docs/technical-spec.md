@@ -115,13 +115,20 @@ The `PrivilegeHandler` is configured via a `PrivilegeConfig.xml` file or within 
 | Property | Description | Default |
 | --- | --- | --- |
 | `verbose` | Enables verbose logging. | `false` |
-| `autoPersistOnUserChangesData` | Automatically persists the model when a user changes their data. | `false` |
+| `autoPersistOnUserChangesData` | Synchronously persists successful privilege-model mutations and user data changes made during authentication. | `false` |
 | `persistSessions` | Enables persistence of active sessions across restarts. | `false` |
 | `persistSessionsPath` | Path to the file where sessions are persisted. | **Required if `persistSessions` is true** |
 | `allowSessionRefresh` | Allows refreshing an expired session. | `false` |
 | `allowPasswordReset` | Allows password resets via `UserChallengeHandler`. | `false` |
 | `disallowSourceChange` | Prevents a session from being used from a different IP/source. | `false` |
 | `privilegeConflictResolution` | Resolution strategy when multiple roles define the same privilege (`STRICT`, `MERGE`). | `MERGE` |
+
+When `autoPersistOnUserChangesData` is `true`, successful user, role, group, and personal access token CRUD operations are
+flushed before the operation returns. User login history and password-hash upgrades performed during authentication are
+also flushed. This behavior is independent of `persistSessions` and does not require the caller to have the explicit
+`Persist` privilege. Persistence failures are reported to the caller. When the setting is `false`, model changes remain
+dirty until explicitly persisted or flushed by another operation. `PerElementXmlPersistenceHandler` continues to write
+changes during its mutation methods; its explicit `persist()` remains a no-op.
 
 ### EncryptionHandler Properties
 Configure the `DefaultEncryptionHandler` for password and token hashing:
