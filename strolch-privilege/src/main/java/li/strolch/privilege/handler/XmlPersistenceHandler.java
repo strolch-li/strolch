@@ -549,7 +549,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * Writes the model to the XML files. Where the files are written to was defined in the {@link #initialize(Map)}
 	 */
 	@Override
-	public boolean persist() throws XMLStreamException, IOException {
+	public synchronized boolean persist() throws XMLStreamException, IOException {
 		long start = System.nanoTime();
 
 		boolean saved;
@@ -566,11 +566,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	private boolean writeSessionsFile() {
-		if (!this.persistSessions || !this.sessionsDirty)
-			return false;
-
 		List<CertificateStub> sessions;
 		synchronized (this.sessions) {
+			if (!this.persistSessions || !this.sessionsDirty)
+				return false;
 			sessions = new LinkedList<>(this.sessions.values());
 			this.sessionsDirty = false;
 		}
@@ -579,17 +578,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			writeAtomically(this.sessionsPath, tmpFile -> new CertificateStubsSaxWriter(sessions, tmpFile).write());
 			return true;
 		} catch (Exception e) {
-			this.sessionsDirty = true;
+			synchronized (this.sessions) {
+				this.sessionsDirty = true;
+			}
 			throw new PrivilegeException("Failed to write sessions file", e);
 		}
 	}
 
 	private boolean writeTokensFile() {
-		if (!this.tokensDirty)
-			return false;
-
 		List<PersonalAccessToken> tokens;
 		synchronized (this.tokens) {
+			if (!this.tokensDirty)
+				return false;
 			tokens = new LinkedList<>(this.tokens.values());
 			this.tokensDirty = false;
 		}
@@ -598,17 +598,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			writeAtomically(this.tokensPath, tmpFile -> new PrivilegeTokensSaxWriter(tokens, tmpFile).write());
 			return true;
 		} catch (Exception e) {
-			this.tokensDirty = true;
+			synchronized (this.tokens) {
+				this.tokensDirty = true;
+			}
 			throw new PrivilegeException("Failed to write tokens file", e);
 		}
 	}
 
 	private boolean writeRolesFile() {
-		if (!this.rolesDirty)
-			return false;
-
 		List<Role> roles;
 		synchronized (this.roles) {
+			if (!this.rolesDirty)
+				return false;
 			roles = new LinkedList<>(this.roles.values());
 			this.rolesDirty = false;
 		}
@@ -617,17 +618,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			writeAtomically(this.rolesPath, tmpFile -> new PrivilegeRolesSaxWriter(roles, tmpFile).write());
 			return true;
 		} catch (Exception e) {
-			this.rolesDirty = true;
+			synchronized (this.roles) {
+				this.rolesDirty = true;
+			}
 			throw new PrivilegeException("Failed to write roles file", e);
 		}
 	}
 
 	private boolean writeGroupsFile() {
-		if (!this.groupsDirty)
-			return false;
-
 		List<Group> groups;
 		synchronized (this.groups) {
+			if (!this.groupsDirty)
+				return false;
 			groups = new LinkedList<>(this.groups.values());
 			this.groupsDirty = false;
 		}
@@ -636,17 +638,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			writeAtomically(this.groupsPath, tmpFile -> new PrivilegeGroupsSaxWriter(groups, tmpFile).write());
 			return true;
 		} catch (Exception e) {
-			this.groupsDirty = true;
+			synchronized (this.groups) {
+				this.groupsDirty = true;
+			}
 			throw new PrivilegeException("Failed to write groups file", e);
 		}
 	}
 
 	private boolean writeUsersFile() {
-		if (!this.usersDirty)
-			return false;
-
 		List<User> users;
 		synchronized (this) {
+			if (!this.usersDirty)
+				return false;
 			users = getAllUsers();
 			this.usersDirty = false;
 		}
@@ -655,7 +658,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			writeAtomically(this.usersPath, tmpFile -> new PrivilegeUsersSaxWriter(users, tmpFile).write());
 			return true;
 		} catch (Exception e) {
-			this.usersDirty = true;
+			synchronized (this) {
+				this.usersDirty = true;
+			}
 			throw new PrivilegeException("Failed to write users file", e);
 		}
 	}
