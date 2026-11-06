@@ -235,6 +235,7 @@ public class PrivilegeCrudHandler {
 				validTo, null, privileges);
 
 		this.privilegeHandler.persistenceHandler.addAccessToken(pat);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		return tokenId + ":" + token;
 	}
@@ -253,6 +254,7 @@ public class PrivilegeCrudHandler {
 
 		this.privilegeHandler.persistenceHandler.removeAccessToken(tokenId);
 		this.privilegeHandler.personalAccessTokenCache.remove(tokenId);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 	}
 
 	public Map<String, String> getPolicyDefs(Certificate certificate) {
@@ -498,6 +500,7 @@ public class PrivilegeCrudHandler {
 
 			// delegate to persistence handler
 			this.persistenceHandler.addUser(newUser);
+			this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 			logger.info("Created new user {}", newUser.getUsername());
 
@@ -579,6 +582,7 @@ public class PrivilegeCrudHandler {
 			this.persistenceHandler.replaceUser(user);
 			this.privilegeHandler.updateExistingSessionsForUser(user, false);
 		}
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Created {} users", toCreate.size());
 		logger.info("Updated {} users", toUpdate.size());
@@ -731,6 +735,7 @@ public class PrivilegeCrudHandler {
 			// delegate to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
 			this.privilegeHandler.updateExistingSessionsForUser(newUser, true);
+			this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 			logger.info("Replaced user {}", newUser.getUsername());
 
@@ -777,6 +782,7 @@ public class PrivilegeCrudHandler {
 		// delegate user removal to persistence handler
 		this.privilegeHandler.invalidateSessionsFor(user);
 		this.persistenceHandler.removeUserById(user.getUserId());
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Removed user with ID {}", user.getUserId());
 		return user.asUserRep();
@@ -824,6 +830,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Set locale to {} for {}", locale, newUser.getUsername());
 		return newUser.asUserRep();
@@ -870,6 +877,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Requiring user {} to change their password on next login.", newUser.getUsername());
 		return newUser.asUserRep();
@@ -950,6 +958,7 @@ public class PrivilegeCrudHandler {
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD)
 			this.privilegeHandler.invalidate(certificate);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		if (password == null)
 			logger.info("Cleared password for {}", newUser.getUsername());
@@ -1000,6 +1009,7 @@ public class PrivilegeCrudHandler {
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 		this.privilegeHandler.invalidateSessionsFor(newUser);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Set state of user {} to {}", newUser.getUsername(), state);
 
@@ -1032,6 +1042,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.addRole(newRole);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Added new role {}", newRole.getName());
 
@@ -1071,6 +1082,7 @@ public class PrivilegeCrudHandler {
 
 		// update any existing certificates with new role
 		this.privilegeHandler.updateExistingSessionsWithNewRole(newRole);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Replaced role {}", newRole.getName());
 
@@ -1106,6 +1118,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate role removal to persistence handler
 		this.persistenceHandler.removeRole(roleName);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Removed role {}", roleName);
 		return existingRole.asRoleRep();
@@ -1132,6 +1145,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.addGroup(group);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Added new group {}", group.name());
 		return group;
@@ -1162,6 +1176,7 @@ public class PrivilegeCrudHandler {
 
 		// update any existing certificates with new group
 		this.privilegeHandler.updateExistingSessionsWithNewGroup(group);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Replaced group {}", group.name());
 		return group;
@@ -1196,6 +1211,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate group removal to persistence handler
 		this.persistenceHandler.removeGroup(groupName);
+		this.privilegeHandler.persistModelIfAutoPersistEnabled();
 
 		logger.info("Removed group {}", groupName);
 		return existingGroup;
