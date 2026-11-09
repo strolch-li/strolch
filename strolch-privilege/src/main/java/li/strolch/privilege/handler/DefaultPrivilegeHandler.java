@@ -708,25 +708,37 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				this.persistenceHandler.addUser(user.withHistory(history));
 				persistModelIfAutoPersistEnabled();
 			} else {
+				// User found by userId but not by username: SSO user changed their username.
+				// Remove the old user and add the updated one.
 				user = copyCustomProperties(user, internalUser);
 
 				history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
-				this.persistenceHandler.removeUserById(user.getUserId());
+				this.persistenceHandler.removeUserById(internalUser.getUserId());
 				persistModelIfAutoPersistEnabled();
 				this.persistenceHandler.addUser(user.withHistory(history));
 				persistModelIfAutoPersistEnabled();
 			}
 		} else {
+			// User found by username. Check if the userId has changed (username unchanged, but userId may differ).
+			if (user.getUserId() != null && !user.getUserId().equals(internalUser.getUserId())) {
+				// userId changed: remove old user and add the updated one
+				user = copyCustomProperties(user, internalUser);
+				history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
+				this.persistenceHandler.removeUserById(internalUser.getUserId());
+				persistModelIfAutoPersistEnabled();
+				this.persistenceHandler.addUser(user.withHistory(history));
+				persistModelIfAutoPersistEnabled();
+			} else {
+				// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
+				if (user.getUserId() == null)
+					user = user.withUserId(internalUser.getUserId());
 
-			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
-			if (user.getUserId() == null)
-				user = user.withUserId(internalUser.getUserId());
+				user = copyCustomProperties(user, internalUser);
 
-			user = copyCustomProperties(user, internalUser);
-
-			history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
-			this.persistenceHandler.replaceUser(user.withHistory(history));
-			persistModelIfAutoPersistEnabled();
+				history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
+				this.persistenceHandler.replaceUser(user.withHistory(history));
+				persistModelIfAutoPersistEnabled();
+			}
 		}
 
 		// initialize a new privilege context
