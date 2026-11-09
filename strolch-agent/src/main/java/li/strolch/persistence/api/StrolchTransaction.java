@@ -41,7 +41,9 @@ import li.strolch.utils.objectfilter.ObjectFilterStatistics;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -849,6 +851,27 @@ public interface StrolchTransaction extends AutoCloseable {
 	Stream<Resource> streamResources(String... types);
 
 	/**
+	 * Returns all current resources of the given type, excluding those marked for removal.
+	 *
+	 * <p>The result combines resources from the transaction's live stream and its cached
+	 * stream, deduplicating by resource ID. The returned list is ordered by resource ID.</p>
+	 *
+	 * @param type the resource type to query
+	 *
+	 * @return an unmodifiable list of resources of the given type
+	 */
+	default List<Resource> currentResources(String type) {
+		Map<String, Resource> resourcesById = new TreeMap<>();
+		streamResources(type)
+				.filter(resource -> !isRemoved(resource))
+				.forEach(resource -> resourcesById.put(resource.getId(), resource));
+		streamCachedResources(type)
+				.filter(resource -> !isRemoved(resource))
+				.forEach(resource -> resourcesById.put(resource.getId(), resource));
+		return List.copyOf(resourcesById.values());
+	}
+
+	/**
 	 * <p>Returns a stream of orders for the given types, if empty, streams all possible types</p>
 	 *
 	 * <i>Note:</i> This method does not stream over newly added or updated elements, only existing ones.
@@ -860,6 +883,27 @@ public interface StrolchTransaction extends AutoCloseable {
 	Stream<Order> streamOrders(String... types);
 
 	/**
+	 * Returns all current orders of the given type, excluding those marked for removal.
+	 *
+	 * <p>The result combines orders from the transaction's live stream and its cached
+	 * stream, deduplicating by order ID. The returned list is ordered by order ID.</p>
+	 *
+	 * @param type the order type to query
+	 *
+	 * @return an unmodifiable list of orders of the given type
+	 */
+	default List<Order> currentOrders(String type) {
+		Map<String, Order> ordersById = new TreeMap<>();
+		streamOrders(type)
+				.filter(order -> !isRemoved(order))
+				.forEach(order -> ordersById.put(order.getId(), order));
+		streamCachedOrders(type)
+				.filter(order -> !isRemoved(order))
+				.forEach(order -> ordersById.put(order.getId(), order));
+		return List.copyOf(ordersById.values());
+	}
+
+	/**
 	 * <p>Returns a stream of activities for the given types, if empty, streams all possible types</p>
 	 *
 	 * <i>Note:</i> This method does not stream over newly added or updated elements, only existing ones.
@@ -869,6 +913,27 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return a stream of activities
 	 */
 	Stream<Activity> streamActivities(String... types);
+
+	/**
+	 * Returns all current activities of the given type, excluding those marked for removal.
+	 *
+	 * <p>The result combines activities from the transaction's live stream and its cached
+	 * stream, deduplicating by activity ID. The returned list is ordered by activity ID.</p>
+	 *
+	 * @param type the activity type to query
+	 *
+	 * @return an unmodifiable list of activities of the given type
+	 */
+	default List<Activity> currentActivities(String type) {
+		Map<String, Activity> activitiesById = new TreeMap<>();
+		streamActivities(type)
+				.filter(activity -> !isRemoved(activity))
+				.forEach(activity -> activitiesById.put(activity.getId(), activity));
+		streamCachedActivities(type)
+				.filter(activity -> !isRemoved(activity))
+				.forEach(activity -> activitiesById.put(activity.getId(), activity));
+		return List.copyOf(activitiesById.values());
+	}
 
 	/**
 	 * <p>
