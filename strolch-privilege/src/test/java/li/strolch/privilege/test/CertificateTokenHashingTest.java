@@ -101,8 +101,9 @@ public class CertificateTokenHashingTest extends AbstractPrivilegeTest {
 		String sessionId = cert.getSessionId();
 		String tokenValue = authToken.substring(authToken.indexOf(':') + 1);
 
-		// Allow async session persistence to write to disk
-		Thread.sleep(1200L);
+		// Force synchronous session persistence instead of relying on async timer
+		this.privilegeHandler.persistSessions(cert, "test-source");
+		Thread.sleep(200L); // brief pause to ensure file I/O completes
 
 		File targetPath = new File("target", TARGET);
 		File sessionsFile = new File(targetPath, PARAM_SESSIONS_FILE_DEF);
