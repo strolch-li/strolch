@@ -6,6 +6,12 @@ Testing Strolch applications requires a specific approach to handle the in-memor
 
 The `RuntimeMock` class (from `li.strolch.testbase.runtime`) is the central tool for Strolch testing. It allows you to programmatically set up a Strolch environment.
 
+### Mocking Policy
+
+- Never use Java dynamic proxies in tests, and do not add Mockito or another mocking framework.
+- Tests that exercise Strolch APIs must use a real runtime and transactions from `RuntimeMock`.
+- If a component's behavior needs to be controlled, provide a concrete test component and configure it in the runtime instead of substituting a proxy or mock.
+
 ### Usage
 - **Initialization**: Typically done in a `@BeforeClass` method.
 - **Environment**: It creates a runtime directory in `target/` and copies configuration from a source directory (e.g., `src/test/resources/runtime`).
@@ -15,15 +21,19 @@ The `RuntimeMock` class (from `li.strolch.testbase.runtime`) is the central tool
 private static final String TARGET_PATH = "target/" + MyTest.class.getSimpleName();
 private static final String SOURCE_PATH = "src/test/resources/runtime";
 private static RuntimeMock runtimeMock;
+private static Certificate cert;
 
 @BeforeClass
 public static void beforeClass() {
 	runtimeMock = new RuntimeMock().mockRuntime(TARGET_PATH, SOURCE_PATH);
 	runtimeMock.startContainer();
+	cert = runtimeMock.loginTest();
 }
 
 @AfterClass
 public static void afterClass() {
+	if (cert != null)
+		runtimeMock.logout(cert);
 	if (runtimeMock != null)
 		runtimeMock.destroyRuntime();
 }
@@ -35,6 +45,20 @@ public static void afterClass() {
 - `getPrivilegeHandler()`: Access the `PrivilegeHandler` for authentication.
 - `loginAdmin()` / `loginTest()`: Quick authentication.
 - `openUserTx(certificate, readOnly)`: Open a transaction.
+
+Use the real transaction for resource changes and commit it explicitly:
+
+```java
+@Test
+public void shouldUpdateResource() {
+	try (StrolchTransaction tx = runtimeMock.openUserTx(cert, false)) {
+		Resource resource = tx.readLock(tx.getResourceBy(TYPE_PRODUCT, "Product001", true));
+		resource.setString(PARAM_DESCRIPTION, "Updated in this test");
+		tx.update(resource);
+		tx.commitOnClose();
+	}
+}
+```
 
 ---
 
