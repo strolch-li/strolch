@@ -42,6 +42,24 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 		this.elementMap = new ConcurrentHashMap<>();
 	}
 
+	/** Applies a prepared root without validation, version assignment, callbacks or DAO access. */
+	void publishRoot(String type, String id, T value, Map<String, T> preparedType) {
+		Map<String, T> byType = this.elementMap.get(type);
+		if (value == null) {
+			if (byType != null) byType.remove(id);
+		} else {
+			if (byType == null) {
+				byType = preparedType;
+				this.elementMap.put(type, byType);
+			}
+			byType.put(id, value);
+		}
+	}
+
+	void publishClear(String type) {
+		if (type == null) this.elementMap.clear(); else this.elementMap.remove(type);
+	}
+
 	@Override
 	public DataStoreMode getDataStoreMode() {
 		return DataStoreMode.TRANSIENT;

@@ -80,7 +80,12 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	protected void commit() throws Exception {
 		if (this.connection != null) {
 			this.connection.commit();
-			this.connection.close();
+			try {
+				this.connection.close();
+			} catch (Exception e) {
+				// A pool cleanup failure cannot turn an acknowledged database commit into rollback.
+				logger.error("Transaction committed but connection cleanup failed", e);
+			}
 		}
 	}
 

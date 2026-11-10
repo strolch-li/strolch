@@ -196,6 +196,8 @@ int stock = product.getInteger("stock");
 
 ### Transactional Data Access
 
+Transient and cached transactions keep `flush()` changes local and publish prepared roots after persistence commits. Business decisions use explicit refreshed `readLock()` dependencies; ordinary reads are not transaction snapshots. See [transaction publication and recovery](docs/TRANSACTION-PUBLICATION.md) and [benchmarks](strolch-jmh-benchmark/TRANSACTION-PUBLICATION.md).
+
 Interact with the data model using safe, auditable transactions:
 
 ```java

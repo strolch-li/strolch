@@ -5,3 +5,4 @@ target/
 *.iml
 data/
 jmh-result.json
+results/
