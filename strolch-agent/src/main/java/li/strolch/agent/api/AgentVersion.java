@@ -46,6 +46,10 @@ public class AgentVersion extends StrolchVersion {
 		return this.agentName;
 	}
 
+	public String getEnvironment() {
+		return this.environment;
+	}
+
 	public void setAgentName(String agentName) {
 		this.agentName = agentName;
 	}
