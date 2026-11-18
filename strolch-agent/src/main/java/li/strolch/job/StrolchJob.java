@@ -78,6 +78,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	private CronExpression cronExpression;
 
 	private String realmName;
+	private String sourceRealmName;
 
 	private long initialDelay;
 	private TimeUnit initialDelayTimeUnit;
@@ -174,6 +175,15 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 	public String getRealmName() {
 		return this.realmName;
+	}
+
+	public String getSourceRealmName() {
+		return this.sourceRealmName;
+	}
+
+	public StrolchJob setSourceRealmName(String sourceRealmName) {
+		this.sourceRealmName = sourceRealmName;
+		return this;
 	}
 
 	public long getInitialDelay() {
@@ -280,6 +290,12 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 */
 	protected StrolchTransaction openTx(Certificate cert, boolean readOnly) {
 		StrolchRealm realm = getContainer().getRealm(cert);
+		this.realmName = realm.getRealm();
+		return realm.openTx(cert, this.getClass(), readOnly);
+	}
+
+	protected StrolchTransaction openTx(String realmName, Certificate cert, boolean readOnly) {
+		StrolchRealm realm = getContainer().getRealm(realmName);
 		this.realmName = realm.getRealm();
 		return realm.openTx(cert, this.getClass(), readOnly);
 	}

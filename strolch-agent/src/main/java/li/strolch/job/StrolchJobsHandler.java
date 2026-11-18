@@ -83,7 +83,8 @@ public class StrolchJobsHandler extends StrolchComponent {
 		runAsAgent(ctx -> {
 			for (String realmName : realmNames) {
 				try (StrolchTransaction tx = openTx(ctx.getCertificate(), realmName, true)) {
-					tx.streamResources(TYPE_STROLCH_JOB).forEach(jobRes -> loadJob(jobs, jobRes, catchExceptions));
+					tx.streamResources(TYPE_STROLCH_JOB)
+							.forEach(jobRes -> loadJob(jobs, jobRes, realmName, catchExceptions));
 				}
 			}
 		});
@@ -115,7 +116,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 		jobs.add(reloadJobsJob);
 	}
 
-	private void loadJob(List<StrolchJob> jobs, Resource jobRes, boolean catchExceptions) {
+	void loadJob(List<StrolchJob> jobs, Resource jobRes, String sourceRealmName, boolean catchExceptions) {
 		try {
 			String className = jobRes.getParameter(PARAM_CLASS_NAME, true).getValue();
 			JobMode mode = JobMode.valueOf(jobRes.getParameter(PARAM_MODE, true).getValue());
@@ -136,7 +137,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 						className);
 				return;
 			}
-			job.setConfigureMethod(ConfigureMethod.Model).setMode(mode);
+			job.setConfigureMethod(ConfigureMethod.Model).setMode(mode).setSourceRealmName(sourceRealmName);
 
 			if (mode == JobMode.Manual) {
 				jobs.add(job);
