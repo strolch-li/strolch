@@ -116,7 +116,7 @@ public class SimulatedSmtpMailer extends SmtpMailer {
 			};
 
 			if (!debug) {
-				messageAsString = messageAsString.substring(0, 300);
+				messageAsString = messageAsString.substring(0, Math.min(messageAsString.length(), 300));
 			}
 			logger.info("""
 					Simulated sending of the following message:
