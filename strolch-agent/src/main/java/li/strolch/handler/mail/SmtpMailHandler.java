@@ -229,7 +229,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendEncryptedMail(String recipients, String subject, String text) {
-		if (!this.encryptionEnabled)
+		if (isNotSimulated() && !this.encryptionEnabled)
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 
@@ -253,7 +253,7 @@ public class SmtpMailHandler extends MailHandler {
 	@Override
 	public void sendEncryptedMailWithAttachment(String recipients, String subject, String text,
 			MailAttachment... attachments) {
-		if (!this.encryptionEnabled)
+		if (isNotSimulated() && !this.encryptionEnabled)
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 
@@ -279,7 +279,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendEncryptedMailAsync(String recipients, String subject, String text) {
-		if (!this.encryptionEnabled)
+		if (isNotSimulated() && !this.encryptionEnabled)
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 		getExecutorService("Mail").submit(() -> doSendEncryptedMail(recipients, subject, text));
@@ -334,7 +334,7 @@ public class SmtpMailHandler extends MailHandler {
 	@Override
 	public void sendEncryptedMailWithAttachmentAsync(String recipients, String subject, String text,
 			MailAttachment... attachments) {
-		if (!this.encryptionEnabled)
+		if (isNotSimulated() && !this.encryptionEnabled)
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 		ExecutorService svc = getExecutorService("Mail");

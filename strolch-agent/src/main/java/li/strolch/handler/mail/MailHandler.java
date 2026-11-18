@@ -28,8 +28,15 @@ import li.strolch.utils.MailAttachment;
  */
 public abstract class MailHandler extends StrolchComponent {
 
-	public MailHandler(ComponentContainer container, String componentName) {
+	protected MailHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+	}
+
+	public boolean isSimulated() {
+		return false;
+	}
+	public boolean isNotSimulated() {
+		return !isSimulated();
 	}
 
 	/**

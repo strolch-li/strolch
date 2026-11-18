@@ -28,6 +28,11 @@ public class SimulatedMailHandler extends SmtpMailHandler {
 	}
 
 	@Override
+	public boolean isSimulated() {
+		return true;
+	}
+
+	@Override
 	protected SimulatedSmtpMailer initializeSmtpMailer(ComponentConfiguration configuration) {
 		return SimulatedSmtpMailer.init(configuration.getAsProperties());
 	}
