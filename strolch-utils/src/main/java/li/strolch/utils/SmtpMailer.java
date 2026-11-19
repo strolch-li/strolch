@@ -43,11 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -91,6 +87,7 @@ public class SmtpMailer {
 	public static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
 	public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
 	public static final String PARAM_OVERRIDE_RECIPIENTS = "overrideRecipients";
+	public static final String INLINE_FILENAME_PREFIX = "inline; filename=\"";
 
 	private final Properties props;
 	private InternetAddress from;
@@ -104,6 +101,14 @@ public class SmtpMailer {
 	private static SmtpMailer instance;
 
 	private final ReentrantLock lock = new ReentrantLock();
+
+	public boolean isSimulated() {
+		return this instanceof SimulatedSmtpMailer;
+	}
+
+	public boolean isNotSimulated() {
+		return !(this instanceof SimulatedSmtpMailer);
+	}
 
 	/**
 	 * <p>
@@ -147,7 +152,7 @@ public class SmtpMailer {
 	 */
 	public static SmtpMailer getInstance() {
 		if (instance == null)
-			throw new RuntimeException("Instance not yet configured! Call init first!");
+			throw new IllegalStateException("Instance not yet configured! Call init first!");
 		return instance;
 	}
 
@@ -197,6 +202,7 @@ public class SmtpMailer {
 		DBC.PRE.assertNotEmpty("username must not be empty!", username);
 		DBC.PRE.assertNotNull("password must not be empty!", password);
 		this.authenticator = new Authenticator() {
+			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password);
 			}
@@ -260,7 +266,7 @@ public class SmtpMailer {
 	 * @return the fingerprint of the signing key, or null if no signing key is set
 	 */
 	public String getSigningKeyFingerprint() {
-		return this.signingKey == null ? null : this.signingKey.getFingerprint().toString();
+		return this.signingKey == null ? null : Arrays.toString(this.signingKey.getFingerprint());
 	}
 
 	/**
@@ -268,7 +274,7 @@ public class SmtpMailer {
 	 * of all currently valid signing subkeys.
 	 *
 	 * @return the expiration of the signing key, or empty if no signing key is set, the key has no valid signing subkey
-	 * 		or if the key never expires
+	 * or if the key never expires
 	 */
 	public Optional<Instant> getSigningKeyExpiration() {
 		if (this.signingKey == null)
@@ -302,6 +308,23 @@ public class SmtpMailer {
 
 	private boolean canSign() {
 		return this.signingKey != null;
+	}
+
+	private boolean hasEncryptionKeys() {
+		return canSign() && this.recipientCertificates != null && !this.recipientCertificates.isEmpty();
+	}
+
+	private boolean shouldEncrypt() {
+		if (hasEncryptionKeys())
+			return true;
+
+		if (isSimulated()) {
+			logger.warn("Encryption and signing are skipped for simulated email because the required keys are not configured.");
+			return false;
+		}
+
+		assertCanEncrypt();
+		return false;
 	}
 
 	private void assertCanEncrypt() {
@@ -405,6 +428,9 @@ public class SmtpMailer {
 
 			message.setContent(multipart);
 
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
@@ -438,7 +464,7 @@ public class SmtpMailer {
 			return;
 		}
 
-		assertCanEncrypt();
+		boolean encrypt = shouldEncrypt();
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
@@ -446,19 +472,21 @@ public class SmtpMailer {
 		try {
 			recipientAddresses = evaluateRecipients(subject, recipients);
 			message = prepareMimeMessage(subject, session);
-			attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
+			if (encrypt)
+				attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
+			else
+				attachUnencryptedMessage(message, mailText, secretText, encryptedTextFileName);
+		} catch (InterruptedException _) {
+			Thread.currentThread().interrupt();
+			logger.error("Interrupted while encrypting message. Cancelling sending of message.");
+			return;
 		} catch (Exception e) {
-			if (e instanceof InterruptedException) {
-				Thread.currentThread().interrupt();
-				logger.error("Interrupted while encrypting message. Cancelling sending of message.");
-				return;
-			}
-
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted email with subject {} to {}", subject, recipients);
+		logger.info("Sent {} email with subject {} to {}", encrypt ? "signed and encrypted" : "simulated unencrypted and unsigned",
+				subject, recipients);
 	}
 
 	public void sendEncryptedEmailWithAttachment(String recipients, String subject, String mailText, String secretText,
@@ -470,7 +498,7 @@ public class SmtpMailer {
 			return;
 		}
 
-		assertCanEncrypt();
+		boolean encrypt = shouldEncrypt();
 
 		Session session = Session.getInstance(this.props, this.authenticator);
 
@@ -479,11 +507,19 @@ public class SmtpMailer {
 		try {
 			recipientAddresses = evaluateRecipients(subject, recipients);
 			message = prepareMimeMessage(subject, session);
-			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText),
-					encryptedTextFileName);
+			Multipart multipart;
+			if (encrypt) {
+				multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText),
+						encryptedTextFileName);
 
-			for (MailAttachment attachment : attachments) {
-				attachEncryptedFile(attachment, multipart);
+				for (MailAttachment attachment : attachments) {
+					attachEncryptedFile(attachment, multipart);
+				}
+			} else {
+				multipart = attachUnencryptedMessage(message, mailText, secretText, encryptedTextFileName);
+				for (MailAttachment attachment : attachments) {
+					attachUnencryptedFile(attachment.attachment(), attachment.fileName(), attachment.type(), multipart);
+				}
 			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -494,7 +530,8 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted email with subject {} and {} to {}", subject, attachmentsSummary,
+		logger.info("Sent {} email with subject {} and {} to {}",
+				encrypt ? "signed and encrypted" : "simulated unencrypted and unsigned", subject, attachmentsSummary,
 				recipients);
 	}
 
@@ -518,12 +555,14 @@ public class SmtpMailer {
 		InternetAddress[] recipientAddresses;
 		if (this.overrideRecipients == null) {
 			recipientAddresses = parseAddress(recipients);
-			logger.info("Sending email with subject {} to recipients {}", subject,
-					addressesToString(recipientAddresses));
+			if (logger.isInfoEnabled())
+				logger.info("Sending email with subject {} to recipients {}", subject,
+						addressesToString(recipientAddresses));
 		} else {
 			recipientAddresses = this.overrideRecipients;
-			logger.info("Sending email with subject {} to override recipient {}", subject,
-					addressesToString(recipientAddresses));
+			if (logger.isInfoEnabled())
+				logger.info("Sending email with subject {} to override recipient {}", subject,
+						addressesToString(recipientAddresses));
 		}
 		return recipientAddresses;
 	}
@@ -555,7 +594,7 @@ public class SmtpMailer {
 		encryptedPart.setFileName(fileName);
 		encryptedPart.setContent(encryptedAndSignedMessage, "application/pgp-encrypted; name=\"" + fileName + "\"");
 		encryptedPart.setDescription(fileName);
-		encryptedPart.setDisposition("inline; filename=\"" + fileName + "\"");
+		encryptedPart.setDisposition(INLINE_FILENAME_PREFIX + fileName + "\"");
 
 		Multipart multiPart = new MimeMultipart();
 		multiPart.addBodyPart(textPart);
@@ -563,6 +602,28 @@ public class SmtpMailer {
 
 		message.setContent(multiPart);
 		return multiPart;
+	}
+
+	protected Multipart attachUnencryptedMessage(MimeMessage message, String mailText, String secretText,
+			String fileName) throws MessagingException {
+		MimeBodyPart textPart = new MimeBodyPart();
+		textPart.setText(mailText, UTF_8.name());
+
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(textPart);
+		attachUnencryptedFile(secretText, fileName, "text/plain", multipart);
+		message.setContent(multipart);
+		return multipart;
+	}
+
+	private void attachUnencryptedFile(String content, String fileName, String contentType, Multipart multipart)
+			throws MessagingException {
+		MimeBodyPart attachmentPart = new MimeBodyPart();
+		attachmentPart.setContent(content, contentType + "; name=\"" + fileName + "\"");
+		attachmentPart.setFileName(fileName);
+		attachmentPart.setDescription(fileName);
+		attachmentPart.setDisposition(INLINE_FILENAME_PREFIX + fileName + "\"");
+		multipart.addBodyPart(attachmentPart);
 	}
 
 	protected void attachEncryptedFile(MailAttachment attachment, Multipart multipart)
@@ -574,7 +635,7 @@ public class SmtpMailer {
 		attachmentPart.setContent(signAndEncrypt(attachment.attachment()),
 				"application/pgp-encrypted; name=\"" + fileName + ".asc\"");
 		attachmentPart.setDescription(fileName);
-		attachmentPart.setDisposition("inline; filename=\"" + fileName + ".asc\"");
+		attachmentPart.setDisposition(INLINE_FILENAME_PREFIX + fileName + ".asc\"");
 		multipart.addBodyPart(attachmentPart);
 	}
 
@@ -583,8 +644,10 @@ public class SmtpMailer {
 		for (MailAttachment attachment : attachments) {
 
 			if (attachment.encrypt()) {
-				assertCanEncrypt();
-				attachEncryptedFile(attachment, multipart);
+				if (shouldEncrypt())
+					attachEncryptedFile(attachment, multipart);
+				else
+					attachUnencryptedFile(attachment.attachment(), attachment.fileName(), attachment.type(), multipart);
 				continue;
 			}
 
@@ -600,7 +663,7 @@ public class SmtpMailer {
 			attachmentPart.setContent(content, attachment.type() + "; name=\"" + fileName + "\"");
 			attachmentPart.setFileName(fileName);
 			attachmentPart.setDescription(fileName);
-			attachmentPart.setDisposition("inline; filename=\"" + fileName + "\"");
+			attachmentPart.setDisposition(INLINE_FILENAME_PREFIX + fileName + "\"");
 
 			multipart.addBodyPart(attachmentPart);
 		}
@@ -646,17 +709,18 @@ public class SmtpMailer {
 					.overrideHashAlgorithm(HashAlgorithm.SHA256);
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
-			EncryptionStream encryptionStream = PGPainless
-					.getInstance()
-					.generateMessage()
-					.onOutputStream(signatureResult)
-					.withOptions(ProducerOptions.sign(signingOptions).setCleartextSigned().setVersion(""));
+			try (EncryptionStream encryptionStream = PGPainless
+						 .getInstance()
+						 .generateMessage()
+						 .onOutputStream(signatureResult)
+						 .withOptions(ProducerOptions.sign(signingOptions).setCleartextSigned().setVersion(""))) {
 
-			Streams.pipeAll(new ByteArrayInputStream(plainText.getBytes()), encryptionStream);
-			encryptionStream.close();
-
+				Streams.pipeAll(new ByteArrayInputStream(plainText.getBytes(UTF_8)), encryptionStream);
+			}
 			return signatureResult.toString(UTF_8);
+
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw new IllegalStateException("Interrupted while waiting to lock", e);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to sign plain text!", e);
@@ -677,19 +741,19 @@ public class SmtpMailer {
 				throw new IllegalStateException("Failed to acquired lock in 10s!");
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
-			EncryptionStream encryptionStream = PGPainless
-					.getInstance()
-					.generateMessage()
-					.onOutputStream(signatureResult)
-					.withOptions(ProducerOptions
-							.signAndEncrypt(getEncryptionOptions(), getSigningOptions())
-							.setAsciiArmor(true)
-							.setVersion(""));
+			try (EncryptionStream encryptionStream = PGPainless
+						 .getInstance()
+						 .generateMessage()
+						 .onOutputStream(signatureResult)
+						 .withOptions(ProducerOptions
+								 .signAndEncrypt(getEncryptionOptions(), getSigningOptions())
+								 .setAsciiArmor(true)
+								 .setVersion(""))) {
 
-			Streams.pipeAll(new ByteArrayInputStream(plainText.getBytes()), encryptionStream);
-			encryptionStream.close();
-
+				Streams.pipeAll(new ByteArrayInputStream(plainText.getBytes(UTF_8)), encryptionStream);
+			}
 			return signatureResult.toString(UTF_8);
+
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Exception e) {
@@ -701,7 +765,7 @@ public class SmtpMailer {
 		}
 	}
 
-	protected SigningOptions getSigningOptions() throws PGPException {
+	protected SigningOptions getSigningOptions() {
 		return SigningOptions
 				.get(PGPainless.getInstance())
 				.addInlineSignature(SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(this.signingKeyPassword)),

@@ -23,10 +23,14 @@ import org.junit.Test;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.DocumentSignatureType;
 import org.pgpainless.algorithm.OpenPGPKeyVersion;
+import org.pgpainless.decryption_verification.ConsumerOptions;
+import org.pgpainless.decryption_verification.DecryptionStream;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
 import org.pgpainless.util.Passphrase;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +40,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Properties;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.*;
 
 public class SmtpMailerTest {
@@ -79,25 +84,41 @@ public class SmtpMailerTest {
 	}
 
 	@Test
-	public void shouldSignCanonicalTextDocument() {
-		String plainText = "Hello world!\nThis is a signed text document.";
-		String signed = this.emailSender.sign(plainText, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
-		assertNotNull(signed);
-		assertTrue(signed.contains("-----BEGIN PGP SIGNED MESSAGE-----"));
-		assertTrue(signed.contains("-----BEGIN PGP SIGNATURE-----"));
-		assertTrue(signed.contains("-----END PGP SIGNATURE-----"));
-		assertTrue(signed.contains(plainText));
+	public void shouldSignCanonicalTextDocument() throws Exception {
+		assertSignedText("Hello world!\nThis is a signed text document. Grüße", DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
 	}
 
 	@Test
-	public void shouldSignBinaryDocument() {
-		String plainText = "Hello binary document!";
-		String signed = this.emailSender.sign(plainText, DocumentSignatureType.BINARY_DOCUMENT);
+	public void shouldSignBinaryDocument() throws Exception {
+		assertSignedText("Hello binary document! Grüße", DocumentSignatureType.BINARY_DOCUMENT);
+	}
+
+	private void assertSignedText(String plainText, DocumentSignatureType signatureType) throws Exception {
+		String signed = this.emailSender.sign(plainText, signatureType);
 		assertNotNull(signed);
 		assertTrue(signed.contains("-----BEGIN PGP SIGNED MESSAGE-----"));
 		assertTrue(signed.contains("-----BEGIN PGP SIGNATURE-----"));
 		assertTrue(signed.contains("-----END PGP SIGNATURE-----"));
 		assertTrue(signed.contains(plainText));
+
+		OpenPGPKey signingKey;
+		try (FileInputStream in = new FileInputStream(SIGNING_KEY_FILE_NAME)) {
+			signingKey = PGPainless.getInstance().readKey().parseKey(in);
+		}
+		assertNotNull(signingKey);
+		var signingCertificate = signingKey.toCertificate();
+		ConsumerOptions options = ConsumerOptions.get(PGPainless.getInstance()).addVerificationCert(signingCertificate);
+		DecryptionStream verificationStream = PGPainless
+				.getInstance()
+				.processMessage()
+				.onInputStream(new ByteArrayInputStream(signed.getBytes(UTF_8)))
+				.withOptions(options);
+		String verifiedText;
+		try (verificationStream) {
+			verifiedText = new String(verificationStream.readAllBytes(), UTF_8);
+		}
+		assertEquals(plainText, verifiedText);
+		assertTrue(verificationStream.getMetadata().isVerifiedSignedBy(signingCertificate));
 	}
 
 	@Test
