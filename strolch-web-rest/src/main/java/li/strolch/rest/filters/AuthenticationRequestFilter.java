@@ -46,6 +46,7 @@ import static jakarta.ws.rs.core.HttpHeaders.*;
 import static java.lang.String.join;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.*;
 import static org.glassfish.jersey.http.HttpHeaders.*;
 
@@ -336,8 +337,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			certificate = sessionHandler.authenticatePersonalAccessToken(pat, remoteIp);
 		} else {
 			logger.debug("Performing basic auth for user {}...", username);
-			certificate = sessionHandler.authenticate(username, password.toCharArray(), remoteIp, Usage.SINGLE,
-					false);
+			certificate = sessionHandler.authenticate(username, password.toCharArray(), remoteIp, Usage.SINGLE, false);
 		}
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
@@ -385,7 +385,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			String[] parts = token.split(":", 2);
 			if (isUuid(parts[0])) {
 				try {
-					logger.debug("Performing personal access token auth via bearer token...");
+					logger.info("Performing personal access token auth via bearer token...");
 					Certificate certificate = sessionHandler.authenticatePersonalAccessToken(token, remoteIp);
 					requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 					requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
@@ -411,10 +411,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 				String[] parts = sessionId.split(":", 2);
 				if (isUuid(parts[0])) {
 					try {
-						logger.debug("Performing personal access token auth via authorization header...");
+						logger.info("Performing personal access token auth via authorization header...");
 						certificate = sessionHandler.authenticatePersonalAccessToken(sessionId, remoteIp);
 					} catch (Exception patEx) {
-						logger.debug("Ignoring unknown session: {}", e.getMessage());
+						logger.error("Failed authenticating with PAT: {}", getRootCause(patEx).getMessage());
 						requestContext.abortWith(Response
 								.status(Response.Status.UNAUTHORIZED)
 								.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
@@ -423,7 +423,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 						return Optional.empty();
 					}
 				} else {
-					logger.debug("Ignoring unknown session: {}", e.getMessage());
+					logger.error("Ignoring invalid session with color: {}", getRootCause(e).getMessage());
 					requestContext.abortWith(Response
 							.status(Response.Status.UNAUTHORIZED)
 							.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
@@ -432,7 +432,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					return Optional.empty();
 				}
 			} else {
-				logger.debug("Ignoring unknown session: {}", e.getMessage());
+				logger.error("Ignoring unknown session: {}", getRootCause(e).getMessage());
 				requestContext.abortWith(Response
 						.status(Response.Status.UNAUTHORIZED)
 						.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
