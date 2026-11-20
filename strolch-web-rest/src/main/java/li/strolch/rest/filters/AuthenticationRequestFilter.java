@@ -385,12 +385,13 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			String[] parts = token.split(":", 2);
 			if (isUuid(parts[0])) {
 				try {
-					logger.info("Performing personal access token auth via bearer token...");
+					logger.debug("Performing personal access token auth via bearer token...");
 					Certificate certificate = sessionHandler.authenticatePersonalAccessToken(token, remoteIp);
 					requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 					requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
 					return Optional.ofNullable(certificate);
 				} catch (Exception e) {
+					logger.error("Ignoring invalid personal access token: {}", getRootCause(e).getMessage());
 					// Fall back to validateCertificate (e.g. cold session cache after restart)
 				}
 			}
@@ -423,7 +424,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 						return Optional.empty();
 					}
 				} else {
-					logger.error("Ignoring invalid session with color: {}", getRootCause(e).getMessage());
+					logger.error("Ignoring invalid session with colon: {}", getRootCause(e).getMessage());
 					requestContext.abortWith(Response
 							.status(Response.Status.UNAUTHORIZED)
 							.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
