@@ -247,6 +247,93 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
+	public void shouldReauthenticateAfterApiSessionIsInvalidated() {
+		login("admin", "admin".toCharArray());
+		Certificate cert = this.ctx.getCertificate();
+		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Invalidation Token", ZonedDateTime.now(),
+				ZonedDateTime.now().plusDays(1), null, null);
+
+		Certificate apiCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+		assertTrue(this.privilegeHandler.invalidate(apiCert));
+
+		Certificate reauthenticatedCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+		assertFalse(apiCert.getSessionId().equals(reauthenticatedCert.getSessionId()));
+		assertNotNull(this.privilegeHandler.validate(reauthenticatedCert));
+	}
+
+	@Test
+	public void shouldRefreshApiSessionActivityOnCachedTokenAuthentication() {
+		login("admin", "admin".toCharArray());
+		Certificate cert = this.ctx.getCertificate();
+		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Activity Token", ZonedDateTime.now(),
+				ZonedDateTime.now().plusDays(1), null, null);
+
+		Certificate apiCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+		ZonedDateTime oldLastAccess = ZonedDateTime.now().minusHours(1);
+		apiCert.setLastAccess(oldLastAccess);
+
+		assertSame(apiCert, this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test"));
+		assertTrue(apiCert.getLastAccess().isAfter(oldLastAccess));
+	}
+
+	@Test
+	public void shouldInvalidateOnlyTheMatchingApiSession() {
+		login("admin", "admin".toCharArray());
+		Certificate cert = this.ctx.getCertificate();
+		String firstToken = this.privilegeHandler.createPersonalAccessToken(cert, "First Token", ZonedDateTime.now(),
+				ZonedDateTime.now().plusDays(1), null, null);
+		String secondToken = this.privilegeHandler.createPersonalAccessToken(cert, "Second Token", ZonedDateTime.now(),
+				ZonedDateTime.now().plusDays(1), null, null);
+
+		Certificate firstApiCert = this.privilegeHandler.authenticatePersonalAccessToken(firstToken, "api-test");
+		Certificate secondApiCert = this.privilegeHandler.authenticatePersonalAccessToken(secondToken, "api-test");
+		assertTrue(this.privilegeHandler.invalidate(firstApiCert));
+
+		Certificate reauthenticatedFirst = this.privilegeHandler.authenticatePersonalAccessToken(firstToken, "api-test");
+		Certificate cachedSecond = this.privilegeHandler.authenticatePersonalAccessToken(secondToken, "api-test");
+		assertFalse(firstApiCert.getSessionId().equals(reauthenticatedFirst.getSessionId()));
+		assertEquals(secondApiCert.getSessionId(), cachedSecond.getSessionId());
+		assertNotNull(this.privilegeHandler.validate(reauthenticatedFirst));
+		assertNotNull(this.privilegeHandler.validate(cachedSecond));
+	}
+
+	@Test
+	public void shouldHandleConcurrentApiSessionInvalidationAndAuthentication() throws Exception {
+		login("admin", "admin".toCharArray());
+		Certificate cert = this.ctx.getCertificate();
+		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Concurrent Invalidation Token",
+				ZonedDateTime.now(), ZonedDateTime.now().plusDays(1), null, null);
+		Certificate apiCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+		CountDownLatch readyLatch = new CountDownLatch(2);
+		CountDownLatch startLatch = new CountDownLatch(1);
+		try {
+			Future<Certificate> authFuture = executor.submit(() -> {
+				readyLatch.countDown();
+				startLatch.await();
+				return this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+			});
+			Future<Boolean> invalidateFuture = executor.submit(() -> {
+				readyLatch.countDown();
+				startLatch.await();
+				return this.privilegeHandler.invalidate(apiCert);
+			});
+
+			assertTrue(readyLatch.await(5, TimeUnit.SECONDS));
+			startLatch.countDown();
+			assertTrue(invalidateFuture.get(5, TimeUnit.SECONDS));
+			assertNotNull(authFuture.get(5, TimeUnit.SECONDS));
+
+			Certificate reauthenticatedCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+			assertFalse(apiCert.getSessionId().equals(reauthenticatedCert.getSessionId()));
+			assertNotNull(this.privilegeHandler.validate(reauthenticatedCert));
+		} finally {
+			executor.shutdownNow();
+		}
+	}
+
+	@Test
 	public void shouldCreatePersonalAccessTokenForOtherUser() {
 		login("admin", "admin".toCharArray());
 		Certificate adminCert = this.ctx.getCertificate();

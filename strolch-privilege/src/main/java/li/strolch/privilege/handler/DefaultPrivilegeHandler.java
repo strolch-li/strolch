@@ -134,6 +134,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected ElementLockingHandler<String> lockingHandler;
 	protected Map<String, PersonalAccessTokenCacheEntry> personalAccessTokenCache;
 	protected Map<String, SessionCacheEntry> sessionCache;
+	private final Object sessionRegistrationLock = new Object();
 	protected ScheduledExecutorService executorService;
 	protected Future<?> persistSessionsTask;
 	protected Future<?> prunePersonalAccessTokenCacheTask;
@@ -525,15 +526,21 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				User user = this.persistenceHandler.getUser(pat.username());
 				if (user != null && user.getUserState() == UserState.ENABLED) {
 					if (cachedEntry.matches(tokenValue, pat.passwordCrypt().salt())) {
-						// Cache hit and valid
-						cachedEntry.lastAccess = System.currentTimeMillis();
-						return cachedEntry.context.getCertificate();
+						Certificate certificate = cachedEntry.context.getCertificate();
+						certificate.setLastAccess(ZonedDateTime.now());
+						synchronized (this.sessionRegistrationLock) {
+							boolean isRegistered = this.privilegeContextMap.get(certificate.getSessionId()) == cachedEntry.context;
+							if (this.personalAccessTokenCache.get(tokenId) == cachedEntry && isRegistered) {
+								cachedEntry.lastAccess = System.currentTimeMillis();
+								return certificate;
+							}
+						}
 					}
 				}
 			}
 
 			// Cache is invalid or expired
-			this.personalAccessTokenCache.remove(tokenId);
+			this.personalAccessTokenCache.remove(tokenId, cachedEntry);
 		}
 
 		// tokens are stored as hashed PasswordCrypt
@@ -575,9 +582,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// Build context
 		PrivilegeContext prvCtx = getPrivilegeContextBuilder().buildPrivilegeContext(updatedToken, user, source, now);
-		this.privilegeContextMap.put(prvCtx.getCertificate().getSessionId(), prvCtx);
-		this.personalAccessTokenCache.put(tokenId,
-				new PersonalAccessTokenCacheEntry(prvCtx, tokenValue, passwordCrypt.salt()));
+		PersonalAccessTokenCacheEntry cacheEntry = new PersonalAccessTokenCacheEntry(prvCtx, tokenValue,
+				passwordCrypt.salt());
+		synchronized (this.sessionRegistrationLock) {
+			this.privilegeContextMap.put(prvCtx.getCertificate().getSessionId(), prvCtx);
+			this.personalAccessTokenCache.put(tokenId, cacheEntry);
+		}
 
 		return prvCtx.getCertificate();
 	}
@@ -981,10 +991,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public boolean invalidate(Certificate certificate) {
 
-		// remove registration
-		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
-		if (this.sessionCache != null)
-			this.sessionCache.remove(certificate.getSessionId());
+		PrivilegeContext privilegeContext;
+		synchronized (this.sessionRegistrationLock) {
+			// remove registration and cache entries linked to this session
+			privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
+			if (this.sessionCache != null)
+				this.sessionCache.remove(certificate.getSessionId());
+			this.personalAccessTokenCache.entrySet().removeIf(entry -> entry
+					.getValue()
+					.context
+					.getCertificate()
+					.getSessionId()
+					.equals(certificate.getSessionId()));
+		}
 		if (privilegeContext == null)
 			return false;
 
@@ -1664,7 +1683,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected static class PersonalAccessTokenCacheEntry {
 		public final PrivilegeContext context;
 		public final byte[] fastHash;
-		public long lastAccess;
+		public volatile long lastAccess;
 
 		public PersonalAccessTokenCacheEntry(PrivilegeContext context, String tokenValue, byte[] salt) {
 			this.context = context;
