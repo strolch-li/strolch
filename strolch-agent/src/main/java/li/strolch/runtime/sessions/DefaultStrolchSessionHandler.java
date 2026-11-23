@@ -346,10 +346,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				}
 
 			} else {
-				if (timeOutTime.isAfter(certificate.getLastAccess())) {
-					logger.info("Session {} for user {} has expired, invalidating session...",
-							certificate.getSessionId(), certificate.getUsername());
-					sessionTimeout(certificate);
+				synchronized (certificate) {
+					if (timeOutTime.isAfter(certificate.getLastAccess())) {
+						logger.info("Session {} for user {} has expired, invalidating session...",
+								certificate.getSessionId(), certificate.getUsername());
+						sessionTimeout(certificate);
+					}
 				}
 			}
 		}
