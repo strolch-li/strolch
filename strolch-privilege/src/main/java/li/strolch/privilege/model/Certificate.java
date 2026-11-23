@@ -318,11 +318,11 @@ public final class Certificate implements Comparable<Certificate> {
 		return this.source;
 	}
 
-	public ZonedDateTime getLastAccess() {
+	public synchronized ZonedDateTime getLastAccess() {
 		return this.lastAccess;
 	}
 
-	public void setLastAccess(ZonedDateTime lastAccess) {
+	public synchronized void setLastAccess(ZonedDateTime lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 
