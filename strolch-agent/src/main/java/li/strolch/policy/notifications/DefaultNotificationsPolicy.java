@@ -20,6 +20,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -52,10 +53,13 @@ public class DefaultNotificationsPolicy extends NotificationsPolicy {
 	}
 
 	protected boolean isActive(Resource notification) {
-		return new DateRange()
-				.from(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_FROM), true)
-				.to(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_TO), true)
-				.contains(ZonedDateTime.now());
+		ZonedDateTime from = notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_FROM);
+		ZonedDateTime to = notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_TO);
+		if (to.getYear() < 2000)
+			to = ISO8601.YEAR_3000;
+		if (to.isBefore(from))
+			return false;
+		return new DateRange().from(from, true).to(to, true).contains(ZonedDateTime.now());
 	}
 
 	protected boolean isEnabled(Resource notification) {
