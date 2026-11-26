@@ -34,6 +34,22 @@ import static li.strolch.runtime.StrolchConstants.makeRealmKey;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class InternalStrolchRealm implements StrolchRealm {
+	private volatile TransactionMaps readOnlyTransactionMaps;
+	private final ModelPublication modelPublication = new ModelPublication();
+
+	public ModelPublication getModelPublication() { return this.modelPublication; }
+
+	public TransactionMaps getReadOnlyTransactionMaps() {
+		TransactionMaps maps = this.readOnlyTransactionMaps;
+		if (maps == null) {
+			synchronized (this) {
+				maps = this.readOnlyTransactionMaps;
+				if (maps == null) this.readOnlyTransactionMaps = maps = new TransactionMaps(this, true);
+			}
+		}
+		return maps;
+	}
+
 
 	public static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit";
 	public static final String PROP_TRY_LOCK_TIME = "tryLockTime";

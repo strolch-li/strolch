@@ -16,6 +16,9 @@
 
 package li.strolch.persistence.api;
 
+import li.strolch.agent.impl.TransactionMaps;
+import li.strolch.exception.StrolchElementNotFoundException;
+import java.util.concurrent.locks.Lock;
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.*;
 import li.strolch.exception.StrolchException;
@@ -72,6 +75,15 @@ import static li.strolch.utils.helper.StringHelper.*;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class AbstractTransaction implements StrolchTransaction {
+	private TransactionMaps privateMaps;
+
+	private TransactionMaps privateMaps() {
+		if (!TransactionMaps.supported(this.realm)) return null;
+		if (this.privateMaps == null) this.privateMaps = isReadOnly() ? this.realm.getReadOnlyTransactionMaps() :
+				new TransactionMaps(this.realm);
+		return this.privateMaps;
+	}
+
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractTransaction.class);
 
@@ -347,7 +359,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public boolean needsCommit() {
-		return (!this.objectFilter.isEmpty()) || !this.commands.isEmpty() || !this.flushedCommands.isEmpty();
+		return (!this.objectFilter.isEmpty()) || !this.commands.isEmpty() || !this.flushedCommands.isEmpty() ||
+				(this.privateMaps != null && this.privateMaps.hasChanges());
 	}
 
 	@Override
@@ -400,6 +413,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public <T extends StrolchRootElement> T readLock(T element, int retries) throws ElementLockingException {
+		this.realm.getModelPublication().assertAvailable();
 		if (hasLock(element))
 			return element;
 
@@ -489,7 +503,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ResourceMap getResourceMap() {
 		if (this.resourceMap == null) {
-			this.resourceMap = new AuditingResourceMap(this.realm.getResourceMap(), isReadOnly(),
+			this.resourceMap = new AuditingResourceMap(privateMaps() == null ? this.realm.getResourceMap() : privateMaps().resources(this), isReadOnly(),
 					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.resourceMap;
@@ -498,7 +512,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public OrderMap getOrderMap() {
 		if (this.orderMap == null) {
-			this.orderMap = new AuditingOrderMap(this.realm.getOrderMap(), isReadOnly(),
+			this.orderMap = new AuditingOrderMap(privateMaps() == null ? this.realm.getOrderMap() : privateMaps().orders(this), isReadOnly(),
 					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.orderMap;
@@ -507,7 +521,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ActivityMap getActivityMap() {
 		if (this.activityMap == null) {
-			this.activityMap = new AuditingActivityMap(this.realm.getActivityMap(), isReadOnly(),
+			this.activityMap = new AuditingActivityMap(privateMaps() == null ? this.realm.getActivityMap() : privateMaps().activities(this), isReadOnly(),
 					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.activityMap;
@@ -792,7 +806,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Stream<Resource> streamResources(String... types) {
-		return getResourceMap().stream(this, types).map(e -> {
+		if (this.objectFilter.isEmpty()) return getResourceMap().stream(this, types);
+		return getResourceMap().stream(this, types).filter(e -> getElementOperation(Tags.RESOURCE, e.getLocator()) != Operation.REMOVE).map(e -> {
 			// perhaps the element was changed before, so we check if it is in the filter first
 			Resource element = getElementFromFilter(Tags.RESOURCE, e.getLocator());
 			return element == null ? e : element;
@@ -801,7 +816,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Stream<Order> streamOrders(String... types) {
-		return getOrderMap().stream(this, types).map(e -> {
+		if (this.objectFilter.isEmpty()) return getOrderMap().stream(this, types);
+		return getOrderMap().stream(this, types).filter(e -> getElementOperation(Tags.ORDER, e.getLocator()) != Operation.REMOVE).map(e -> {
 			// perhaps the element was changed before, so we check if it is in the filter first
 			Order element = getElementFromFilter(Tags.ORDER, e.getLocator());
 			return element == null ? e : element;
@@ -810,7 +826,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Stream<Activity> streamActivities(String... types) {
-		return getActivityMap().stream(this, types).map(e -> {
+		if (this.objectFilter.isEmpty()) return getActivityMap().stream(this, types);
+		return getActivityMap().stream(this, types).filter(e -> getElementOperation(Tags.ACTIVITY, e.getLocator()) != Operation.REMOVE).map(e -> {
 			// perhaps the element was changed before, so we check if it is in the filter first
 			Activity element = getElementFromFilter(Tags.ACTIVITY, e.getLocator());
 			return element == null ? e : element;
@@ -880,7 +897,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized Order getOrderBy(String type, String id, boolean assertExists) throws StrolchException {
-		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(type, id));
+		this.realm.getModelPublication().assertAvailable();
+		Locator locator = Order.locatorFor(type, id);
+		Operation operation = getElementOperation(Tags.ORDER, locator);
+		if (operation == Operation.REMOVE) {
+			if (assertExists) throw new StrolchElementNotFoundException("Element removed in this transaction: " + type + "/" + id);
+			return null;
+		}
+		Order element = operation == Operation.GET ? null : getElementFromFilter(Tags.ORDER, locator);
 		if (element != null)
 			return element;
 
@@ -913,19 +937,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (refP.isEmpty())
 			return null;
 
-		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(refP.getUom(), refP.getValue()));
-		if (element != null)
-			return element;
-
-		element = getCachedOrder(refP.getUom(), refP.getValue());
-		if (element != null)
-			return element;
-
-		element = getOrderMap().getBy(this, refP, assertExists);
-		if (element != null)
-			this.orderCache.addElement(refP.getUom(), refP.getValue(), element);
-
-		return element;
+		return getOrderBy(refP.getUom(), refP.getValue(), assertExists);
 	}
 
 	@Override
@@ -994,7 +1006,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException {
-		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
+		this.realm.getModelPublication().assertAvailable();
+		Locator locator = Resource.locatorFor(type, id);
+		Operation operation = getElementOperation(Tags.RESOURCE, locator);
+		if (operation == Operation.REMOVE) {
+			if (assertExists) throw new StrolchElementNotFoundException("Element removed in this transaction: " + type + "/" + id);
+			return null;
+		}
+		Resource element = operation == Operation.GET ? null : getElementFromFilter(Tags.RESOURCE, locator);
 		if (element != null)
 			return element;
 
@@ -1027,19 +1046,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (refP.isEmpty())
 			return null;
 
-		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(refP.getUom(), refP.getValue()));
-		if (element != null)
-			return element;
-
-		element = getCachedResource(refP.getUom(), refP.getValue());
-		if (element != null)
-			return element;
-
-		element = getResourceMap().getBy(this, refP, assertExists);
-		if (element != null)
-			this.resourceCache.addElement(refP.getUom(), refP.getValue(), element);
-
-		return element;
+		return getResourceBy(refP.getUom(), refP.getValue(), assertExists);
 	}
 
 	@Override
@@ -1124,7 +1131,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException {
-		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
+		this.realm.getModelPublication().assertAvailable();
+		Locator locator = Activity.locatorFor(type, id);
+		Operation operation = getElementOperation(Tags.ACTIVITY, locator);
+		if (operation == Operation.REMOVE) {
+			if (assertExists) throw new StrolchElementNotFoundException("Element removed in this transaction: " + type + "/" + id);
+			return null;
+		}
+		Activity element = operation == Operation.GET ? null : getElementFromFilter(Tags.ACTIVITY, locator);
 		if (element != null)
 			return element;
 
@@ -1157,19 +1171,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (refP.isEmpty())
 			return null;
 
-		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(refP.getUom(), refP.getValue()));
-		if (element != null)
-			return element;
-
-		element = getCachedActivity(refP.getUom(), refP.getValue());
-		if (element != null)
-			return element;
-
-		element = getActivityMap().getBy(this, refP, assertExists);
-		if (element != null)
-			this.activityCache.addElement(refP.getUom(), refP.getValue(), element);
-
-		return element;
+		return getActivityBy(refP.getUom(), refP.getValue(), assertExists);
 	}
 
 	@Override
@@ -1286,78 +1288,54 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Stream<Resource> streamCachedResources(String... types) {
-		if (types.length == 0)
-			return this.resourceCache.values().stream();
-		if (types.length == 1) {
-			String type = types[0];
-			if (!this.resourceCache.containsMap(type))
-				return Stream.empty();
-			return new ArrayList<>(this.resourceCache.getMap(type).values()).stream();
-		}
-		return this.resourceCache.values().stream().filter(element -> {
-			String resType = element.getType();
-			for (String type : types) {
-				if (resType.equals(type))
-					return true;
-			}
-			return false;
-		});
+		this.realm.getModelPublication().assertAvailable();
+		Set<String> selected = new HashSet<>(Arrays.asList(types));
+		return this.resourceCache.values().stream()
+				.filter(e -> selected.isEmpty() || selected.contains(e.getType()))
+				.filter(e -> getElementOperation(Tags.RESOURCE, e.getLocator()) != Operation.REMOVE);
 	}
 
 	@Override
 	public Stream<Order> streamCachedOrders(String... types) {
-		if (types.length == 0)
-			return this.orderCache.values().stream();
-		if (types.length == 1) {
-			String type = types[0];
-			if (!this.orderCache.containsMap(type))
-				return Stream.empty();
-			return new ArrayList<>(this.orderCache.getMap(type).values()).stream();
-		}
-		return this.orderCache.values().stream().filter(element -> {
-			String resType = element.getType();
-			for (String type : types) {
-				if (resType.equals(type))
-					return true;
-			}
-			return false;
-		});
+		this.realm.getModelPublication().assertAvailable();
+		Set<String> selected = new HashSet<>(Arrays.asList(types));
+		return this.orderCache.values().stream()
+				.filter(e -> selected.isEmpty() || selected.contains(e.getType()))
+				.filter(e -> getElementOperation(Tags.ORDER, e.getLocator()) != Operation.REMOVE);
 	}
 
 	@Override
 	public Stream<Activity> streamCachedActivities(String... types) {
-		if (types.length == 0)
-			return this.activityCache.values().stream();
-		if (types.length == 1) {
-			String type = types[0];
-			if (!this.activityCache.containsMap(type))
-				return Stream.empty();
-			return new ArrayList<>(this.activityCache.getMap(type).values()).stream();
-		}
-		return this.activityCache.values().stream().filter(element -> {
-			String resType = element.getType();
-			for (String type : types) {
-				if (resType.equals(type))
-					return true;
-			}
-			return false;
-		});
+		this.realm.getModelPublication().assertAvailable();
+		Set<String> selected = new HashSet<>(Arrays.asList(types));
+		return this.activityCache.values().stream()
+				.filter(e -> selected.isEmpty() || selected.contains(e.getType()))
+				.filter(e -> getElementOperation(Tags.ACTIVITY, e.getLocator()) != Operation.REMOVE);
 	}
 
 	@Override
 	public boolean hasResource(String type, String id) {
+		Locator locator = Resource.locatorFor(type, id);
+		Operation operation = getElementOperation(Tags.RESOURCE, locator);
+		if (operation == Operation.REMOVE) return false;
 		boolean inFilter = hasElementInFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
 		return inFilter || getResourceMap().hasElement(this, type, id);
 	}
 
 	@Override
 	public boolean hasOrder(String type, String id) {
+		Locator locator = Order.locatorFor(type, id);
+		Operation operation = getElementOperation(Tags.ORDER, locator);
+		if (operation == Operation.REMOVE) return false;
 		boolean inFilter = hasElementInFilter(Tags.ORDER, Order.locatorFor(type, id));
 		return inFilter || getOrderMap().hasElement(this, type, id);
 	}
 
 	@Override
 	public boolean hasActivity(String type, String id) {
+		Locator locator = Activity.locatorFor(type, id);
+		Operation operation = getElementOperation(Tags.ACTIVITY, locator);
+		if (operation == Operation.REMOVE) return false;
 		boolean inFilter = hasElementInFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
 		return inFilter || getActivityMap().hasElement(this, type, id);
 	}
@@ -1741,6 +1719,19 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void reset() {
+		if (this.privateMaps != null && this.privateMaps.hasChanges()) {
+			TransactionState previous = this.txResult.getState();
+			try {
+				this.txResult.setState(TransactionState.ROLLING_BACK);
+				undoCommands();
+			} finally {
+				this.txResult.setState(previous);
+			}
+			this.privateMaps = null;
+			this.resourceMap = null;
+			this.orderMap = null;
+			this.activityMap = null;
+		}
 		clearCache();
 		if (this.commands != null)
 			this.commands.clear();
@@ -1748,76 +1739,77 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		logger.info("Cache, commands and changes have been cleared!");
 	}
 
+	private void executePendingCommands() {
+		int rounds = 0;
+		while (!this.objectFilter.isEmpty() || !this.commands.isEmpty()) {
+			if (++rounds > 10000) throw new IllegalStateException("Commands did not reach a stable change set");
+			addModelChangeCommands();
+			doCommands();
+		}
+	}
+
 	@Override
 	public void flush() {
 		try {
-			addModelChangeCommands();
-			doCommands();
-			writeChanges();
+			executePendingCommands();
 			clearCache();
 		} catch (Exception e) {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
-
-			String msg = "Strolch Transaction for realm {0} failed due to {1}";
-			msg = format(msg, getRealmName(), getExceptionMessage(e));
-			throw new StrolchTransactionException(msg, e);
+			throw new StrolchTransactionException("Local transaction flush failed for realm " + getRealmName(), e);
 		}
 	}
 
 	@Override
 	public void autoCloseableCommit() {
 		long start = System.nanoTime();
-
+		boolean commitAttempted = false;
+		boolean committed = false;
+		Lock persistenceLock = null;
 		try {
 			this.txResult.setState(TransactionState.COMMITTING);
-
-			addModelChangeCommands();
-			doCommands();
-
-			// do it twice, since some commands might generate new model changes
-			if (!this.objectFilter.isEmpty()) {
-				addModelChangeCommands();
-				doCommands();
+			executePendingCommands();
+			if (this.privateMaps != null && this.privateMaps.hasChanges()) {
+				persistenceLock = this.privateMaps.persistenceLock();
+				if (persistenceLock != null) persistenceLock.lock();
+				this.privateMaps.preparePersistence();
 			}
-
 			writeChanges();
 			long auditTrailDuration = writeAuditTrail();
+			commitAttempted = true;
 			commit();
-			long updateObserversDuration = updateObservers();
-
-			handleCommit(start, auditTrailDuration, updateObserversDuration);
+			committed = true;
 			this.txResult.setState(TransactionState.COMMITTED);
-
+			if (this.privateMaps != null) this.privateMaps.publish();
+			if (persistenceLock != null) {
+				persistenceLock.unlock();
+				persistenceLock = null;
+			}
+			long observerDuration = updateObservers();
+			handleCommit(start, auditTrailDuration, observerDuration);
 		} catch (Exception e) {
-			this.txResult.setState(TransactionState.ROLLING_BACK);
-
-			try {
-				undoCommands();
-			} catch (Exception ex) {
-				logger.error("Failed to commit transaction and then undo commands due to {}", ex.getMessage(), ex);
-				try {
-					rollback();
-					handleRollback(start);
-				} catch (Exception exc) {
-					logger.error("Failed to roll back after failing to undo commands: {}", exc.getMessage(), exc);
-				}
-				logger.error("Transaction failed due to {}", e.getMessage(), e);
-				handleFailure(false, start, ex);
-			}
-
-			try {
-				rollback();
-				handleRollback(start);
-			} catch (Exception ex) {
-				logger.error("Transaction failed due to {}", e.getMessage(), e);
-				logger.error("Failed to commit transaction and then rollback due to {}", ex.getMessage(), ex);
-				handleFailure(false, start, e);
-			}
-
-			this.txResult.setState(TransactionState.FAILED);
-
-			handleFailure(true, start, e);
+			handleCommitFailure(start, commitAttempted, committed, e);
+		} finally {
+			if (persistenceLock != null) persistenceLock.unlock();
 		}
+	}
+
+	private void handleCommitFailure(long start, boolean commitAttempted, boolean committed, Exception e) {
+		if (committed) {
+			// The durable commit is complete. Never compensate model changes or call DB rollback here.
+			throw new StrolchPostCommitException("Transaction committed; post-commit processing failed for realm " + getRealmName(), e);
+		}
+		if (commitAttempted) {
+			this.txResult.setState(TransactionState.UNKNOWN);
+			this.realm.getModelPublication().fail(e);
+			try { rollback(); } catch (Exception cleanup) { e.addSuppressed(cleanup); }
+			this.txResult.setState(TransactionState.UNKNOWN);
+			throw new StrolchCommitOutcomeUnknownException("Commit outcome unknown; realm requires recovery: " + getRealmName(), e);
+		}
+		this.txResult.setState(TransactionState.ROLLING_BACK);
+		try { undoCommands(); } catch (Exception undo) { e.addSuppressed(undo); }
+		try { rollback(); } catch (Exception cleanup) { e.addSuppressed(cleanup); }
+		this.txResult.setState(TransactionState.FAILED);
+		handleFailure(true, start, e);
 	}
 
 	@Override
@@ -1850,7 +1842,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 					throw new IllegalStateException(msg);
 				}
 
-				if (!this.objectFilter.isEmpty()) {
+				if (!this.objectFilter.isEmpty() || (this.privateMaps != null && this.privateMaps.hasChanges())) {
 					autoCloseableRollback();
 					String msg
 							= "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
