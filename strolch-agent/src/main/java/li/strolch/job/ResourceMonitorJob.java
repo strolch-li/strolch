@@ -24,17 +24,15 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
-import li.strolch.agent.api.AgentVersion;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.agent.api.StrolchVersion;
-import li.strolch.agent.api.VersionQueryResult;
+import li.strolch.agent.api.*;
 import li.strolch.handler.mail.MailHandler;
 import li.strolch.handler.mail.SimulatedMailHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.job.ResourceMonitorSampler.Snapshot;
+import li.strolch.job.ResourceMonitorStateStore.Decision;
 import li.strolch.job.ResourceMonitorStateStore.EventType;
 import li.strolch.job.ResourceMonitorStateStore.PendingNotification;
+import li.strolch.job.ResourceMonitorStateStore.Update;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.log.LogMessage;
@@ -46,6 +44,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.MailAttachment;
 import li.strolch.utils.helper.SystemHelper;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +55,10 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+import static java.text.MessageFormat.format;
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
+import static li.strolch.job.ResourceMonitorStateStore.generateReport;
+import static li.strolch.job.ResourceMonitorStateStore.lockFor;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.runtime.StrolchConstants.TYPE_STROLCH_JOB;
@@ -80,15 +83,14 @@ public class ResourceMonitorJob extends StrolchJob {
 		Configuration configuration = readConfiguration(ctx.certificate());
 		String realmName = getSourceRealmName();
 		StrolchRealm realm = getAgent().getRealm(realmName);
-		synchronized (ResourceMonitorStateStore.lockFor(realmName, getId(), configuration.monitorId())) {
+		synchronized (lockFor(realmName, getId(), configuration.monitorId())) {
 			Snapshot snapshot = this.sampler.sample(configuration);
 			ResourceMonitorStateStore store = new ResourceMonitorStateStore();
-			ResourceMonitorStateStore.Update update = store.recordSample(realm, ctx.certificate(), getId(),
-					configuration, snapshot);
+			Update update = store.recordSample(realm, ctx.certificate(), getId(), configuration, snapshot);
 			if (configuration.verbose()) {
 				logger.info("Resource monitor {} in realm {} sampled at {} in {} mode", configuration.monitorId(),
 						realmName, snapshot.sampledAt(), configuration.notificationMode());
-				for (ResourceMonitorStateStore.Decision decision : update.decisions()) {
+				for (Decision decision : update.decisions()) {
 					String value = decision.value() == null ? "unavailable" : decision.value() + "%";
 					logger.info("Resource monitor {} metric {}: status={}, value={}, threshold={}%; inputs={}; {}",
 							configuration.monitorId(), decision.metricKey(), decision.status(), value,
@@ -131,33 +133,19 @@ public class ResourceMonitorJob extends StrolchJob {
 		}
 	}
 
-	private static String sourceValues(ResourceMonitorStateStore.Decision decision) {
+	private static String sourceValues(Decision decision) {
 		String key = decision.metricKey();
 		if ("systemCpu".equals(key) || "processCpu".equals(key))
 			return "sourceRatio=" + (decision.sourceRatio() == null ? "unavailable" : decision.sourceRatio());
 		if (key.startsWith("disk:"))
-			return "usedBytes="
-					+ number(decision.usedBytes())
-					+ ", freeBytes="
-					+ number(decision.freeBytes())
-					+ ", totalBytes="
-					+ number(decision.totalBytes())
-					+ ", usableBytes="
-					+ number(decision.usableBytes());
+			return format("usedBytes={0}, freeBytes={1}, totalBytes={2}, usableBytes={3}", number(decision.usedBytes()),
+					number(decision.freeBytes()), number(decision.totalBytes()), number(decision.usableBytes()));
 		if ("systemMemory".equals(key))
-			return "usedBytes="
-					+ number(decision.usedBytes())
-					+ ", freeBytes="
-					+ number(decision.freeBytes())
-					+ ", totalBytes="
-					+ number(decision.totalBytes());
+			return format("usedBytes={0}, freeBytes={1}, totalBytes={2}", number(decision.usedBytes()),
+					number(decision.freeBytes()), number(decision.totalBytes()));
 		if ("jvmHeap".equals(key))
-			return "usedBytes="
-					+ number(decision.usedBytes())
-					+ ", freeBytes="
-					+ number(decision.freeBytes())
-					+ ", maxBytes="
-					+ number(decision.totalBytes());
+			return format("usedBytes={0}, freeBytes={1}, maxBytes={2}", number(decision.usedBytes()),
+					number(decision.freeBytes()), number(decision.totalBytes()));
 		return "unavailable";
 	}
 
@@ -170,33 +158,40 @@ public class ResourceMonitorJob extends StrolchJob {
 			throw new InterruptedException("Resource monitor delivery interrupted");
 
 		String recipients = validateRecipients(configuration.recipients());
-		MailHandler mail = getContainer().getComponent(MailHandler.class);
+		MailHandler mail = getComponent(MailHandler.class);
 		if (!(mail instanceof SimulatedMailHandler) && (!mail.isEncryptionEnabled() || !mail.isSigningEnabled()))
 			throw new IllegalStateException("Resource monitor requires mail encryption and signing");
 
-		boolean warning = pending.events().stream().anyMatch(event -> event.type() != EventType.RECOVERY) || pending
+		getComponent(OperationsLog.class).addMessage(createLogMessage(isWarning(pending)));
+
+		JsonObject report = generateReport(getSourceRealmName(), getId(), configuration.monitorId(), pending);
+		report.add("operatingSystem", operatingSystemMetadata());
+		report.add("jdk", jdkMetadata());
+		addApplicationMetadata(report);
+
+		mail.sendEncryptedMailWithAttachment(recipients, "Resource monitor report",
+				"A resource monitor report is attached.",
+				new MailAttachment(report.toString(), "resource-monitor_" + getUniqueId() + ".json", "application/json",
+						true, true));
+
+		if (Thread.currentThread().isInterrupted())
+			throw new InterruptedException("Resource monitor delivery interrupted");
+	}
+
+	@NotNull
+	private LogMessage createLogMessage(boolean warning) {
+		return new LogMessage(getSourceRealmName(), SYSTEM_USER_AGENT,
+				Locator.valueOf(AGENT, ResourceMonitorJob.class.getSimpleName(), getId()),
+				warning ? LogSeverity.Warning : LogSeverity.Info, LogMessageState.Information,
+				ResourceBundle.getBundle("strolch-agent"), "job.resourceMonitor.report");
+	}
+
+	private static boolean isWarning(PendingNotification pending) {
+		return pending.events().stream().anyMatch(event -> event.type() != EventType.RECOVERY) || pending
 				.snapshot()
 				.metrics()
 				.stream()
 				.anyMatch(metric -> metric.status() == ResourceMonitorSampler.Status.BREACHED);
-		getContainer()
-				.getComponent(OperationsLog.class)
-				.addMessage(new LogMessage(getSourceRealmName(), SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, ResourceMonitorJob.class.getSimpleName(), getId()),
-						warning ? LogSeverity.Warning : LogSeverity.Info, LogMessageState.Information,
-						ResourceBundle.getBundle("strolch-agent"), "job.resourceMonitor.report"));
-
-		JsonObject report = ResourceMonitorStateStore.report(getSourceRealmName(), getId(), configuration.monitorId(),
-				pending);
-		report.add("operatingSystem", operatingSystemMetadata());
-		report.add("jdk", jdkMetadata());
-		addApplicationMetadata(report);
-		String json = report.toString();
-		mail.sendEncryptedMailWithAttachment(recipients, "Resource monitor report",
-				"A resource monitor report is attached.",
-				new MailAttachment(json, "resource-monitor.json", "application/json", true, true));
-		if (Thread.currentThread().isInterrupted())
-			throw new InterruptedException("Resource monitor delivery interrupted");
 	}
 
 	private static JsonObject operatingSystemMetadata() {
@@ -267,10 +262,10 @@ public class ResourceMonitorJob extends StrolchJob {
 	}
 
 	record Configuration(String monitorId, NotificationMode notificationMode, List<String> recipients,
-			Duration reminderInterval, double diskThresholdPercent,
-			Map<String, Double> diskThresholdOverrides, double systemMemoryThresholdPercent,
-			double systemCpuThresholdPercent, double jvmHeapThresholdPercent,
-			double processCpuThresholdPercent, boolean verbose) {
+						 Duration reminderInterval, double diskThresholdPercent,
+						 Map<String, Double> diskThresholdOverrides, double systemMemoryThresholdPercent,
+						 double systemCpuThresholdPercent, double jvmHeapThresholdPercent,
+						 double processCpuThresholdPercent, boolean verbose) {
 
 		Configuration(String monitorId, NotificationMode notificationMode, List<String> recipients,
 				Duration reminderInterval, double diskThresholdPercent, Map<String, Double> diskThresholdOverrides,

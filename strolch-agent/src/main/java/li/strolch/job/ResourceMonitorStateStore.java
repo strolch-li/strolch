@@ -16,11 +16,7 @@
 
 package li.strolch.job;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.job.ResourceMonitorJob.Configuration;
 import li.strolch.job.ResourceMonitorJob.NotificationMode;
@@ -34,12 +30,7 @@ import li.strolch.privilege.model.Certificate;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 final class ResourceMonitorStateStore {
@@ -51,7 +42,7 @@ final class ResourceMonitorStateStore {
 
 	static Object lockFor(String realmName, String jobId, String monitorId) {
 		String key = realmName + "\u0000" + jobId + "\u0000" + monitorId;
-		return EXECUTION_LOCKS.computeIfAbsent(key, ignored -> new Object());
+		return EXECUTION_LOCKS.computeIfAbsent(key, _ -> new Object());
 	}
 
 	Update recordSample(StrolchRealm realm, Certificate certificate, String jobId, Configuration configuration,
@@ -272,7 +263,8 @@ final class ResourceMonitorStateStore {
 		return json;
 	}
 
-	static JsonObject report(String realmName, String jobId, String monitorId, PendingNotification notification) {
+	static JsonObject generateReport(String realmName, String jobId, String monitorId,
+			PendingNotification notification) {
 		JsonObject pending = encodePending(notification);
 		JsonObject snapshot = pending.getAsJsonObject("snapshot");
 		JsonObject report = new JsonObject();
@@ -375,11 +367,11 @@ final class ResourceMonitorStateStore {
 	}
 
 	record Update(List<Event> events, List<PendingNotification> pending, List<Decision> decisions,
-			String createdNotificationId) {
+				  String createdNotificationId) {
 	}
 
 	record Decision(String metricKey, Status status, Double value, double threshold, Long totalBytes, Long freeBytes,
-			Long usableBytes, Long usedBytes, Double sourceRatio, DecisionReason reason) {
+					Long usableBytes, Long usedBytes, Double sourceRatio, DecisionReason reason) {
 	}
 
 	private record Evaluation(List<Event> events, List<Decision> decisions) {
