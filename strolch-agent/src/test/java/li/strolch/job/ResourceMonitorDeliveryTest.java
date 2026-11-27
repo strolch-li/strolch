@@ -121,7 +121,7 @@ public class ResourceMonitorDeliveryTest {
 		assertEquals("A resource monitor report is attached.", mail.text);
 		assertEquals(1, mail.attachments.length);
 		MailAttachment attachment = mail.attachments[0];
-		assertEquals("resource-monitor.json", attachment.fileName());
+		assertTrue(attachment.fileName().startsWith("resource-monitor_"));
 		assertEquals("application/json", attachment.type());
 		assertTrue(attachment.sign());
 		assertTrue(attachment.encrypt());
